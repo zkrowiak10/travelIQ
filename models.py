@@ -32,4 +32,9 @@ class Trip(db.Model):
         return "Vacation to {} from {} to {}".format(self.name, self.start_date, self.end_date)
 
 
-
+class Hotel_Reservation(db.Model):
+    id  = db.Column(db.Integer, primary_key=True)
+    trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    trip = db.Relationship('Trip', backref='hotel_reservation')
+    user = db.Relationship('User', backref='hotel_reservation')
