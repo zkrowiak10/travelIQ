@@ -1,6 +1,8 @@
 FROM python
 RUN pip install flask
 RUN pip install flask_sqlalchemy
-COPY ./ /dataVol
-EXPOSE 80
-CMD  cd dataVol/ && ls && source run.sh
+RUN pip install flask_migrate
+ENV FLASK_APP=travel_app
+ENV FLASK_ENV=development
+WORKDIR  /dataVol/
+CMD bash
