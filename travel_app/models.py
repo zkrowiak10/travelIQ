@@ -4,9 +4,9 @@ db = SQLAlchemy()
 
 class User (db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.Sting(120), unique=True, nullable=False)
+    username = db.Column(db.String(120), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    trips = db.Relationship('Trip', backref='user')
+    trips = db.relationship('Trip', backref='user')
 
 
 #Stores container schema for all trip categories. 
@@ -17,7 +17,7 @@ class Trip(db.Model):
     name = db.Column(db.String(120), unique=True, nullable=False)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
-    user = db.Relationship('User')
+    user = db.relationship('User')
 
     def __init__(self, user, name, start_date, end_date):
         if start_date > end_date:
@@ -36,5 +36,5 @@ class Hotel_Reservation(db.Model):
     id  = db.Column(db.Integer, primary_key=True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    trip = db.Relationship('Trip', backref='hotel_reservation')
-    user = db.Relationship('User', backref='hotel_reservation')
+    trip = db.relationship('Trip', backref='hotel_reservation')
+    user = db.relationship('User', backref='hotel_reservation')
