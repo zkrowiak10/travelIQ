@@ -4,8 +4,8 @@ class Config():
     """Base config, uses staging database server."""
     DEBUG = False
     TESTING = False
-    host = "localhost"
-    DATABASE="traveliq"
+    host = "salt.db.elephantsql.com"
+    DATABASE="rfxwdoul"
 
     @property
     def SQLALCHEMY_DATABASE_URI(self):

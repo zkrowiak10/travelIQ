@@ -1,7 +1,13 @@
 from flask_sqlalchemy import SQLAlchemy
-
+import click
+from flask.cli import with_appcontext
 db = SQLAlchemy()
 
+@click.command('create')
+@with_appcontext
+def init_db_command():
+    db.create_all()
+    click.echo("Created database")
 class User (db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), unique=True, nullable=False)
@@ -38,3 +44,4 @@ class Hotel_Reservation(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     trip = db.relationship('Trip', backref='hotel_reservation')
     user = db.relationship('User', backref='hotel_reservation')
+
