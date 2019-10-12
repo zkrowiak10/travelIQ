@@ -1,18 +1,32 @@
 from flask_sqlalchemy import SQLAlchemy
 import click
 from flask.cli import with_appcontext
+from werkzeug.security import check_password_hash, generate_password_hash
 db = SQLAlchemy()
 
-@click.command('create')
-@with_appcontext
-def init_db_command():
-    db.create_all()
-    click.echo("Created database")
+
+
+
 class User (db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(256))
     trips = db.relationship('Trip', backref='user')
+
+    #register new user object
+    def register(self, username, email, password):
+        self.username = username
+        self.email = email
+        self.password = generate_password_hash(password)
+
+    @classmethod
+    def login(user_name, password):
+        user = User.query.filter_by(username=user_name).first()
+        if check_password_hash(user.password, password):
+            return user
+        raise Exception("Username or password incorrect")
+
 
 
 #Stores container schema for all trip categories. 
@@ -44,4 +58,65 @@ class Hotel_Reservation(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     trip = db.relationship('Trip', backref='hotel_reservation')
     user = db.relationship('User', backref='hotel_reservation')
+    check_in = db.Column(db.DateTime, nullable=False)
+    check_out = db.Column(db.DateTime, nullable=False)
+    refundable = db.Column(db.Boolean)
+    cancellation_date = db.Column(db.DateTime)
+    destination_id = db.Column(db.Integer, db.ForeignKey('destination.id'))
+    destination = db.relationship('Destination', backref='Hotel_Reservation')
+    breakfast_included = db.Column(db.Boolean)
+    contact_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
+    contact_info = db.relationship('Contact')
+    trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
+    trip = db.relationship('Trip', backref='hotel_reservation')
 
+#trips should be broken down into destination cities that segment out the stay
+class Destination (db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(256), nullable=False)
+    trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
+    trip = db.relationship('Trip', backref='destination')
+
+#a generalized way to store contact info to share common attributes such ass address, phone number, 
+# etc between hotels, flights, etc
+class Contact(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    address = db.Column(db.String) #street address
+    city = db.Column(db.String(256))
+    phone = db.Column(db.String(256))
+
+class Flight(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    departure_time = db.Column(db.DateTime, nullable=False)
+    eta = db.Column(db.DateTime, nullable=False)
+    destination = db.Column(db.String(256), nullable=False)
+    departing_from = db.Column(db.String(256), nullable=False)
+    trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
+    trip = db.relationship('Trip', backref='flight')
+
+
+class Car_Rental (db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    pickup_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
+    pickup = db.relationship('Contact')
+    dropoff_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
+    dropoff = db.relationship('Contact')
+    company = db.Column(db.String(256))
+    trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
+    trip = db.relationship('Trip', backref='carRental')
+
+class Activity(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
+    trip = db.relationship('Trip', backref='activity')
+    destination_id = db.Column(db.Integer, db.ForeignKey('destination.id'))
+    destination = db.relationship('Destination', backref='Activity')
+    name = db.Column(db.String(256))
+    description = db.Column(db.Text)
+    
+
+@click.command('create')
+@with_appcontext
+def init_db_command():
+    db.create_all()
+    click.echo("Created database")
