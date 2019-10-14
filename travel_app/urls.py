@@ -1,9 +1,90 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app
 )
-
+import logging
+import functools
+from travel_app import models
+import logging
 bp = Blueprint('welcome', __name__, url_prefix='/')
 
 @bp.route('/',  methods=('GET', 'POST'))
 def welcome():
-    return "test"
+    return render_template("welcome.html")
+
+@bp.route('/login', methods=('POST',))
+def login():
+    try:
+        # logging.debug("In login method",request.form )
+        username = request.form['Lusername']
+        password = request.form['Lpassword']
+        user = models.User.login(username, password)
+        g.user = user
+        session['user_id'] = user.id
+        return redirect(url_for('iq.iqPage'))
+
+    except Exception as e:
+        # logging.debug("there was an exception: ", e)
+        flash("Invalid Username or password") 
+        return redirect(url_for('welcome.welcome'))
+
+@bp.route('/register', methods=('POST',))
+def register():
+    if request.method != "POST":
+        flash("can only be POST")
+        return redirect(url_for('welcome.welcome'))
+
+    username = request.form['username']
+    email = request.form['email']
+    password = request.form['password']
+
+    if password != request.form.get('confirmPassword'):
+        flash('Make sure passwords match')
+        return redirect(url_for('welcome.welcome'))
+    try:
+        models.User.register(username,username,password)
+        flash('Username {} created'.format(username))
+        return redirect(url_for('welcome.welcome'))
+    except Exception as e:
+        flash('something went wrong')
+        return redirect(url_for('welcome.welcome'))
+        
+@bp.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('welcome.welcome'))
+
+
+
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            flash('Please log in first')
+            return redirect(url_for('welcome.welcome'))
+
+        return view(**kwargs)
+
+    return wrapped_view
+
+iq = Blueprint('iq', __name__, url_prefix='/app')
+
+
+@iq.route('/', methods=('GET','POST'))
+@login_required
+def iqPage():
+    if request.method == 'GET':
+        trips = models.Trip.query.filter_by(user_id = session['user_id']).all()
+        return render_template('app/iqApp.html', trips = trips)
+
+
+
+@iq.before_app_request
+def load_logged_in_user():
+    user_id = session.get('user_id')
+
+    if user_id is None:
+        g.user = None
+    else:
+        # g.user = User.query.filter_by(user_id = user_id).first()
+        user = models.User.query.filter_by(id=user_id).first()
+        g.user = user

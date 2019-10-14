@@ -1,0 +1,43 @@
+h1, h3, p {
+    font-family: 'Anton', sans-serif;
+}
+
+nav {
+    box-shadow: 5px 5px 10px #c6c6c6;
+    padding-top: 10px
+}
+
+.nav-right {
+    float: right;
+}
+
+.nav-left {
+    display: inline
+}
+
+.form {
+    margin: 20% ;
+    padding: 10%;
+
+    border-color: #0675bf;
+    box-shadow: 2px 2px 20px #c6c6c6;
+    background-color: #ebf7ff
+}
+.welcome-story {
+    margin: 10% 3% 0% 10%;
+    
+}
+
+.welcome-picture {
+    width: 110%;
+}
+
+.centered-picture {
+    margin: auto;
+    margin-top: 8%;
+    width: 400px
+}
+
+.centered-text {
+    text-align: center;
+} 

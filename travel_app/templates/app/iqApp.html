@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{%block nav%}
+<h3 class="nav-link nav-left"> {{g['trip']}} Test it</h3>
+<a class="nav-link nav-right" href="{{url_for('welcome.logout')}}"> <h5>Logout</h3></a>
+{% endblock %}
+{%block title%} TraveIQ {% endblock %}
+
+{% block content %}
+
+{% if trips|length == 0 %}
+<div class="col-4"></div>
+<div class="col-6 centered">
+    <h1 class='centered-text'> You Have Not Created Any Trips Yet?</h1>
+    <br>
+    <h4 class='centered-text'> Create Your First One Today</h4>
+    <p class='centered-text'>
+        <img src="{{url_for('static', filename='Assets/travel_search.png')}}" style="width: 400px">
+    </p>
+    
+</div >
+<div class="col-4"></div>
+
+{% else %}
+
+
+{% endif %}
+
+{% endblock %}

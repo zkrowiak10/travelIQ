@@ -3,6 +3,9 @@ from travel_app import config, models, models, urls
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+import logging
+
+logging.basicConfig( level=logging.DEBUG)
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
@@ -16,9 +19,8 @@ def create_app():
     except OSError:
         pass
     
-    @app.route('/')
-    def hello():
-        return 'Hello, World!'
+    app.register_blueprint(urls.bp)
+    app.register_blueprint(urls.iq)
 
     return app
 

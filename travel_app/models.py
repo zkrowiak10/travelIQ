@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 import click
 from flask.cli import with_appcontext
 from werkzeug.security import check_password_hash, generate_password_hash
+import logging
 db = SQLAlchemy()
 
 
@@ -12,18 +13,33 @@ class User (db.Model):
     username = db.Column(db.String(120), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(256))
-    trips = db.relationship('Trip', backref='user')
-
+    
+    def __str__(self):
+        return "Username: " + self.username
     #register new user object
+    @classmethod
     def register(self, username, email, password):
-        self.username = username
-        self.email = email
-        self.password = generate_password_hash(password)
+
+        if username == "" or email == "" or password =="":
+            logging.info('Not all fields filled out')
+            raise Exception('All fields must be filled out')
+        if User.query.filter_by(username=username).first() != None:
+            print("this is the user"+User.query.filter_by(username=username).first())
+            raise Exception('Username Already Exists')
+        user = User(username = username,password = generate_password_hash(password), email = email)
+        db.session.add(user)
+        db.session.commit()
+        
 
     @classmethod
-    def login(user_name, password):
+    def login(self, user_name, password):
         user = User.query.filter_by(username=user_name).first()
+        # logging.debug("username is", user)
+        # logging.debug("Login params", user_name, password)
+        if user == None:
+            raise Exception("Username does not exist")
         if check_password_hash(user.password, password):
+            # logging.INFO('logged in')
             return user
         raise Exception("Username or password incorrect")
 
@@ -75,7 +91,7 @@ class Destination (db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(256), nullable=False)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
-    trip = db.relationship('Trip', backref='destination')
+    trip = db.relationship('Trip')
 
 #a generalized way to store contact info to share common attributes such ass address, phone number, 
 # etc between hotels, flights, etc
@@ -98,12 +114,12 @@ class Flight(db.Model):
 class Car_Rental (db.Model):
     id = db.Column(db.Integer, primary_key = True)
     pickup_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
-    pickup = db.relationship('Contact')
+    pickup = db.relationship(Contact, foreign_keys=[pickup_id])
     dropoff_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
-    dropoff = db.relationship('Contact')
+    dropoff = db.relationship('Contact', foreign_keys=[dropoff_id], lazy=True)
     company = db.Column(db.String(256))
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
-    trip = db.relationship('Trip', backref='carRental')
+    trip = db.relationship('Trip', foreign_keys=[trip_id])
 
 class Activity(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -120,3 +136,8 @@ class Activity(db.Model):
 def init_db_command():
     db.create_all()
     click.echo("Created database")
+
+
+if __name__=="__main__":
+    print("doing work")
+    User.login("test", "password")
