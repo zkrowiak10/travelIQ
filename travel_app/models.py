@@ -54,8 +54,9 @@ class Trip(db.Model):
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
     user = db.relationship('User')
+    description = db.Column(db.Text)
 
-    def __init__(self, user, name, start_date, end_date):
+    def __init__(self, user, name, start_date, end_date, description):
         if start_date > end_date:
             raise Exception('Trip end date must be after start date.')
         self.end_date = end_date
@@ -63,6 +64,10 @@ class Trip(db.Model):
         self.name = name
         self.user = user
         self.user_id = user.id
+        self.description = description
+
+        db.session.add(self)
+        db.session.commit()
 
     def __str__(self):
         return "Vacation to {} from {} to {}".format(self.name, self.start_date, self.end_date)

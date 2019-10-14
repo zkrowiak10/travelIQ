@@ -74,8 +74,30 @@ iq = Blueprint('iq', __name__, url_prefix='/app')
 def iqPage():
     if request.method == 'GET':
         trips = models.Trip.query.filter_by(user_id = session['user_id']).all()
+        logging.debug(trips[0].name)
         return render_template('app/iqApp.html', trips = trips)
 
+@iq.route('/g', methods=('GET',))
+@login_required
+def change_g():
+    trip_id = request.args['trip']
+    g.trip = models.Trip.query.filter_by(id = trip_id).first()
+    return redirect(request.referrer)
+
+@iq.route('/createTrip', methods=('POST','GET'))
+@login_required
+def create_trip():
+    if request.method == 'POST':
+        f = request.form
+        name, start_date, end_date, description = f['TName'], f['TStart'], f['TEnd'], f['TDescription']
+        trip = models.Trip(g.user,name, start_date,end_date, description)
+
+        flash('Created Trip')   
+        return redirect(url_for('iq.iqPage'))
+    if request.method == 'GET':
+        return render_template('app/createTrip.html')
+
+    
 
 
 @iq.before_app_request

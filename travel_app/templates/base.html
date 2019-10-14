@@ -1,5 +1,6 @@
 <!doctype html>
 <head>
+        <link rel="icon" href="{{url_for('static', filename='Assets/icon.png')}}">
         <script> 
                 var loggedIn = false;
                 {% if g.user %}
@@ -13,14 +14,21 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src= 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
-    <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet"></script>
+    <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet">
+    <script src="{{url_for('static', filename='frontEnd.js')}}"></script>
     <link href="https://fonts.googleapis.com/css?family=Acme&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+ 
+
 </head>
 <header>
-    <nav class="nav-empty"> 
-            <img src="{{url_for('static', filename='Assets/Logo_Text_200.png')}}" style="width: 150px"/>
+        
+    <nav class="navbar nav-empty navbar-expand-sm navbar-light bg-light"> 
+            <a class="navbar-brand" href='{{url_for("iq.iqPage")}}'><img src="{{url_for('static', filename='Assets/Logo_Text_200.png')}}" style="width: 150px"/></a>
+            
             {%block nav %} {% endblock %}
+           
+
     </nav>
             {% for message in get_flashed_messages() %}
                 <div class="flash alert alert-primary" role="alert">{{ message }}</div>

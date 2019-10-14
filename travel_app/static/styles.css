@@ -1,10 +1,11 @@
-h1, h3, p {
+h1, h3, h4, p {
     font-family: 'Anton', sans-serif;
 }
 
 nav {
     box-shadow: 5px 5px 10px #c6c6c6;
-    padding-top: 10px
+    padding-top: 10px;
+    padding-left: 30px
 }
 
 .nav-right {
@@ -30,14 +31,14 @@ nav {
 
 .welcome-picture {
     width: 110%;
-}
 
-.centered-picture {
-    margin: auto;
-    margin-top: 8%;
-    width: 400px
 }
 
 .centered-text {
     text-align: center;
+   
 } 
+
+.headline {
+    margin-top: 30px
+}
