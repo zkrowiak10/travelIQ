@@ -46,7 +46,7 @@ def register():
         return redirect(url_for('welcome.welcome'))
     except Exception as e:
         flash('something went wrong')
-        loggin.debug("Exception in creating new user", e)
+        logging.debug("Exception in creating new user", e)
         return redirect(url_for('welcome.welcome'))
         
 @bp.route('/logout')
