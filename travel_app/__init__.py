@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import logging
 
-logging.basicConfig( level=logging.DEBUG)
+logging.basicConfig(level=logging.ERROR, filename='app.log', format="%(asctime)s - %(levelname)s - %(message)s")
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
@@ -18,7 +18,7 @@ def create_app():
         os.makedirs(app.instance_path)
     except OSError:
         pass
-    
+    logging.debug('test log')
     app.register_blueprint(urls.bp)
     app.register_blueprint(urls.iq)
 

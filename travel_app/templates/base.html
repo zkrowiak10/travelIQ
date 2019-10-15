@@ -1,4 +1,4 @@
-<!doctype html>
+<!doctype html style="heigh:100%">
 <head>
         <link rel="icon" href="{{url_for('static', filename='Assets/icon.png')}}">
         <script> 
@@ -35,7 +35,9 @@
             {% endfor %}
 </header>
 <title> {% block title %} {% endblock %}</title>
+<body class="h-100" style="height: 100%">
+        {% block content %}{% endblock %}
+</body>
 
-{% block content %}{% endblock %}
                     
                     

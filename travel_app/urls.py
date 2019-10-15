@@ -46,6 +46,7 @@ def register():
         return redirect(url_for('welcome.welcome'))
     except Exception as e:
         flash('something went wrong')
+        loggin.debug("Exception in creating new user", e)
         return redirect(url_for('welcome.welcome'))
         
 @bp.route('/logout')
@@ -73,15 +74,18 @@ iq = Blueprint('iq', __name__, url_prefix='/app')
 @login_required
 def iqPage():
     if request.method == 'GET':
-        trips = models.Trip.query.filter_by(user_id = session['user_id']).all()
-        logging.debug(trips[0].name)
+        try:
+            trips = models.Trip.query.filter_by(user_id = session['user_id']).all()
+        
+        except Exception as e:
+            loggin.debug(e)
         return render_template('app/iqApp.html', trips = trips)
 
 @iq.route('/g', methods=('GET',))
 @login_required
 def change_g():
     trip_id = request.args['trip']
-    g.trip = models.Trip.query.filter_by(id = trip_id).first()
+    session['trip_id'] = trip_id
     return redirect(request.referrer)
 
 @iq.route('/createTrip', methods=('POST','GET'))
@@ -90,8 +94,12 @@ def create_trip():
     if request.method == 'POST':
         f = request.form
         name, start_date, end_date, description = f['TName'], f['TStart'], f['TEnd'], f['TDescription']
-        trip = models.Trip(g.user,name, start_date,end_date, description)
-
+        try:
+            trip = models.Trip(g.user,name, start_date,end_date, description)
+        except Exception as e:
+            logging.error("Exception in creating trip: {}".format(e))
+            flash('something went wrong: {}'.format(e))
+            return redirect(url_for('iq.iqPage'))
         flash('Created Trip')   
         return redirect(url_for('iq.iqPage'))
     if request.method == 'GET':
@@ -103,10 +111,20 @@ def create_trip():
 @iq.before_app_request
 def load_logged_in_user():
     user_id = session.get('user_id')
-
+    
     if user_id is None:
         g.user = None
     else:
         # g.user = User.query.filter_by(user_id = user_id).first()
         user = models.User.query.filter_by(id=user_id).first()
         g.user = user
+
+@iq.before_app_request
+def load_current_trip():
+    trip_id = session.get('trip_id')
+
+    if trip_id is None:
+        g.trip = None
+    else:
+        g.trip = models.Trip.query.filter_by(id = trip_id).first()
+        

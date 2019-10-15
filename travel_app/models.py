@@ -50,7 +50,7 @@ class User (db.Model):
 class Trip(db.Model):
     id  = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    name = db.Column(db.String(120), unique=True, nullable=False)
+    name = db.Column(db.String(120), nullable=False)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
     user = db.relationship('User')
@@ -59,6 +59,14 @@ class Trip(db.Model):
     def __init__(self, user, name, start_date, end_date, description):
         if start_date > end_date:
             raise Exception('Trip end date must be after start date.')
+        if name is "" or start_date is "" or end_date is "":
+            raise Exception('A Trip must have a name, start and end dates')
+        
+        #check that user has no trips with that name
+        current_trips = Trip.query.filter_by(user= user).all()
+        for trip in current_trips:
+            if trip.name == name:
+                raise Exception("Must choose a unique name for your trip")
         self.end_date = end_date
         self.start_date = start_date
         self.name = name
