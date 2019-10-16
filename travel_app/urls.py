@@ -23,7 +23,8 @@ def login():
         return redirect(url_for('iq.iqPage'))
 
     except Exception as e:
-        # logging.debug("there was an exception: ", e)
+        logging.debug("there was an exception: " + str(e))
+        
         flash("Invalid Username or password") 
         return redirect(url_for('welcome.welcome'))
 
@@ -106,7 +107,10 @@ def create_trip():
         return render_template('app/createTrip.html')
 
     
-
+@iq.route('/addDest', methods=('POST',))
+@login_required
+def create_dest():
+    pass
 
 @iq.before_app_request
 def load_logged_in_user():
