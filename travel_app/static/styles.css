@@ -7,6 +7,11 @@ a {
     color: black
 }
 
+.sideways {
+    float: left;
+    display: inline;
+    max-width: 30%
+}
 #v-pills-tabContent {
     padding-top: 20px
 }

@@ -106,6 +106,17 @@ class Destination (db.Model):
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     trip = db.relationship('Trip')
 
+    def __init__(self, name, trip_id):
+        commit = True
+        trip = trip_id
+        self.name = name
+        self.trip_id = trip
+
+        if commit:
+            db.session.add(self)
+            db.session.commit()
+        
+
 #a generalized way to store contact info to share common attributes such ass address, phone number, 
 # etc between hotels, flights, etc
 class Contact(db.Model):

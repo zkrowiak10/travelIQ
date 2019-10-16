@@ -77,10 +77,11 @@ def iqPage():
     if request.method == 'GET':
         try:
             trips = models.Trip.query.filter_by(user_id = session['user_id']).all()
+            destinations = models.Destination.query.filter_by(trip_id = g.trip.id).all()
         
         except Exception as e:
-            loggin.debug(e)
-        return render_template('app/iqApp.html', trips = trips)
+            logging.debug(e)
+        return render_template('app/iqApp.html', trips = trips, dests = destinations)
 
 @iq.route('/g', methods=('GET',))
 @login_required
@@ -110,7 +111,14 @@ def create_trip():
 @iq.route('/addDest', methods=('POST',))
 @login_required
 def create_dest():
-    pass
+    try:
+        name = request.form['DName']
+
+        models.Destination(name, g.trip.id)
+    except Exception as e:
+        logging.error('Exception creating destination: ' + str(e))
+        flash('something went wrong')
+    return redirect(request.referrer)
 
 @iq.before_app_request
 def load_logged_in_user():
