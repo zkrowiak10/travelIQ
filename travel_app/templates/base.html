@@ -23,8 +23,8 @@
 </head>
 <header>
         
-    <nav class="navbar nav-empty navbar-expand-sm navbar-light bg-light"> 
-            <a class="navbar-brand" href='{{url_for("iq.iqPage")}}'><img src="{{url_for('static', filename='Assets/Logo_Text_200.png')}}" style="width: 150px"/></a>
+    <nav id="nav-bar" class="navbar nav-empty navbar-expand-sm"> 
+            <a  href='{{url_for("iq.iqPage")}}'><img src="{{url_for('static', filename='Assets/Logo_Text_200.png')}}" style="width: 150px"/></a>
             
             {%block nav %} {% endblock %}
            

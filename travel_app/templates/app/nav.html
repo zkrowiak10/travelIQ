@@ -2,32 +2,34 @@
 {%block nav%}
 
 {% if g.trip%}
-<h3 class="nav-link nav-left"> {{g.trip.name}}</h3>
+<h5 class="nav-link nav-left" style="color:#42A031"> {{g.trip.name}}</h5>
 {% else %}
-<h3 class="nav-link nav-left"> Choose A Trip To Edit</h3>
+<h5 class="nav-link nav-left"> Choose A Trip To Edit</h5>
 
 {% endif %}
-<ul class="navbar-nav mr-auto">
-        <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  {%for trip in trips %}
-                  <a class="dropdown-item" href="{{url_for('iq.change_g')}}?trip={{trip.id}}">{{trip.name}}</a>
-                  
-                  
-                  {%endfor%}
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="{{url_for('iq.create_trip')}}">Create A New Trip</a>
-                </div>
-              </li>
-              <li class="nav-item" >
-                    
+<ul class="navbar-nav mr-auto ">
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+      {%for trip in trips %}
+      <a class="dropdown-item" href="{{url_for('iq.change_g')}}?trip={{trip.id}}">{{trip.name}}</a>
+      
+      
+      {%endfor%}
+      <div class="dropdown-divider"></div>
+      <a class="dropdown-item" href="{{url_for('iq.create_trip')}}">Create A New Trip</a>
+    </div>
+  </li> 
+  <li class="nav-item"></li>
+  <li class="nav-item">
+      <a class="nav-link "  href="#"><h5>Plan</h5></a>
+  </li>
+  <li class="nav-item">
+      <a class="nav-link" href="#"><h5>Budget</h5></a>
+  </li>
         
-        </li>
         
 </ul>
-<a class=" navbar-text nav-right" href="{{url_for('welcome.logout')}}"> <h5>Logout</h3></a>
+<a class="navbar-text nav-right" href="{{url_for('welcome.logout')}}"> <h5>Logout</h5></a>
 
 {% endblock %}

@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import logging
 
-logging.basicConfig(level=logging.ERROR, filename='app.log', format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(level=logging.ERROR, filename='app.log', format="%(levelname)s - %(message)s")
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
