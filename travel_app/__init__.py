@@ -1,5 +1,5 @@
 import os
-from travel_app import config, models, models, urls
+from travel_app import config, models, models, urls, ajax
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -21,6 +21,7 @@ def create_app():
     logging.debug('test log')
     app.register_blueprint(urls.bp)
     app.register_blueprint(urls.iq)
+    app.register_blueprint(ajax.ajax)
 
     return app
 
