@@ -165,3 +165,4 @@ def init_db_command():
 if __name__=="__main__":
     print("doing work")
     User.login("test", "password")
+
