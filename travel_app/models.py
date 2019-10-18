@@ -8,6 +8,8 @@ db = SQLAlchemy()
 
 
 
+        
+
 class User (db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), unique=True, nullable=False)
@@ -115,7 +117,9 @@ class Destination (db.Model):
         if commit:
             db.session.add(self)
             db.session.commit()
-        
+    
+    def __str__(self):
+        return "Destination {} on trip {}".format(self.name, self.trip.name)
 
 #a generalized way to store contact info to share common attributes such ass address, phone number, 
 # etc between hotels, flights, etc
