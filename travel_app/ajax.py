@@ -78,20 +78,14 @@ def destinations():
                 # if not OAUTH():
                 return abort(401)
             
-<<<<<<< HEAD
+
             dest.name = data['name']
             models.db.session.add(dest)
             models.db.session.commit()
         except Exception as e:
             logging.error("There was an error in loading json PATCH: " + str(e))
             return abort(400)
-=======
-#             dest.name = data['name']
-#             models.db.session.add(dest)
-#             models.db.session.commit()
-#         except Exception as e:
-#             logging.error("There was an error in loading json POST request: " + str(e))
->>>>>>> eda4e7223b0a17bd5dffddd2365f315a051c768a
+
 
 #     #if DELETE delete resource
 #     if request.method == "DELETE":
@@ -101,17 +95,13 @@ def destinations():
 #             if not data['id']:
 #                 raise Exception("No trip id")
             
-<<<<<<< HEAD
-            dest = models.Destination.query.filter_by(id = data['id']).first()
-=======
-#             dest = models.Destination.query.filter_by(id = data['id').first()
->>>>>>> eda4e7223b0a17bd5dffddd2365f315a051c768a
 
-#             if dest.trip.user != g.user:
-#                 # if not OAUTH():
-#                 return abort(401)
+            dest = models.Destination.query.filter_by(id = data['id']).first()
+
+
+
             
-<<<<<<< HEAD
+
             models.db.session.delete(dest)
             models.db.session.commit()
         except Exception as e:
@@ -119,7 +109,4 @@ def destinations():
             return abort(400)
         
         return Response("Deleted", 200)
-=======
-#             models.db.session.delete(dest)
-#             models.db.session.commit()
->>>>>>> eda4e7223b0a17bd5dffddd2365f315a051c768a
+
