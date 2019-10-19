@@ -7,9 +7,11 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG, filename='app.log', format="%(levelname)s - %(message)s")
 
-def create_app():
+def create_app(configParam = None):
+    if not configParam:
+        configParam = config.Testing()
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_object(config.Development())
+    app.config.from_object(configParam)
     app.cli.add_command(models.init_db_command)
     models.db.init_app(app)
     migrate = Migrate(app, models.db)
@@ -21,7 +23,7 @@ def create_app():
     logging.debug('test log')
     app.register_blueprint(urls.bp)
     app.register_blueprint(urls.iq)
-    app.register_blueprint(ajax.ajax)
+    # app.register_blueprint(ajax.ajax)
 
     return app
 

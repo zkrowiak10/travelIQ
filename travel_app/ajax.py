@@ -1,3 +1,4 @@
+
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app, jsonify, abort, Response
 )
@@ -5,6 +6,7 @@ import logging
 import functools
 from travel_app import models, urls
 import logging
+
 
 login_required = urls.login_required
 
@@ -21,6 +23,7 @@ def destinations():
         try:
             dest_list = models.Destination.query.filter_by(trip_id = g.trip.id).all()
         
+
         except Exception as e:
             logging.error("There was an error in loading json GET request: " + str(e))
             return abort(400)
@@ -56,6 +59,7 @@ def destinations():
             
             return abort(400)
         return Response("created",201)
+
         
         
 
@@ -66,33 +70,48 @@ def destinations():
             if not data['id']:
                 raise Exception("No trip id")
             
+
             dest = models.Destination.query.filter_by(id = data['id']).first()
+
 
             if dest.trip.user != g.user:
                 # if not OAUTH():
                 return abort(401)
             
+<<<<<<< HEAD
             dest.name = data['name']
             models.db.session.add(dest)
             models.db.session.commit()
         except Exception as e:
             logging.error("There was an error in loading json PATCH: " + str(e))
             return abort(400)
+=======
+#             dest.name = data['name']
+#             models.db.session.add(dest)
+#             models.db.session.commit()
+#         except Exception as e:
+#             logging.error("There was an error in loading json POST request: " + str(e))
+>>>>>>> eda4e7223b0a17bd5dffddd2365f315a051c768a
 
-    #if DELETE delete resource
-    if request.method == "DELETE":
-        # check auth
-        try:
-            data = request.get_json()
-            if not data['id']:
-                raise Exception("No trip id")
+#     #if DELETE delete resource
+#     if request.method == "DELETE":
+#         # check auth
+#         try:
+#             data = request.get_json()
+#             if not data['id']:
+#                 raise Exception("No trip id")
             
+<<<<<<< HEAD
             dest = models.Destination.query.filter_by(id = data['id']).first()
+=======
+#             dest = models.Destination.query.filter_by(id = data['id').first()
+>>>>>>> eda4e7223b0a17bd5dffddd2365f315a051c768a
 
-            if dest.trip.user != g.user:
-                # if not OAUTH():
-                return abort(401)
+#             if dest.trip.user != g.user:
+#                 # if not OAUTH():
+#                 return abort(401)
             
+<<<<<<< HEAD
             models.db.session.delete(dest)
             models.db.session.commit()
         except Exception as e:
@@ -100,3 +119,7 @@ def destinations():
             return abort(400)
         
         return Response("Deleted", 200)
+=======
+#             models.db.session.delete(dest)
+#             models.db.session.commit()
+>>>>>>> eda4e7223b0a17bd5dffddd2365f315a051c768a
