@@ -92,7 +92,7 @@ class Hotel_Reservation(db.Model):
     check_in = db.Column(db.DateTime, nullable=False)
     check_out = db.Column(db.DateTime, nullable=False)
     refundable = db.Column(db.Boolean)
-    cancellation_date = db.Column(db.DateTime)
+    cancellation_date = db.Column(db.DateTime) 
     destination_id = db.Column(db.Integer, db.ForeignKey('destination.id'))
     destination = db.relationship('Destination', backref='Hotel_Reservation')
     breakfast_included = db.Column(db.Boolean)
@@ -107,12 +107,13 @@ class Destination (db.Model):
     name = db.Column(db.String(256), nullable=False)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     trip = db.relationship('Trip')
-
-    def __init__(self, name, trip_id):
+    notes = db.Column(db.String(256))
+    def __init__(self, name, trip_id, notes):
         commit = True
         trip = trip_id
         self.name = name
         self.trip_id = trip
+        self.notes = notes
 
         if commit:
             db.session.add(self)

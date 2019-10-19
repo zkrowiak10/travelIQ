@@ -12,6 +12,7 @@
     function formToggle(){
         $('#noTrips').toggle()
         $('#createTrips').toggle()
+      
     }
 
     
@@ -71,7 +72,7 @@
 
   <div class="row h-100">
       <div class="col-3 sideBar border-right list-group">
-        <a class="list-group-item" data-bind="click: destinations.get" href="#">Destinations</a>
+        <a class="list-group-item" id="#primaryItem" data-bind="click: destinations.get" href="#">Destinations</a>
         <a class="list-group-item" data-bind="click: hotels.get" href="#">Hotels</a>
         <a class="list-group-item" data-bind="click: flights.get" href="#">Flights</a>
         <a class="list-group-item" data-bind="click: rentals.get" href="#">Rentals</a>
@@ -79,7 +80,35 @@
       </div>
 
       <div class="col-9" id="tabContent">
-        <div class="contentArea" id="destinations">dest</div>
+        <div class="contentArea" id="destinations">
+            <h1>Destinations</h1>
+            <br>
+            <p>All other activities (hotels, restaurants, etc...) are linked to a destination so you can organize your trip easily</p>
+            <br>
+            <table class="table border">
+                <thead>
+                  <tr>
+                    <th>Destination Name</th>
+                    <th>Notes</th>
+                    <th>
+                    </th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody data-bind="foreach: destinations.destList">
+                    <tr >
+                        <td data-bind="text: name"></td>
+                        <td data-bind="text: notes"></td>
+                        <td ></td>
+                        <!-- will add the following functions soon -->
+                        <!-- data-bind="click: this.update()" -->
+                        <!-- data-bind="click: this.delete()" -->
+                        <td ><a  href="#">Update  </a><a  href="#">Delete</a></td>
+                    </tr>
+                  </tbody>
+            </table>
+
+        </div>
         <div class="contentArea" id="hotels">hot</div>
         <div class="contentArea" id="flights">fl</div>
         <div class="contentArea" id="rentals">rent</div>

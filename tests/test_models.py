@@ -46,4 +46,11 @@ def test_register(app):
         with pytest.raises(Exception):
             m.User("TestUser1","email@server.com", "password")
             m.User("TestUser1","email@server.com", "password")
+
+
+def test_ajax(client):
+
+        response = client.post("/ajax/destinations")
+        assert response.status == 401
+
         

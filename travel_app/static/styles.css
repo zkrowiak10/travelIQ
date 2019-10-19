@@ -40,6 +40,9 @@ nav {
     display: inline
 }
 
+#tabContent {
+    padding: 30px
+}
 .form {
     margin: 20% ;
     padding: 10%;

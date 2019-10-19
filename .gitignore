@@ -1,7 +1,11 @@
 .vscode/*
 venv/*
 */__pycache__/*
+/*/*/__pycache__/*
 data/*
 migrations/*
 .DS_Store
 app.log
+migrations/__pycache__
+migrations/versions/__pycache__/*
+migrations/versions/__pycache__/213c269d55a0_.cpython-37.pyc
