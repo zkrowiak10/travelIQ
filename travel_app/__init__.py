@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.DEBUG, filename='app.log', format="%(levelname
 
 def create_app(configParam = None):
     if not configParam:
-        configParam = config.Testing()
+        configParam = config.Development()
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(configParam)
     app.cli.add_command(models.init_db_command)
@@ -23,7 +23,7 @@ def create_app(configParam = None):
     logging.debug('test log')
     app.register_blueprint(urls.bp)
     app.register_blueprint(urls.iq)
-    # app.register_blueprint(ajax.ajax)
+    app.register_blueprint(ajax.ajax)
 
     return app
 
