@@ -22,10 +22,10 @@ class User (db.Model):
 
         if username == "" or email == "" or password =="":
             logging.info('Not all fields filled out')
-            raise Exception('All fields must be filled out')
+            raise AssertionError('All fields must be filled out')
         if User.query.filter_by(username=username).first() != None:
             print("this is the user"+User.query.filter_by(username=username).first())
-            raise Exception('Username Already Exists')
+            raise AssertionError('Username Already Exists')
         user = User(username = username,password = generate_password_hash(password), email = email)
         db.session.add(user)
         db.session.commit()
@@ -37,11 +37,11 @@ class User (db.Model):
         # logging.debug("username is", user)
         # logging.debug("Login params", user_name, password)
         if user == None:
-            raise Exception("Username does not exist")
+            raise AssertionError("Username does not exist")
         if check_password_hash(user.password, password):
             # logging.INFO('logged in')
             return user
-        raise Exception("Username or password incorrect")
+        raise AssertionError("Username or password incorrect")
 
 
 
@@ -58,15 +58,15 @@ class Trip(db.Model):
 
     def __init__(self, user, name, start_date, end_date, description):
         if start_date > end_date:
-            raise Exception('Trip end date must be after start date.')
+            raise AssertionError('Trip end date must be after start date.')
         if name is "" or start_date is "" or end_date is "":
-            raise Exception('A Trip must have a name, start and end dates')
+            raise AssertionError('A Trip must have a name, start and end dates')
         
         #check that user has no trips with that name
         current_trips = Trip.query.filter_by(user= user).all()
         for trip in current_trips:
             if trip.name == name:
-                raise Exception("Must choose a unique name for your trip")
+                raise AssertionError("Must choose a unique name for your trip")
         self.end_date = end_date
         self.start_date = start_date
         self.name = name
@@ -158,6 +158,7 @@ class Activity(db.Model):
 @click.command('create')
 @with_appcontext
 def init_db_command():
+    db.drop_all()
     db.create_all()
     click.echo("Created database")
 
