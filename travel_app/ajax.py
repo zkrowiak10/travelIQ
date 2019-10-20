@@ -75,9 +75,11 @@ def destinations():
             dest.name = data['name']
             models.db.session.add(dest)
             models.db.session.commit()
+            return Response("updated",200)
         except Exception as e:
             logging.error("There was an error in loading json PATCH: " + str(e))
             return abort(400)
+        
 
     #if DELETE delete resource
     if request.method == "DELETE":

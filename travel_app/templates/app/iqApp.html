@@ -103,32 +103,40 @@
                         <!-- will add the following functions soon -->
                         <!-- data-bind="click: this.update()" -->
                         <!-- data-bind="click: this.delete()" -->
-                        <td ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                        <td ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-bind="click: modal" >
                             Edit
                           </button></td>
-                          <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                              <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                  <div class="modal-header">
-                                    <h5 class="modal-title" data-bind="text: name" id="exampleModalLabel">Modal title</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                      <span aria-hidden="true">&times;</span>
-                                    </button>
-                                  </div>
-                                  <div class="modal-body" data-bind="text: name">
-                                    
-                                  </div>
-                                  <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="button" class="btn btn-primary">Save changes</button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
+
                     </tr>
 
                   </tbody>
             </table>
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title"  id="exampleModalLabel">Edit Destination</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <h5>Destination Name</h5>
+                      <input type="text" data-bind="value: destinations.modal.name">
+                      <br>
+                      <h5>Notes</h5>
+                      <input type="text" data-bind="value: destinations.modal.notes">
+                      
+                    </div>
+                    <div class="modal-footer">
+                      
+                      <button type="button" id="dest-modal-close" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                      <button type="button" class="btn btn-primary"  data-bind="click: destinations.modal.save">Save changes</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
 
         </div>
