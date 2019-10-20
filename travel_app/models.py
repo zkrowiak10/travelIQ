@@ -7,10 +7,19 @@ db = SQLAlchemy()
 
 
 
+class Base(db.Model):
+    __abstract__ = True
+
+    def update(self, dictionary):
+        logging.debug('in update function \n dictionary is: ' + str(dictionary))
+        for key, value in dictionary.items():
+            if key == "id":
+                continue
+            setattr(self, key, value)
 
         
 
-class User (db.Model):
+class User (Base):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -49,7 +58,7 @@ class User (db.Model):
 
 #Stores container schema for all trip categories. 
 #Would like to add validation at some point to validate that it ends after it starts
-class Trip(db.Model):
+class Trip(Base):
     id  = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     name = db.Column(db.String(120), nullable=False)
@@ -83,7 +92,7 @@ class Trip(db.Model):
         return "Vacation to {} from {} to {}".format(self.name, self.start_date, self.end_date)
 
 
-class Hotel_Reservation(db.Model):
+class Hotel_Reservation(Base):
     id  = db.Column(db.Integer, primary_key=True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -102,7 +111,7 @@ class Hotel_Reservation(db.Model):
     trip = db.relationship('Trip', backref='hotel_reservation')
 
 #trips should be broken down into destination cities that segment out the stay
-class Destination (db.Model):
+class Destination (Base):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(256), nullable=False)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
@@ -110,12 +119,16 @@ class Destination (db.Model):
     notes = db.Column(db.String(256))
     trip_order = db.Column(db.Integer)
     days_there = db.Column(db.Integer)
-    def __init__(self, name, trip_id, notes):
-        commit = True
+
+
+    def __init__(self, name, trip_id, notes, days_there, trip_order, commit = True):
+        
         trip = trip_id
         self.name = name
         self.trip_id = trip
         self.notes = notes
+        self.days_there = days_there
+        self.trip_order = trip_order
 
         if commit:
             db.session.add(self)
@@ -126,13 +139,13 @@ class Destination (db.Model):
 
 #a generalized way to store contact info to share common attributes such ass address, phone number, 
 # etc between hotels, flights, etc
-class Contact(db.Model):
+class Contact(Base):
     id = db.Column(db.Integer, primary_key = True)
     address = db.Column(db.String) #street address
     city = db.Column(db.String(256))
     phone = db.Column(db.String(256))
 
-class Flight(db.Model):
+class Flight(Base):
     id = db.Column(db.Integer, primary_key = True)
     departure_time = db.Column(db.DateTime, nullable=False)
     eta = db.Column(db.DateTime, nullable=False)
@@ -142,7 +155,7 @@ class Flight(db.Model):
     trip = db.relationship('Trip', backref='flight')
 
 
-class Car_Rental (db.Model):
+class Car_Rental (Base):
     id = db.Column(db.Integer, primary_key = True)
     pickup_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
     pickup = db.relationship(Contact, foreign_keys=[pickup_id])
@@ -152,7 +165,7 @@ class Car_Rental (db.Model):
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     trip = db.relationship('Trip', foreign_keys=[trip_id])
 
-class Activity(db.Model):
+class Activity(Base):
     id = db.Column(db.Integer, primary_key = True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     trip = db.relationship('Trip', backref='activity')

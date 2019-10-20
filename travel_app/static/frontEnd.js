@@ -209,8 +209,8 @@ function destinations() {
     self.modal = {
         name : ko.observable(""),
         notes: ko.observable(""),
-        trip_order: ko.observable(""),
-        days_there: ko.observable(""),
+        trip_order: ko.observable(0),
+        days_there: ko.observable(0),
         render: function(dest) {
             console.log('rendering modal', this.name())
             this.name(dest.name())
@@ -241,7 +241,8 @@ function destinations() {
         create: async function() {
             modal = this.destinations.modal
             destList = this.destinations.destList
-            dest = new destination({name: modal.name(), notes: modal.notes()})
+            dest = new destination({name: modal.name(), notes: modal.notes(), trip_order: modal.trip_order(), 
+                days_there: modal.days_there()})
             dest.save().then(()=>{
                     destList.push(dest)
                     $("#destCreate-modal-close").click()

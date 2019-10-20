@@ -50,7 +50,8 @@ def destinations():
             #     trip_id = data['trip_id']
             #     logging.debug('resetting trip_id: ' + str(trip_id))
             
-            dest = models.Destination(data['name'],trip_id, data['notes'] )
+            # need to improve constructor to take all fields
+            dest = models.Destination(data['name'], session['trip_id'], data['notes'], int(data['days_there']), int(data['trip_order']))
             
             data = {"id": dest.id}
             logging.info('created trip: ' + str(dest.name)+ "with id: " + str(data['id']))
@@ -66,6 +67,8 @@ def destinations():
     if request.method == "PATCH":
         try:
             data = request.get_json()
+            
+            logging.debug("patching data from dict: " + str(data))
             if not data['id']:
                 raise Exception("No trip id")
             
@@ -75,6 +78,7 @@ def destinations():
                 # if not OAUTH():
                 return abort(401)
             
+            dest.update(data)
             logging.debug("this is the edited notes" + str(dest.notes))
             
             # dest.name = data['name']
