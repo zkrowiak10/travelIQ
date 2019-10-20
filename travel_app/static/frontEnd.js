@@ -8,10 +8,25 @@ $().ready(()=>{
 
 // flesh this out for more sophistocated methods
 api = {
-    get: function(endpoint, method, body) {
+    get: function(endpoint) {
         return new Promise((resolve, reject)=>{
             fetch (endpoint, {
-                method: method,
+                method: "GET",
+                headers: {
+                    "Content-Type" : "application/json"
+                }
+    
+                }).then((res)=>{
+                        res.json()
+                        .then((data)=> {resolve(data)})
+
+            })
+        })
+    },
+    post: function(endpoint, body) {
+        return new Promise((resolve, reject)=>{
+            fetch (endpoint, {
+                method: "POST",
                 headers: {
                     "Content-Type" : "application/json"
                 }
@@ -112,12 +127,43 @@ function viewModel() {
 
 }
 
+function destination (dest) {
+    let self = this
+    for (key in dest) {
+        self[key] = ko.observable(dest[key])
+    }
+    save = async function() {
+        data = ko.toJSON(self)
+        response = await api.post(destinationsEndpoint, data)
+        // will need to process potential erros down the road
+        // if (response.status)
+
+    }
+}
+
 
 function destinations() {
     let self = this;
     self.destList = ko.observableArray([]);
 
-    this.get =  async function() {
+    self.modal = {
+        name : ko.observable(""),
+        notes: ko.observable(""),
+        render: function(dest) {
+            this.name(dest.name)
+            this.notes(dest.notes)
+            this.dest = dest
+        },
+        save: function() {
+            dest.name(this.name)
+            dest.notes(this.notes)
+        }
+
+    }
+
+
+    
+    self.get =  async function() {
 
             //get data through fetch
             data = await api.get(destinationsEndpoint, "GET")
@@ -132,7 +178,7 @@ function destinations() {
                 
             }
             for (dest of data) {
-                self.destList.push(dest)
+                self.destList.push(new destination(dest))
             }
             
 
