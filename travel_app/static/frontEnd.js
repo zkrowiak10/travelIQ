@@ -32,12 +32,17 @@ api = {
                 },
                 "body":  body 
     
-                }).then((res)=>{
-                        res.json()
-                        .then((data)=> {resolve(data)})
+            }).then((res)=>{        
+                res.json()
+                .then((data)=> {resolve(data)},(e) => {
+                    console.log("in catch of api POST")
+                    reject(e)
+                })
 
             })
+                  
         })
+        
     },
     patch: function(endpoint, body) {
         return new Promise((resolve, reject)=>{
@@ -53,6 +58,20 @@ api = {
                     })
 
         })
+        
+    },
+    delete: function(endpoint, body) {
+
+            return fetch(endpoint, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type" : "application/json"
+                },
+                "body":  body 
+    
+                })
+
+        
         
     }
 
@@ -144,15 +163,41 @@ function destination (dest) {
     self.modal = function(self) {
         model.destinations.modal.render(self)
     }
-    self.save = async function() {
+    self.update = async function() {
         data = ko.toJSON(self)
-        console.log(data)
         response = await api.patch(destinationsEndpoint, data)
         // will need to process potential erros down the road
         if (response.status != 200) {
             alert('something went wrong')
         }
 
+    },
+
+    //creates new destination on server and returns json of created resource
+    // with id attribute
+    self.save = async function() {
+        data = ko.toJSON(self)
+        // try {
+        response = await api.post(destinationsEndpoint, data)
+        console.log(response)
+        self.id = response.id
+        // }
+        // catch (e) {
+        //     console.log(e)
+        // }
+        // if (!response.id) {
+        //     throw "error creating destination"
+        // }
+        return response
+    }
+
+    self.delete = async function() {
+        body = ko.toJSON(self)
+        console.log('delete request body', body)
+        response = await api.delete(destinationsEndpoint, body)
+        if (response.status != 200) {
+            throw Error("Resource not deleted")
+        }
     }
 }
 
@@ -162,25 +207,67 @@ function destinations() {
     self.destList = ko.observableArray([]);
 
     self.modal = {
-        name : ko.observable("test"),
+        name : ko.observable(""),
         notes: ko.observable(""),
+        trip_order: ko.observable(""),
+        days_there: ko.observable(""),
         render: function(dest) {
             console.log('rendering modal', this.name())
             this.name(dest.name())
             this.notes(dest.notes())
+            this.trip_order(dest.trip_order())
+            this.days_there(dest.days_there())
             this.dest = dest
             console.log('at end of modal', this.name())
+        },
+        clear: function() {
+            modal = this.destinations.modal
+            modal.name("")
+            modal.notes("")
+            modal.trip_order("")
+            modal.days_there("")
         },
         save: function() {
             modal = this.destinations.modal
             console.log("in save", modal.dest)
             modal.dest.name(modal.name())
             modal.dest.notes(modal.notes())
-            modal.dest.save()
+            modal.dest.days_there(modal.days_there())
+            modal.dest.trip_order(modal.trip_order())
+            modal.dest.update()
             
             $("#dest-modal-close").click()
+        },
+        create: async function() {
+            modal = this.destinations.modal
+            destList = this.destinations.destList
+            dest = new destination({name: modal.name(), notes: modal.notes()})
+            dest.save().then(()=>{
+                    destList.push(dest)
+                    $("#destCreate-modal-close").click()
+                }).catch((e) =>{
+                    alert('something went wrong')
+                    console.log(e)
+                    $("#destCreate-modal-close").click()
+                })
+        },
+
+        delete: async function() {
+            modal = this.destinations.modal
+            destList = this.destinations.destList
+            modal.dest.delete().then(()=>{
+                console.log("promise succeeded")
+                destList.pop(model.dest)
+                $("#dest-modal-close").click()
+            }, (e) => {
+                console.log(e)
+                alert("something went wrong. Item not deleted")
+                $("#dest-modal-close").click()
+            }
+            )
         }
 
+ 
     }
 
 

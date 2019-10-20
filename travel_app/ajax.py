@@ -49,13 +49,16 @@ def destinations():
             # if data['trip_id'] is not None:
             #     trip_id = data['trip_id']
             #     logging.debug('resetting trip_id: ' + str(trip_id))
-            models.Destination(data['name'],trip_id )
-            logging.info('created trip: ' + str(data['name']))
+            
+            dest = models.Destination(data['name'],trip_id, data['notes'] )
+            
+            data = {"id": dest.id}
+            logging.info('created trip: ' + str(dest.name)+ "with id: " + str(data['id']))
         except Exception as e:
             logging.error("There was an error in loading json POST request: " + str(e))
             
             return abort(400)
-        return Response("created",201)
+        return jsonify(data), 201
         
         
 
@@ -72,7 +75,12 @@ def destinations():
                 # if not OAUTH():
                 return abort(401)
             
-            dest.name = data['name']
+            logging.debug("this is the edited notes" + str(dest.notes))
+            
+            # dest.name = data['name']
+            # dest.notes = data['notes']
+            # dest.trip_order = data['trip_order']
+            
             models.db.session.add(dest)
             models.db.session.commit()
             return Response("updated",200)

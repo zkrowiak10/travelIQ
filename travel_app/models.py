@@ -108,6 +108,8 @@ class Destination (db.Model):
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     trip = db.relationship('Trip')
     notes = db.Column(db.String(256))
+    trip_order = db.Column(db.Integer)
+    days_there = db.Column(db.Integer)
     def __init__(self, name, trip_id, notes):
         commit = True
         trip = trip_id

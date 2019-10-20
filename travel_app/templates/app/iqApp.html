@@ -88,16 +88,24 @@
             <table class="table border">
                 <thead>
                   <tr>
+                    <th></th>
+                    <th></th>
                     <th>Destination Name</th>
+                    <th>Days At Destination</th>
                     <th>Notes</th>
                     <th>
                     </th>
-                    <th></th>
+                    <th><button type="button" class="btn btn-primary" data-toggle="modal" data-bind="click: destinations.modal.clear"data-target="#createModal"   >
+                        <i class="fas fa-plus"></i>
+                      </button></td></th>
                   </tr>
                 </thead>
                 <tbody data-bind="foreach: destinations.destList">
                     <tr >
+                        <td data-bind="text: trip_order"></td>
+                        <td><input type="checkbox"></td>
                         <td data-bind="text: name"></td>
+                        <td data-bind="text: days_there"></td>
                         <td data-bind="text: notes"></td>
                         <td ></td>
                         <!-- will add the following functions soon -->
@@ -123,7 +131,11 @@
                     <div class="modal-body">
                       <h5>Destination Name</h5>
                       <input type="text" data-bind="value: destinations.modal.name">
+                      <h5> Days There</h5>
+                      <input type="text" data-bind="value: destinations.modal.days_there">
                       <br>
+                      <h5> Trip Order</h5>
+                      <input type="text" data-bind="value: destinations.modal.trip_order">
                       <h5>Notes</h5>
                       <input type="text" data-bind="value: destinations.modal.notes">
                       
@@ -131,12 +143,39 @@
                     <div class="modal-footer">
                       
                       <button type="button" id="dest-modal-close" class="btn btn-secondary" data-dismiss="modal">Close</button>
-
+                      <button type="button" class="btn btn-primary"  data-bind="click: destinations.modal.delete">Delete Item</button>
                       <button type="button" class="btn btn-primary"  data-bind="click: destinations.modal.save">Save changes</button>
                     </div>
                   </div>
                 </div>
               </div>
+              <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title"  id="createModalLabel">Create Destination</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <h5>Destination Name</h5>
+                        <input type="text" data-bind="value: destinations.modal.name">
+                        <br>
+                        <h5>Notes</h5>
+                        <input type="text" data-bind="value: destinations.modal.notes">
+                        
+                      </div>
+                      <div class="modal-footer">
+                        
+                        <button type="button" id="destCreate-modal-close" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        
+                        <button type="button" class="btn btn-primary"  data-bind="click: destinations.modal.create">Create</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+  
 
 
         </div>
