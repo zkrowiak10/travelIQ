@@ -2,6 +2,9 @@
 
 $().ready(()=>{
     model = new viewModel()
+    // model.destList.subscribe(function() {
+
+    // })
     ko.applyBindings(model);
     model.destinations.get()
 })
@@ -93,22 +96,10 @@ function tabControl(showTab) {
 function viewModel() {
     let self = this
 
-    self.destinations = new destinations()
+    self.destinations =  destinations
 
 
-    hotels= {
-
-        get: function() {
-            //get data through fetch
-
-            //hide remove all other children to the info-window 
-            tabControl("#hotels")
-
-            //show destinations window (with creation form)
-
-            //populate data
-        }
-    }
+    self.hotels = hotels
 
     flights= {
 
@@ -154,6 +145,7 @@ function viewModel() {
 
 }
 
+// constructor function for destinations
 function destination (dest) {
     let self = this
     for (key in dest) {
@@ -181,13 +173,6 @@ function destination (dest) {
         response = await api.post(destinationsEndpoint, data)
         console.log(response)
         self.id = response.id
-        // }
-        // catch (e) {
-        //     console.log(e)
-        // }
-        // if (!response.id) {
-        //     throw "error creating destination"
-        // }
         return response
     }
 
@@ -202,11 +187,11 @@ function destination (dest) {
 }
 
 
-function destinations() {
-    let self = this;
-    self.destList = ko.observableArray([]);
+destinations = {
+    self : this,
+    destList : ko.observableArray([]),
 
-    self.modal = {
+    modal : {
         name : ko.observable(""),
         notes: ko.observable(""),
         trip_order: ko.observable(0),
@@ -264,16 +249,11 @@ function destinations() {
                 console.log(e)
                 alert("something went wrong. Item not deleted")
                 $("#dest-modal-close").click()
-            }
-            )
+            })
         }
+    },
 
- 
-    }
-
-
-    
-    self.get =  async function() {
+    get :  async function() {
 
             //get data through fetch
             data = await api.get(destinationsEndpoint, "GET")
@@ -282,39 +262,158 @@ function destinations() {
             //call tab control to show this tab
             tabControl('#destinations')
 
-            console.log(self.destList().length)
-            while (self.destList().length > 0) {
+            console.log(destinations.destList().length)
+            while (destinations.destList().length > 0) {
                 self.destList.pop()
                 
             }
             for (dest of data) {
-                self.destList.push(new destination(dest))
+                destinations.destList.push(new destination(dest))
             }
-            
 
+            }
 
-
-            
-            
-
-
-
-                        
-
-            
-            },
-        post = function() {
-
-            //need to fill this out
-            fetch(destinationsEndpoint, {
-                method:'POST',
-                headers: {
-                    "Content-type": 'application/json',
-                },
-                body: JSON.stringify({
-                    name: "testDest"
-                })
-            })
-        }
 
 }
+
+
+hotels = {
+    self : this,
+    list : ko.observableArray([]),
+    
+    modal : {
+        name : ko.observable(""),
+        check_in: ko.observable(""),
+        check_out: ko.observable(),
+        refundable: ko.observable(),
+        cancellation_date: ko.observable(),
+        breakfast_included: ko.observable(),
+
+        render: function(obj) {
+            console.log('rendering modal', this.name())
+            hotels.modal.name(obj.name())
+            hotels.modal.check_in(obj.check_in())
+            hotels.modal.check_out(obj.check_out())
+            hotels.modal.refundable(obj.refundable())
+            hotels.modal.cancellation_date(obj.cancellation_date())
+            hotels.modal.obj = obj
+            console.log('at end of modal', this.name())
+        },
+        clear: function() {
+            hotels.modal.name('')
+            hotels.modal.check_in('')
+            hotels.modal.check_out('')
+            hotels.modal.refundable('')
+            hotels.modal.cancellation_date('')
+            hotels.modal.breakfast_included('')
+        },
+        save: function() {
+            modal = hotels.modal
+            console.log("in save", modal.obj)
+            modal.obj.name(modal.name())
+            modal.obj.check_in(modal.check_in())
+            modal.obj.check_out(modal.check_out())
+            modal.obj.refundable(modal.refundable())
+            modal.obj.cancellation_date(modal.cancellation_date())
+            modal.obj.update()
+            
+            $("#hotel-modal-close").click()
+        },
+        create: async function() {
+            modal = hotels.modal
+            list = hotels.list
+            data = {}
+            
+            for (key in modal.obj) {
+                modal.obj[key](modal[key]())
+            }
+            console.log("creating hotel with data: ", data)
+            obj = new hotels.hotel(modal)
+            obj.save().then(()=>{
+                    list.push(obj)
+                    $("#hotelCreate-modal-close").click()
+                }).catch((e) =>{
+                    alert('something went wrong')
+                    console.log(e)
+                    $("#hotelCreate-modal-close").click()
+                })
+        },
+
+        delete: async function() {
+            modal = this.destinations.modal
+            destList = this.destinations.destList
+            modal.dest.delete().then(()=>{
+                console.log("promise succeeded")
+                destList.pop(model.dest)
+                $("#dest-modal-close").click()
+            }, (e) => {
+                console.log(e)
+                alert("something went wrong. Item not deleted")
+                $("#dest-modal-close").click()
+            })
+        }
+    },
+
+    get :  async function() {
+
+            //get data through fetch
+            data = await api.get(hotelsEndpoint, "GET")
+            
+            console.log('in hotels get')
+            //call tab control to show this tab
+            tabControl('#hotels')
+
+            
+            while (hotels.list().length > 0) {
+                hotels.list.pop()
+                
+            }
+            for (obj of data) {
+                hotels.list.push(new hotel(dest))
+            }
+
+            },
+    hotel: function(obj) {
+        let self = this
+        for (key in obj) {
+            self[key] = ko.observable(obj[key])
+        }
+    
+        self.modal = function(self) {
+            model.hotels.modal.render(self)
+        }
+        self.update = async function() {
+            data = ko.toJSON(self)
+            response = await api.patch(hotelsEndpoint, data)
+            // will need to process potential erros down the road
+            if (response.status != 200) {
+                alert('something went wrong')
+            }
+    
+        },
+    
+        //creates new destination on server and returns json of created resource
+        // with id attribute
+        self.save = async function() {
+            data = ko.toJSON(self)
+            // try {
+            response = await api.post(hotelsEndpoint, data)
+            console.log(response)
+            self.id = response.id
+            return response
+        }
+    
+        self.delete = async function() {
+            body = ko.toJSON(self)
+            console.log('delete request body', body)
+            response = await api.delete(hotelsEndpoint, body)
+            if (response.status != 200) {
+                throw Error("Resource not deleted")
+            }
+        }
+    }
+
+
+}
+
+

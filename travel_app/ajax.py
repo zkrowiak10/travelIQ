@@ -3,7 +3,7 @@ from flask import (
 )
 import logging
 import functools
-from travel_app import models, urls
+from travel_app import models, urls, utils
 import logging
 
 login_required = urls.login_required
@@ -114,3 +114,10 @@ def destinations():
             return abort(400)
         
         return Response("Deleted", 200)
+
+
+@ajax.route('/hotels', methods=('GET', 'POST', 'PATCH', 'DELETE'))
+@login_required
+def hotels():
+    api = utils.API(models.Hotel_Reservation)
+    return api.api_driver(request)

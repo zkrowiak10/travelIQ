@@ -94,6 +94,8 @@ class Trip(Base):
 
 class Hotel_Reservation(Base):
     id  = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(256))
+    link = db.Column(db.String(256))
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     trip = db.relationship('Trip', backref='hotel_reservation')
