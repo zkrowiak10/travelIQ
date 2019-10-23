@@ -16,7 +16,7 @@ class Base(db.Model):
             if key == "id":
                 continue
             setattr(self, key, value)
-
+            
         
 
 class User (Base):
@@ -62,8 +62,8 @@ class Trip(Base):
     id  = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     name = db.Column(db.String(120), nullable=False)
-    start_date = db.Column(db.DateTime, nullable=False)
-    end_date = db.Column(db.DateTime, nullable=False)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=False)
     user = db.relationship('User')
     description = db.Column(db.Text)
 
@@ -100,10 +100,10 @@ class Hotel_Reservation(Base):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     trip = db.relationship('Trip', backref='hotel_reservation')
     user = db.relationship('User', backref='hotel_reservation')
-    check_in = db.Column(db.DateTime, nullable=False)
-    check_out = db.Column(db.DateTime, nullable=False)
+    check_in = db.Column(db.Date, nullable=False)
+    check_out = db.Column(db.Date, nullable=False)
     refundable = db.Column(db.Boolean)
-    cancellation_date = db.Column(db.DateTime) 
+    cancellation_date = db.Column(db.Date) 
     destination_id = db.Column(db.Integer, db.ForeignKey('destination.id'))
     destination = db.relationship('Destination', backref='Hotel_Reservation')
     breakfast_included = db.Column(db.Boolean)

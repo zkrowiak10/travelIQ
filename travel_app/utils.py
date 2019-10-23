@@ -24,10 +24,12 @@ class API ():
                 return abort(400)
             
             data = []
-
+            
             for obj in obj_list:
+                logging.debug("this is the data __dict" + str(obj.__dict__))
                 dict = {}
                 for key, value in obj.__dict__.items():
+                    
                     if key != "_sa_instance_state":
                         dict[key] = value
                 data.append(dict)
@@ -47,6 +49,7 @@ class API ():
                 #check if json payload specifies trip, if not, set it to g
                 #should throw error if g doesn't have trip attribute
                 trip_id = g.trip.id
+                data['trip_id'] = g.trip.id
                 logging.debug('setting trip_id: ' + str(trip_id))
                 # if data['trip_id'] is not None:
                 #     trip_id = data['trip_id']

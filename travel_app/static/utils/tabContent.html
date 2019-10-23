@@ -1,116 +1,30 @@
-{% extends 'app/nav.html' %}
-{%block title%} TraveIQ {% endblock %}
-
-{% block content %}
-
-<script>
-    //all url endpoints below
-    destinationsEndpoint = "{{url_for('ajax.destinations')}}"
-    hotelsEndpoint = "{{url_for('ajax.hotels')}}"
-    flightsEndpoint = "{{url_for('ajax.flights')}}"
-    tabContentEndpoint = "{{url_for('static', filename = 'utils/tabContent.html')}}"
-    
-</script>
-{% if trips|length == 0 %}
-<script>
-    function formToggle(){
-        $('#noTrips').toggle()
-        $('#createTrips').toggle()
-      
-    }
-
-    
-
-    
-</script>
-<div class="container  ">
-    <div class="row">
-        <div class="col"></div>
-        <div class="col-6 centered">
-            <div id ="noTrips">
-                <div class="headline">
-                        <h1 class='centered-text'> You Have Not Created Any Trips Yet</h1>
-                        <br>
-                        
-                </div>
-                
-                <p class='centered-text'>
-                    <img src="{{url_for('static', filename='Assets/travel_search.png')}}" style="width: 400px">
-                    <button type="button" onclick='formToggle()' class="btn btn-outline-primary headline">
-                            Create Your First One Today
-                    </button>
-                </p>
-            </div>
-
-            <!-- form -->
-            <form  method="post" style="display: none" id='createTrips' action="{{url_for('iq.create_trip')}}">
-                <h1 >New Trip</h1> 
-                <div class="form-group">
-                  <label for="name">Trip Name</label>
-                  <input class="form-control" required name="TName" aria-describedby="emailHelp" placeholder="eg. 'Trip to Italy'">
-
-                </div>
-                <div class="form-group">
-                  <label for="StartDate">Trip Start Date</label>
-                  <input type="date" required class="form-control" name="TStart">
-                </div>
-                <div class="form-group">
-                        <label for="StartDate">Trip End Date</label>
-                        <input type="date" required class="form-control" name="TEnd">
-                </div>
-                <div class="form-group">
-                        <label for="Description">Description</label>
-                        <textarea class="form-control" name="TDescription"></textarea>
-                </div>
-                <button type="submit" name="login" class="btn btn-primary">Create</button>
-                <button type="button" onclick="formToggle()" class="btn btn-primary">Cancel</button>
-            </form>
-
-            
-            
-        </div >
-        <div class="col"></div>
-    </div>
-</div>
-{% else %}
-
-  <div class="row h-100">
-      <div class="col-3 sideBar border-right list-group">
-        <a class="list-group-item" id="#primaryItem" data-bind="click: destinations.get" href="#">Destinations</a>
-        <a class="list-group-item" data-bind="click: hotels.get" href="#">Hotels</a>
-        <a class="list-group-item" data-bind="click: flights.get" href="#">Flights</a>
-        <a class="list-group-item" data-bind="click: rentals.get" href="#">Rentals</a>
-        <a class="list-group-item" data-bind="click: restaurants.get" href="#">Restaurants</a>
-      </div>
-
-      <div class="col-9" id="tabContent">
-        <div class="contentArea" id="destinations">
-            <h1>Destinations</h1>
+<div class="contentArea" id="destinations">
+            <h1 data-bind="text: title">Destinations</h1>
             <br>
-            <p>All other activities (hotels, restaurants, etc...) are linked to a destination so you can organize your trip easily</p>
+            <p data-bind="text: subtitle">All other activities (hotels, restaurants, etc...) are linked to a destination so you can organize your trip easily</p>
             <br>
             <table class="table border">
                 <thead>
                   <tr>
                     <th></th>
                     <th></th>
-                    <th>Destination Name</th>
-                    <th>Days At Destination</th>
-                    <th>Notes</th>
+                    <!-- ko foreach: headerRows -->
+                    <th data-bind="text: Field">Destination Name</th>
+                    <!-- /ko -->
                     <th>
                     </th>
-                    <th><button type="button" class="btn btn-primary" data-toggle="modal" data-bind="click: destinations.modal.clear"data-target="#createModal"   >
+                    <th><button type="button" class="btn btn-primary"   >
                         <i class="fas fa-plus"></i>
-                      </button></td></th>
+                      </button data-bind="click: showCreateModal"></td></th>
                   </tr>
                 </thead>
                 <tbody data-bind="foreach: destinations.destList.sorted(function (l, r) { return l.trip_order() > r.trip_order() ? 1: -1})">
                     <tr >
                         <td data-bind="text: trip_order"></td>
                         <td><input type="checkbox"></td>
-                        <td data-bind="text: name"></td>
-                        <td data-bind="text: days_there"></td>
-                        <td data-bind="text: notes"></td>
+                        <!-- ko foreach: dataFields -->
+                        <td data-bind="text: data[name]"></td>
+                        <!
                         <td ></td>
                         <!-- will add the following functions soon -->
                         <!-- data-bind="click: this.update()" -->
@@ -294,122 +208,3 @@
                     </div>
                   </div>
                 </div>
-  
-
-        </div>
-        <div class="contentArea" id="flights">
-            <h1>Flights</h1>
-            <br>
-            <p>Your flight booking info can be stored here</p>
-            <br>
-            <table class="table border">
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th>From</th>
-                    <th>To</th>
-                    <th>Departure Time</th>
-                    <th>ETA</th>
-                    <th></th>
-                    <th><button type="button" class="btn btn-primary" data-toggle="modal" data-bind="click: flights.modal.clear"data-target="#createFlightModal"   >
-                        <i class="fas fa-plus"></i>
-                      </button></td></th>
-                  </tr>
-                </thead>
-                <tbody data-bind="foreach: hotels.list.sorted(function (l, r) { return l.check_in() > r.check_in() ? 1: -1})">
-                    <tr >
-                        <td><input type="checkbox"></td>
-                        <td data-bind="text: departing_from"></td>
-                        <td data-bind="text: destination"></td>
-                        <td data-bind="text: departure_time"></td>
-                        <td data-bind="text: eta"></td>
-                        <td ></td>
-                        <!-- will add the following functions soon -->
-                        <!-- data-bind="click: this.update()" -->
-                        <!-- data-bind="click: this.delete()" -->
-                        <td ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#flightsModal" data-bind="click: modal" >
-                            Edit
-                          </button></td>
-
-                    </tr>
-
-                  </tbody>
-            </table>
-            <div class="modal fade" id="flightsModal" tabindex="-1" role="dialog" aria-labelledby="flightsModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title"  id="flightsModalLabel">Edit Hotel</h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-                      <h5>From</h5>
-                      <input type="text" data-bind="value: flights.modal.departing_from">
-                      <h5> To</h5>
-                      <input type="text" data-bind="value: flights.modal.destination">
-                      <br>
-                      <h5> Departure Time</h5>
-                      <input type="datetime-local" data-bind="value: flights.modal.departure_time">
-                      <h5>ETA</h5>
-                      <input type="datetime-local" data-bind="value: flights.modal.eta">
-                      </div>
-                    <div class="modal-footer">
-                      
-                      <button type="button" id="hotel-modal-close" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                      <button type="button" class="btn btn-primary"  data-bind="click: flights.modal.delete">Delete Item</button>
-                      <button type="button" class="btn btn-primary"  data-bind="click: flights.modal.save">Save changes</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="modal fade" id="createFlightModal" tabindex="-1" role="dialog" aria-labelledby="createFlightModalLabel" aria-hidden="true">
-                  <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title"  id="createFlightModalLabel">New Flight</h5>
-                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                          </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="modal-body">
-                              <h5>From</h5>
-                              <input type="text" data-bind="value: flights.modal.departing_from">
-                              <h5> To</h5>
-                              <input type="text" data-bind="value: flights.modal.destination">
-                              <br>
-                              <h5> Departure Time</h5>
-                              <input type="datetime-local" data-bind="value: flights.modal.departure_time">
-                              <h5>ETA</h5>
-                              <input type="datetime-local" data-bind="value: flights.modal.eta">
-                            </div>
-                        </div>
-                      
-                      <div class="modal-footer">
-                        
-                        <button type="button" id="create-flight-modal-close" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        
-                        <button type="button" class="btn btn-primary"  data-bind="click: flights.modal.create">Create</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-  
-
-        </div>
-        <div class="contentArea" id="rentals">
-          <tab-content params="value: rentals">
-
-          </tab-content>
-        </div>
-        <div class="contentArea" id="restaurants">rest</div>
-      </div>
-
-
-        
-
-{% endif %}
-
-{% endblock %}

@@ -121,3 +121,9 @@ def destinations():
 def hotels():
     api = utils.API(models.Hotel_Reservation)
     return api.api_driver(request)
+
+@ajax.route('/flights', methods=('GET', 'POST', 'PATCH', 'DELETE'))
+@login_required
+def flights():
+    api = utils.API(models.Flight)
+    return api.api_driver(request)

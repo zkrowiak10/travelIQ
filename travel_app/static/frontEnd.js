@@ -1,5 +1,11 @@
 
-
+// console.log('fetching', tabContentEndpoint)
+fetch('/static/utils/tabContent.html', {
+    headers: {
+        "Content-Type" : "text/html"
+    }
+}).then((response)=>{response.text().then((text)=>{
+    
 $().ready(()=>{
     model = new viewModel()
     // model.destList.subscribe(function() {
@@ -99,21 +105,9 @@ function viewModel() {
     self.destinations =  destinations
 
 
-    self.hotels = hotels
+    self.hotels = new hotels()
 
-    flights= {
-
-        get: function() {
-            //get data through fetch
-
-            //hide remove all other children to the info-window 
-            tabControl("#flights")
-
-            //show destinations window (with creation form)
-
-            //populate data
-        }
-    }
+    flights= new flights()
     rentals= {
 
         get: function() {
@@ -126,6 +120,10 @@ function viewModel() {
 
             //populate data
         }
+    }
+
+    rentals = {
+        
     }
 
     restaurants= {
@@ -221,7 +219,7 @@ destinations = {
             modal.dest.trip_order(modal.trip_order())
             modal.dest.update()
             
-            $("#dest-modal-close").click()
+            $(closeModalId).click()
         },
         create: async function() {
             modal = this.destinations.modal
@@ -244,11 +242,11 @@ destinations = {
             modal.dest.delete().then(()=>{
                 console.log("promise succeeded")
                 destList.pop(model.dest)
-                $("#dest-modal-close").click()
+                $(closeModalId).click()
             }, (e) => {
                 console.log(e)
                 alert("something went wrong. Item not deleted")
-                $("#dest-modal-close").click()
+                $(closeModalId).click()
             })
         }
     },
@@ -277,119 +275,51 @@ destinations = {
 }
 
 
-hotels = {
-    self : this,
-    list : ko.observableArray([]),
+function hotels(){
+    self = this
+    this.list = ko.observableArray([]),
     
-    modal : {
-        name : ko.observable(""),
-        check_in: ko.observable(""),
-        check_out: ko.observable(),
-        refundable: ko.observable(),
-        cancellation_date: ko.observable(),
-        breakfast_included: ko.observable(),
-
-        render: function(obj) {
-            console.log('rendering modal', this.name())
-            hotels.modal.name(obj.name())
-            hotels.modal.check_in(obj.check_in())
-            hotels.modal.check_out(obj.check_out())
-            hotels.modal.refundable(obj.refundable())
-            hotels.modal.cancellation_date(obj.cancellation_date())
-            hotels.modal.obj = obj
-            console.log('at end of modal', this.name())
-        },
-        clear: function() {
-            hotels.modal.name('')
-            hotels.modal.check_in('')
-            hotels.modal.check_out('')
-            hotels.modal.refundable('')
-            hotels.modal.cancellation_date('')
-            hotels.modal.breakfast_included('')
-        },
-        save: function() {
-            modal = hotels.modal
-            console.log("in save", modal.obj)
-            modal.obj.name(modal.name())
-            modal.obj.check_in(modal.check_in())
-            modal.obj.check_out(modal.check_out())
-            modal.obj.refundable(modal.refundable())
-            modal.obj.cancellation_date(modal.cancellation_date())
-            modal.obj.update()
-            
-            $("#hotel-modal-close").click()
-        },
-        create: async function() {
-            modal = hotels.modal
-            list = hotels.list
-            data = {}
-            
-            for (key in modal.obj) {
-                modal.obj[key](modal[key]())
-            }
-            console.log("creating hotel with data: ", data)
-            obj = new hotels.hotel(modal)
-            obj.save().then(()=>{
-                    list.push(obj)
-                    $("#hotelCreate-modal-close").click()
-                }).catch((e) =>{
-                    alert('something went wrong')
-                    console.log(e)
-                    $("#hotelCreate-modal-close").click()
-                })
-        },
-
-        delete: async function() {
-            modal = this.destinations.modal
-            destList = this.destinations.destList
-            modal.dest.delete().then(()=>{
-                console.log("promise succeeded")
-                destList.pop(model.dest)
-                $("#dest-modal-close").click()
-            }, (e) => {
-                console.log(e)
-                alert("something went wrong. Item not deleted")
-                $("#dest-modal-close").click()
-            })
-        }
-    },
-
-    get :  async function() {
+    this.fields = ['name', 'link', 'check_in', 'check_out', 
+        'refundable', 'cancellation_date', 
+        'destination_id', 'breakfast_included'],
+    this.modal = new modal(self, self.fields, "#hotel-modal-close","#create-hotel-modal-close"),
+  
+    this.get =  async function() {
 
             //get data through fetch
             data = await api.get(hotelsEndpoint, "GET")
             
-            console.log('in hotels get')
+            console.log('in hotels get. data: ', data)
             //call tab control to show this tab
             tabControl('#hotels')
 
             
-            while (hotels.list().length > 0) {
-                hotels.list.pop()
+            while (self.list().length > 0) {
+                self.list.pop()
                 
             }
             for (obj of data) {
-                hotels.list.push(new hotel(dest))
+                console.log(obj)
+                self.list.push(new self.construct(obj))
             }
 
-            },
-    hotel: function(obj) {
-        let self = this
+            }
+    this.construct = function(obj) {
         for (key in obj) {
-            self[key] = ko.observable(obj[key])
+            this[key] = ko.observable(obj[key])
         }
     
-        self.modal = function(self) {
-            model.hotels.modal.render(self)
+        this.modal = function(self) {
+            self.modal.render(self)
         }
-        self.update = async function() {
-            data = ko.toJSON(self)
+        this.update = async function() {
+            data = ko.toJSON(this)
             response = await api.patch(hotelsEndpoint, data)
             // will need to process potential erros down the road
             if (response.status != 200) {
                 alert('something went wrong')
             }
-    
+        
         },
     
         //creates new destination on server and returns json of created resource
@@ -416,4 +346,158 @@ hotels = {
 
 }
 
+function flights(){
+    self = this
+    this.list = ko.observableArray([]),
+    
+    this.fields = ['departure_time', 'eta', 'destination', 'departing_from']
+    this.modal = new modal(self, self.fields, "#flight-modal-close","#create-flight-modal-close"),
+  
+    this.get =  async function() {
 
+            //get data through fetch
+            data = await api.get(flightsEndpoint, "GET")
+            
+            
+            //call tab control to show this tab
+            tabControl('#flights')
+
+            
+            while (self.list().length > 0) {
+                self.list.pop()
+                
+            }
+            for (obj of data) {
+                console.log(obj)
+                self.list.push(new self.construct(obj))
+            }
+
+            }
+    this.construct = function(obj) {
+        for (key in obj) {
+            this[key] = ko.observable(obj[key])
+        }
+    
+        this.modal = function(self) {
+            self.modal.render(self)
+        }
+        this.update = async function() {
+            data = ko.toJSON(this)
+            response = await api.patch(flightsEndpoint, data)
+            // will need to process potential erros down the road
+            if (response.status != 200) {
+                alert('something went wrong')
+            }
+        
+        },
+    
+        //creates new destination on server and returns json of created resource
+        // with id attribute
+        this.save = async function() {
+            data = ko.toJSON(self)
+            // try {
+            response = await api.post(flightsEndpoint, data)
+            console.log(response)
+            self.id = response.id
+            return response
+        }
+    
+        this.delete = async function() {
+            body = ko.toJSON(self)
+            console.log('delete request body', body)
+            response = await api.delete(flightsEndpoint, body)
+            if (response.status != 200) {
+                throw Error("Resource not deleted")
+            }
+        }
+    }
+
+
+}
+function modal(parent, fields, closeModalId, closeModalCreateId) {
+        let self = this
+        this.fields = fields
+        this.closeModalId = closeModalId
+        this.parent = parent
+        this.closeModalCreateId = closeModalCreateId
+        
+        for (let i=0; i < fields.length; i++) {
+            key = fields[i]
+            this[key] = ko.observable()
+        }
+        
+        this.render = function(obj) {
+            for (key in obj) {
+                this[key](obj[key]())
+            }
+            this.obj = obj
+        },
+        this.clear = function() {
+           
+            for (let i=0; i < self.fields.length; i++) {
+                key = self.fields[i]
+                self[key](null)
+            }
+            self.obj = null
+        },
+
+        this.save = function() {
+            for (key in fields) {
+                obj[key](self[key]())
+            }
+            self.obj.update()
+            
+            $(self.closeModalId).click()
+        },
+        this.create = async function() {
+            parent = self.parent
+            data = {}
+
+            console.log('in modal create')
+            for (let i=0; i < self.fields.length; i++) {
+                key = self.fields[i]
+                val = self[key]
+                console.log('val ' , val)
+                data[key] = val()
+            }
+            console.log("creating hotel with data: ", data)
+            obj = new parent.construct(data)
+            obj.save().then(()=>{
+                    parent.list.push(obj)
+                    $(self.closeModalCreateId).click()
+                }).catch((e) =>{
+                    alert('something went wrong')
+                    console.log(e)
+                    console.log(self.closeModalCreateId)
+                    $(self.closeModalCreateId).click()
+                })
+        }
+
+        this.delete = async function() {
+            
+            list = this.parent.list
+            this.obj.delete().then(()=>{
+                console.log("promise succeeded")
+                list.pop(this.obj)
+                $(closeModalId).click()
+            }, (e) => {
+                console.log(e)
+                alert("something went wrong. Item not deleted")
+                $(closeModalId).click()
+            })
+        }
+    
+
+}
+
+// ko.components.register('tab-content'{
+//     viewModel: function(params) {
+//             this.Model = params.value
+
+
+//     }
+// })
+
+
+})
+})
