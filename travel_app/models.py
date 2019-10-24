@@ -166,6 +166,8 @@ class Car_Rental (Base):
     company = db.Column(db.String(256))
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     trip = db.relationship('Trip', foreign_keys=[trip_id])
+    pickup_day = db.Column(db.DateTime)
+    dropoff_day = db.Column(db.DateTime)
 
 class Activity(Base):
     id = db.Column(db.Integer, primary_key = True)

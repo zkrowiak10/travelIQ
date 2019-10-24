@@ -5,7 +5,42 @@ fetch('/static/utils/tabContent.html', {
         "Content-Type" : "text/html"
     }
 }).then((response)=>{response.text().then((text)=>{
-    
+    rentalData= [
+        {
+            "pickup": "Honolulu",
+            "drop_off": "Baisy-Thy",
+            "company": "Amet Foundation",
+            "pickup_day": "17-04-19",
+            "dropoff_day": "09-25-20"
+        },
+        {
+            "pickup": "Goes",
+            "drop_off": "Eisleben",
+            "company": "Mauris Blandit Incorporated",
+            "pickup_day": "10-06-19",
+            "dropoff_day": "10-18-19"
+        },
+        {
+            "pickup": "Roubaix",
+            "drop_off": "Hofstade",
+            "company": "Risus Quisque Libero Industries",
+            "pickup_day": "29-04-20",
+            "dropoff_day": "08-14-19"
+        },
+        {
+            "pickup": "Pictou",
+            "drop_off": "Bayonne",
+            "company": "Sagittis Duis Gravida Incorporated",
+            "pickup_day": "31-05-19",
+            "dropoff_day": "07-08-20"
+        },
+        {
+            "pickup": "Buggenhout",
+            "drop_off": "Brucargo",
+            "company": "Duis Cursus Diam Institute",
+            "pickup_day": "05-05-20",
+            "dropoff_day": "10-06-19"
+        },]
 $().ready(()=>{
     model = new viewModel()
     // model.destList.subscribe(function() {
@@ -93,8 +128,9 @@ function tabControl(showTab) {
     tabs = $('.contentArea')
     for (tab of tabs) {
         $(tab).hide()
-        $(showTab).show()
+        
     }
+    $(showTab).show()
 }
 
 
@@ -108,31 +144,62 @@ function viewModel() {
     self.hotels = new hotels()
 
     flights= new flights()
-    rentals= {
 
-        get: function() {
-            //get data through fetch
 
-            //hide remove all other children to the info-window 
-            tabControl("#rentals")
-
-            //show destinations window (with creation form)
-
-            //populate data
-        }
-    }
-
-    rentals = {
+    self.rentals = {
+        title: "Car Rentals",
+        description: "Reserve your car rentals!",
+        Fields: [
+            {key:"pickup",
+            pretty: "Pickup Location"},
+            {
+                key: "drop_off",
+                pretty: "Drop Off Location"
+            },
+            {
+                key: "company",
+                pretty: "Rental Company"
+            },
+            {
+                key: "pickup_day",
+                pretty: "Pick Up day"
+            },
+            {
+                key: 'dropoff_day',
+                pretty: "Dropoff Day"
+            }
         
+            ],
+        data : ko.observableArray(),
+        get: function() {
+
+            //api later
+            for (item of rentalData) {
+                console.log(item)
+                model.rentals.data.push(item)
+            }
+            tabControl("#rentals")
+        },
+        
+        
+
     }
+
+    // for (item of rentalData) {
+    //     rentals.data().push(item))
+    // },
 
     restaurants= {
 
+        id : "restaurants",
+        title: "A Beautiful Restaurant",
+        description: "Plan out your meals!",
+        Fields: [{pretty: "rt" }],
         get: function() {
             //get data through fetch
 
             //hide remove all other children to the info-window 
-            tabControl("#retaurants")
+            tabControl("#restaurants")
 
             //show destinations window (with creation form)
 
@@ -183,6 +250,7 @@ function destination (dest) {
         }
     }
 }
+
 
 
 destinations = {
@@ -490,13 +558,17 @@ function modal(parent, fields, closeModalId, closeModalCreateId) {
 
 }
 
-// ko.components.register('tab-content'{
-//     viewModel: function(params) {
-//             this.Model = params.value
 
 
-//     }
-// })
+ko.components.register('tab-content',{
+    viewModel: function(params) {
+            this.Model = params.value
+            
+
+
+    },
+    template: text
+})
 
 
 })
