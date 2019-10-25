@@ -43,9 +43,6 @@ fetch('/static/utils/tabContent.html', {
         },]
 $().ready(()=>{
     model = new viewModel()
-    // model.destList.subscribe(function() {
-
-    // })
     ko.applyBindings(model);
     model.destinations.get()
 })
@@ -146,48 +143,12 @@ function viewModel() {
     flights= new flights()
 
 
-    self.rentals = {
-        title: "Car Rentals",
-        description: "Reserve your car rentals!",
-        Fields: [
-            {key:"pickup",
-            pretty: "Pickup Location"},
-            {
-                key: "drop_off",
-                pretty: "Drop Off Location"
-            },
-            {
-                key: "company",
-                pretty: "Rental Company"
-            },
-            {
-                key: "pickup_day",
-                pretty: "Pick Up day"
-            },
-            {
-                key: 'dropoff_day',
-                pretty: "Dropoff Day"
-            }
-        
-            ],
-        data : ko.observableArray(),
-        get: function() {
-
-            //api later
-            for (item of rentalData) {
-                console.log(item)
-                model.rentals.data.push(item)
-            }
-            tabControl("#rentals")
-        },
+    self.rentals = new rentals()
         
         
 
-    }
+    
 
-    // for (item of rentalData) {
-    //     rentals.data().push(item))
-    // },
 
     restaurants= {
 
@@ -251,6 +212,48 @@ function destination (dest) {
     }
 }
 
+function rentals(){
+
+    this.title = "Car Rentals"
+    this.description ="Reserve your car rentals!"
+    this.Fields = [
+        {key:"pickup",
+        pretty: "Pickup Location"},
+        {
+            key: "drop_off",
+            pretty: "Drop Off Location"
+        },
+        {
+            key: "company",
+            pretty: "Rental Company"
+        },
+        {
+            key: "pickup_day",
+            pretty: "Pick Up day"
+        },
+        {
+            key: 'dropoff_day',
+            pretty: "Dropoff Day"
+        }
+    
+        ],
+    this.data = ko.observableArray()
+    construct = function(obj) {
+        for (key in obj){
+            this[key] = ko.observable(obj[key])
+        }
+    }
+    this.get= function() {
+        model.rentals.data([])
+        //api later
+        for (item of rentalData) {
+            
+            model.rentals.data.push(new construct(item))
+        }
+        tabControl("#rentals")
+    }
+    this.construct = construct
+}
 
 
 destinations = {

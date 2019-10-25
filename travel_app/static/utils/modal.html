@@ -1,0 +1,39 @@
+<div class="modal fade" data-bind="with: modal" >
+  <div class="modal-dialog" role="document">
+
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" data-bind="text: title"></h5>
+        <button type="button" class="close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <h5>Destination Name</h5>
+        <input type="text" >
+        <h5> Days There</h5>
+        <input type="number" >
+        <br>
+        <h5> Trip Order</h5>
+        <input type="number" >
+        <h5>Notes</h5>
+        <input type="text" data-bind="value: destinations.modal.notes">
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="dest-modal-close" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary"  data-bind="click: destinations.modal.delete">Delete Item</button>
+        <button type="button" class="btn btn-primary"  data-bind="click: destinations.modal.save">Save changes</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+  
+
+
+
+        
