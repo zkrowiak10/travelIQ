@@ -17,9 +17,9 @@
                     <!-- /ko -->
                     <th>
                     </th>
-                    <th><button type="button" class="btn btn-primary"   >
+                    <th><button type="button" data-bind="click: modal.show" class="btn btn-primary"   >
                         <i class="fas fa-plus"></i>
-                      </button data-bind="click: showCreateModal"></td></th>
+                      </button ></td></th>
                   </tr>
                 </thead>
                 <tbody data-bind="foreach: data">
@@ -34,7 +34,7 @@
                         <!-- will add the following functions soon -->
                         <!-- data-bind="click: this.update()" -->
                         <!-- data-bind="click: this.delete()" -->
-                        <td ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-bind="" >
+                        <td ><button type="button" class="btn btn-primary"  data-bind="click: $parent.modal.render" >
                             Edit
                           </button></td>
 
@@ -45,3 +45,5 @@
             
             
 </div>
+
+<modal-simple params="value: Model.modal" data-bind="visible: Model.modal.visible"></modal-simple>

@@ -1,10 +1,8 @@
 
 // console.log('fetching', tabContentEndpoint)
-fetch('/static/utils/tabContent.html', {
-    headers: {
-        "Content-Type" : "text/html"
-    }
-}).then((response)=>{response.text().then((text)=>{
+GetModules()
+.then((modules)=>{
+    console.log(modules)
     rentalData= [
         {
             "pickup": "Honolulu",
@@ -47,6 +45,23 @@ $().ready(()=>{
     model.destinations.get()
 })
 
+function logging(...args) {
+    console.log(...args)
+}
+
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [year, month, day].join('-');
+}
 // flesh this out for more sophistocated methods
 api = {
     get: function(endpoint) {
@@ -217,23 +232,30 @@ function rentals(){
     this.title = "Car Rentals"
     this.description ="Reserve your car rentals!"
     this.Fields = [
-        {key:"pickup",
-        pretty: "Pickup Location"},
+        {
+            key:"pickup",
+            pretty: "Pickup Location",
+            type: "text"
+        },
         {
             key: "drop_off",
-            pretty: "Drop Off Location"
+            pretty: "Drop Off Location",
+            type: "text"
         },
         {
             key: "company",
-            pretty: "Rental Company"
+            pretty: "Rental Company",
+            type: "text"
         },
         {
             key: "pickup_day",
-            pretty: "Pick Up day"
+            pretty: "Pick Up day",
+            type: "date"
         },
         {
             key: 'dropoff_day',
-            pretty: "Dropoff Day"
+            pretty: "Dropoff Day",
+            type:"date"
         }
     
         ],
@@ -243,6 +265,10 @@ function rentals(){
             this[key] = ko.observable(obj[key])
         }
     }
+
+    this.modal = new modal(this, this.Fields, "Edit Rentals", "","")
+    
+    logging('in rentals constructor. Modal: ', this.modal)
     this.get= function() {
         model.rentals.data([])
         //api later
@@ -485,24 +511,48 @@ function flights(){
 
 
 }
-function modal(parent, fields, closeModalId, closeModalCreateId) {
+function modal(parent, fields, title, closeModalId, closeModalCreateId) {
         let self = this
-        this.fields = fields
-        this.closeModalId = closeModalId
+        this.Fields = fields
+        
         this.parent = parent
-        this.closeModalCreateId = closeModalCreateId
+        this.title= title
+        self.visible = ko.observable()
         
-        for (let i=0; i < fields.length; i++) {
-            key = fields[i]
+        for (Field of this.Fields) {
+            key = Field.key
+            
             this[key] = ko.observable()
+            
         }
-        
+
         this.render = function(obj) {
-            for (key in obj) {
-                this[key](obj[key]())
+            logging('testing this:', self)
+            for (field of self.Fields) {
+                try {
+                    key = field.key
+                    if (field.type == "date") {
+                        date = new Date(obj[key]())
+                        date = formatDate(date)
+                        self[key](date)
+                        logging('date ', date)
+                    }
+                    self[key](obj[key]())
+                    
+                }
+                catch (e) {
+                    logging('render failed for', key, "reason: ", e)
+                    continue
+                }
+            
+          
+                
             }
-            this.obj = obj
+            self.show()
+            self.obj = obj
         },
+
+      
         this.clear = function() {
            
             for (let i=0; i < self.fields.length; i++) {
@@ -512,54 +562,69 @@ function modal(parent, fields, closeModalId, closeModalCreateId) {
             self.obj = null
         },
 
+        this.showCreate= function(){
+            this.clear()
+            this.show()
+        }
+
+        close = function() {
+            self.visible(false)
+        }
+
+        this.show= function(){
+            self.visible(true)
+        }
+
         this.save = function() {
-            for (key in fields) {
-                obj[key](self[key]())
+            for (Field of self.Fields) {
+                key = Field.key
+                self.obj[key](self[key]())
             }
             self.obj.update()
             
-            $(self.closeModalId).click()
-        },
-        this.create = async function() {
-            parent = self.parent
-            data = {}
-
-            console.log('in modal create')
-            for (let i=0; i < self.fields.length; i++) {
-                key = self.fields[i]
-                val = self[key]
-                console.log('val ' , val)
-                data[key] = val()
-            }
-            console.log("creating hotel with data: ", data)
-            obj = new parent.construct(data)
-            obj.save().then(()=>{
-                    parent.list.push(obj)
-                    $(self.closeModalCreateId).click()
-                }).catch((e) =>{
-                    alert('something went wrong')
-                    console.log(e)
-                    console.log(self.closeModalCreateId)
-                    $(self.closeModalCreateId).click()
-                })
+            self.close()
         }
+        // this.create = async function() {
+        //     parent = self.parent
+        //     data = {}
 
-        this.delete = async function() {
+        //     console.log('in modal create')
+        //     for (let i=0; i < self.fields.length; i++) {
+        //         key = self.fields[i]
+        //         val = self[key]
+        //         console.log('val ' , val)
+        //         data[key] = val()
+        //     }
+        //     console.log("creating hotel with data: ", data)
+        //     obj = new parent.construct(data)
+        //     obj.save().then(()=>{
+        //             parent.list.push(obj)
+        //             $(self.closeModalCreateId).click()
+        //         }).catch((e) =>{
+        //             alert('something went wrong')
+        //             console.log(e)
+        //             console.log(self.closeModalCreateId)
+        //             $(self.closeModalCreateId).click()
+        //         })
+        // }
+
+        // this.delete = async function() {
             
-            list = this.parent.list
-            this.obj.delete().then(()=>{
-                console.log("promise succeeded")
-                list.pop(this.obj)
-                $(closeModalId).click()
-            }, (e) => {
-                console.log(e)
-                alert("something went wrong. Item not deleted")
-                $(closeModalId).click()
-            })
-        }
+        //     list = this.parent.list
+        //     this.obj.delete().then(()=>{
+        //         console.log("promise succeeded")
+        //         list.pop(this.obj)
+        //         $(closeModalId).click()
+        //     }, (e) => {
+        //         console.log(e)
+        //         alert("something went wrong. Item not deleted")
+        //         $(closeModalId).click()
+        //     })
+        // }
     
 
 }
+
 
 
 
@@ -567,12 +632,24 @@ ko.components.register('tab-content',{
     viewModel: function(params) {
             this.Model = params.value
             
+            
+    },
+    template: modules.tabContentTemplate
+})
+
+ko.components.register('modal-simple', {
+    viewModel: function(params) {
+        for (key in params.value) {
+            this[key] = params.value[key]
+            this.model = params.value
+        }
+        
+
 
 
     },
-    template: text
+
+    template: modules.modalTemplate
 })
 
-
-})
 })
