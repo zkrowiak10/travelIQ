@@ -21,5 +21,5 @@ class Development(Testing):
     db_user = "postgres"
     db_password = os.environ['POSTGRES_ENV_POSTGRES_PASSWORD']
     DATABASE="postgres"
-    dbhost = os.environ['POSTGRES_PORT_5432_TCP_ADDR']
+    dbhost = 'postgres:5432'
     # SQLALCHEMY_ECHO = True
