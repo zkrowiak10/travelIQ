@@ -3,11 +3,20 @@
 
 {% block content %}
 
+<script>
+    //all url endpoints below
+    destinationsEndpoint = "{{url_for('ajax.destinations')}}"
+    hotelsEndpoint = "{{url_for('ajax.hotels')}}"
+    flightsEndpoint = "{{url_for('ajax.flights')}}"
+    tabContentEndpoint = "{{url_for('static', filename = 'utils/tabContent.html')}}"
+    
+</script>
 {% if trips|length == 0 %}
 <script>
     function formToggle(){
         $('#noTrips').toggle()
         $('#createTrips').toggle()
+      
     }
 </script>
 <div class="container  ">
@@ -62,55 +71,246 @@
 {% else %}
 
   <div class="row h-100">
-      <div class="col-3 sideBar border-right">
-        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-          <a class="nav-link active" id="v-pills-destinations-tab" data-toggle="pill" href="#v-pills-destinations" role="tab" aria-controls="v-pills-destinations" aria-selected="true">Destinations</a>
-          <a class="nav-link " id="v-pills-hotels-tab" data-toggle="pill" href="#v-pills-hotels" role="tab" aria-controls="v-pills-hotels" aria-selected="true">Hotels</a>
-          <a class="nav-link" id="v-pills-transportation-tab" data-toggle="pill" href="#v-pills-transportation" role="tab" aria-controls="v-pills-transportation" aria-selected="false">Transportation</a>
-          <a class="nav-link" id="v-pills-restaurants-tab" data-toggle="pill" href="#v-pills-restaurants" role="tab" aria-controls="v-pills-restaurants" aria-selected="false">Restaurants</a>
-          <a class="nav-link" id="v-pills-flights-tab" data-toggle="pill" href="#v-pills-flights" role="tab" aria-controls="v-pills-flights" aria-selected="false">Flights</a>
-          
-        </div>
+      <div class="col-3 sideBar border-right list-group">
+        <a class="list-group-item" id="#primaryItem" data-bind="click: destinations.get" href="#">Destinations</a>
+        <a class="list-group-item" data-bind="click: hotels.get" href="#">Hotels</a>
+        <a class="list-group-item" data-bind="click: flights.get" href="#">Flights</a>
+        <a class="list-group-item" data-bind="click: rentals.get" href="#">Rentals</a>
+        <a class="list-group-item" data-bind="click: restaurants.get" href="#">Restaurants</a>
       </div>
 
-        <div class="tab-content col-9" id="v-pills-tabContent">
-          <div  class="tab-pane fade show active" id="v-pills-destinations" role="tabpanel" aria-labelledby="v-pills-destinations-tab">
-                    
-            <div>
-              <form class="sideways" method="POST" action="{{url_for('iq.create_dest')}}">
-                
-                    <label  class="sideways" for="name">Destination</label>
-                    <input class="sideways"   name="DName" aria-describedby="emailHelp" placeholder="eg. 'Florence'">
-                    <button class="sideways" name ="newDest" type="submit">Submit</button>
-                
+      <div class="col-9" id="tabContent">
+        <div class="contentArea" id="destinations">
+            <h1>Destinations</h1>
+            <br>
+            <p>All other activities (hotels, restaurants, etc...) are linked to a destination so you can organize your trip easily</p>
+            <br>
+            <table class="table border">
+                <thead>
+                  <tr>
+                    <th>Order</th>
+                    <th>Destination Name</th>
+                    <th>Days At Destination</th>
+                    <th>Notes</th>
+                    <th>
+                    </th>
+                    <th><button type="button" class="btn btn-primary" data-toggle="modal" data-bind="click: destinations.modal.clear"data-target="#createModal"   >
+                        <i class="fas fa-plus"></i>
+                      </button></td></th>
+                  </tr>
+                </thead>
+                <tbody data-bind="foreach: destinations.destList.sorted(function (l, r) { return l.trip_order() > r.trip_order() ? 1: -1})">
+                    <tr >
+                        <td data-bind="text: trip_order"></td>
+                        <td data-bind="text: name"></td>
+                        <td data-bind="text: days_there"></td>
+                        <td data-bind="text: notes"></td>
+                        <td ></td>
+                        <!-- will add the following functions soon -->
+                        <!-- data-bind="click: this.update()" -->
+                        <!-- data-bind="click: this.delete()" -->
+                        <td ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-bind="click: modal" >
+                            Edit
+                          </button></td>
 
-              </form>
-            </div>  
-            
-            <table>
-              <tr>
-                  <th>Name</th>
-              </tr>
-              {% for dest in dests %}
-              <tr>
-                <td>
-                  {{dest.name}}
-                </td>
-              {% endfor %}
-              </tr>
-              
-            
-        
+                    </tr>
+
+                  </tbody>
             </table>
-          </div>
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title"  id="exampleModalLabel">Edit Destination</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <h5>Destination Name</h5>
+                      <input type="text" data-bind="value: destinations.modal.name">
+                      <h5> Days There</h5>
+                      <input type="number" data-bind="value: destinations.modal.days_there">
+                      <br>
+                      <h5> Trip Order</h5>
+                      <input type="number" data-bind="value: destinations.modal.trip_order">
+                      <h5>Notes</h5>
+                      <input type="text" data-bind="value: destinations.modal.notes">
+                      
+                    </div>
+                    <div class="modal-footer">
+                      
+                      <button type="button" id="dest-modal-close" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-primary"  data-bind="click: destinations.modal.delete">Delete Item</button>
+                      <button type="button" class="btn btn-primary"  data-bind="click: destinations.modal.save">Save changes</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title"  id="createModalLabel">Create Destination</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <h5>Destination Name</h5>
+                        <input type="text" data-bind="value: destinations.modal.name">
+                        <h5> Days There</h5>
+                        <input type="number" data-bind="value: destinations.modal.days_there">
+                        <br>
+                        <h5> Trip Order</h5>
+                        <input type="number" data-bind="value: destinations.modal.trip_order">
+                        <br>
+                        <h5>Notes</h5>
+                        <input type="text" data-bind="value: destinations.modal.notes">
+                        
+                      </div>
+                      <div class="modal-footer">
+                        
+                        <button type="button" id="destCreate-modal-close" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        
+                        <button type="button" class="btn btn-primary"  data-bind="click: destinations.modal.create">Create</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+  
 
-          <div class="tab-pane fade" id="v-pills-hotels" role="tabpanel" aria-labelledby="v-pills-hotels-tab">TODO</div>
-          <div class="tab-pane fade" id="v-pills-transportation" role="tabpanel" aria-labelledby="v-pills-transportation-tab">trans</div>
-          <div class="tab-pane fade" id="v-pills-restaurants" role="tabpanel" aria-labelledby="v-pills-restaurants-tab">rest</div>
-          <div class="tab-pane fade" id="v-pills-flights" role="tabpanel" aria-labelledby="v-pills-flights-tab">fl</div>
+
+        </div>
+        <div class="contentArea" id="hotels">
+            <h1>Hotels</h1>
+            <br>
+            <p>All other activities (hotels, restaurants, etc...) are linked to a destination so you can organize your trip easily</p>
+            <br>
+            <table class="table border">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Destination (City)</th>
+                    <th>Checkin</th>
+                    <th>Checkout</th>
+                    <th></th>
+                    <th><button type="button" class="btn btn-primary" data-toggle="modal" data-bind="click: hotels.modal.clear"data-target="#createHotelModal"   >
+                        <i class="fas fa-plus"></i>
+                      </button></td></th>
+                  </tr>
+                </thead>
+                <tbody data-bind="foreach: hotels.list.sorted(function (l, r) { return l.check_in() > r.check_in() ? 1: -1})">
+                    <tr >
+                        <td><input type="checkbox"></td>
+                        <td data-bind="text: name"></td>
+                        <td>Need to implement</td>
+                        <td data-bind="text: check_in"></td>
+                        <td data-bind="text: check_out"></td>
+                        <td ></td>
+                        <!-- will add the following functions soon -->
+                        <!-- data-bind="click: this.update()" -->
+                        <!-- data-bind="click: this.delete()" -->
+                        <td ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#hotelsModal" data-bind="click: modal" >
+                            Edit
+                          </button></td>
+
+                    </tr>
+
+                  </tbody>
+            </table>
+            <div class="modal fade" id="hotelsModal" tabindex="-1" role="dialog" aria-labelledby="hotelsModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title"  id="hotelsModalLabel">Edit Hotel</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <h5>Hotel Name</h5>
+                      <input type="text" data-bind="value: hotels.modal.name">
+                      <h5> Check In</h5>
+                      <input type="number" data-bind="value: hotels.modal.check_in">
+                      <br>
+                      <h5> Check out</h5>
+                      <input type="number" data-bind="value: hotels.modal.check_out">
+                      <h5>Refundable</h5>
+                      <input type="text" data-bind="value: hotels.modal.refundable">
+                      <h5>Cancellation By</h5>
+                      <input type="text" data-bind="value: hotels.modal.cancellation_date">
+                      <h5>Breakfast Included</h5>
+                      <input type="text" data-bind="value: hotels.modal.breakfast_included">
+                    </div>
+                    <div class="modal-footer">
+                      
+                      <button type="button" id="hotel-modal-close" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-primary"  data-bind="click: hotels.modal.delete">Delete Item</button>
+                      <button type="button" class="btn btn-primary"  data-bind="click: hotels.modal.save">Save changes</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal fade" id="createHotelModal" tabindex="-1" role="dialog" aria-labelledby="createHotelModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title"  id="createHotelModalLabel">New Hotel Reservation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                          <div class="modal-body">
+                              <h5>Hotel Name</h5>
+                              <input type="text" data-bind="value: hotels.modal.name">
+                              <h5> Check In</h5>
+                              <input type="date" data-bind="value: hotels.modal.check_in">
+                              <br>
+                              <h5> Check out</h5>
+                              <input type="date" data-bind="value: hotels.modal.check_out">
+                              <h5>Refundable</h5>
+                              <input type="text" data-bind="value: hotels.modal.refundable">
+                              <h5>Cancellation By</h5>
+                              <input type="date" data-bind="value: hotels.modal.cancellation_date">
+                              <h5>Breakfast Included</h5>
+                              <input type="text" data-bind="value: hotels.modal.breakfast_included">
+                            </div>
+                      </div>
+                      <div class="modal-footer">
+                        
+                        <button type="button" id="create-hotel-modal-close" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        
+                        <button type="button" class="btn btn-primary"  data-bind="click: hotels.modal.create">Create</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+  
+
+        </div>
+        <div class="contentArea" id="flights">
+           
+                
+  
+
+        </div>
+        <div class="contentArea" id="rentals">
+            <tab-content params="value: rentals">
+
+              </tab-content>
+        </div>
+        <div class="contentArea" id="restaurants">
+          <!-- <tab-content params="value: restaurants">
+
+          </tab-content> -->
         </div>
       </div>
-    </div>
+
+
+        
 
 {% endif %}
 

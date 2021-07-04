@@ -1,0 +1,35 @@
+<div class="popup"  >
+  <div class="modal-dialog" role="document">
+    
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" data-bind="text: title" ></h5>
+        <button type="button" class="close" data-bind="click: close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+
+      <!-- this will change to sub component eventually for reusability -->
+      <div class="modal-body" data-bind="foreach: Fields">
+        <h5 data-bind="text: pretty"></h5>
+        <input data-bind="value: $parent[key]" >
+       
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="dest-modal-close" class="btn btn-secondary" data-bind="click: close">Close</button>
+        <button type="button" class="btn btn-primary"  >Delete Item</button>
+        <button type="button" class="btn btn-primary" data-bind="click: save" >Save changes</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+  
+
+
+
+        

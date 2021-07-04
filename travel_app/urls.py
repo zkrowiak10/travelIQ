@@ -81,7 +81,7 @@ def iqPage():
         
         except Exception as e:
             logging.debug(e)
-        return render_template('app/iqApp.html', trips = trips, dests = destinations)
+        return render_template('app/iqApp.html', trips = trips)
 
 @iq.route('/g', methods=('GET',))
 @login_required
