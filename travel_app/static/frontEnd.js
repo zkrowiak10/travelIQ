@@ -155,7 +155,7 @@ function viewModel() {
 
     self.hotels = new hotels()
 
-    flights= new flights()
+    self.flights= new flights()
 
 
     self.rentals = new rentals()
@@ -260,7 +260,7 @@ function rentals(){
     
         ],
     this.data = ko.observableArray()
-    construct = function(obj) {
+    this.construct = function(obj) {
         for (key in obj){
             this[key] = ko.observable(obj[key])
         }
@@ -272,13 +272,13 @@ function rentals(){
     this.get= function() {
         model.rentals.data([])
         //api later
-        for (item of rentalData) {
+        for (let item of rentalData) {
             
             model.rentals.data.push(new construct(item))
         }
         tabControl("#rentals")
     }
-    this.construct = construct
+    
 }
 
 

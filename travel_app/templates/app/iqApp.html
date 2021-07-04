@@ -18,10 +18,6 @@
         $('#createTrips').toggle()
       
     }
-
-    
-
-    
 </script>
 <div class="container  ">
     <div class="row">
@@ -92,8 +88,7 @@
             <table class="table border">
                 <thead>
                   <tr>
-                    <th></th>
-                    <th></th>
+                    <th>Order</th>
                     <th>Destination Name</th>
                     <th>Days At Destination</th>
                     <th>Notes</th>
@@ -107,7 +102,6 @@
                 <tbody data-bind="foreach: destinations.destList.sorted(function (l, r) { return l.trip_order() > r.trip_order() ? 1: -1})">
                     <tr >
                         <td data-bind="text: trip_order"></td>
-                        <td><input type="checkbox"></td>
                         <td data-bind="text: name"></td>
                         <td data-bind="text: days_there"></td>
                         <td data-bind="text: notes"></td>
