@@ -1,18 +1,17 @@
 export {api} 
 
 var api = {
-    get: function(endpoint) {
-            fetch (endpoint, {
+    get: async function(endpoint) {
+            var response = await fetch(endpoint, {
                 method: "GET",
                 headers: {
                     "Content-Type" : "application/json"
                 }
-    
-                }).then((res)=>{
-                        res.json()
-                        .then((data)=> {resolve(data)})
+                })
+            var data = await response.json()
+            return data
 
-            })
+            
        
     },
     post: function(endpoint, body) {

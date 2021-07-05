@@ -1,27 +1,35 @@
-import { api } from './modules/utils/api.js.js'
-// console.log('fetching', tabContentEndpoint)
+import { api } from './modules/utils/api.js'
+import { destinationsController } from './modules/tripBuilder/destinations/destinations.js';
 
     
 $().ready(()=>{
-    model = new viewModel()
-    ko.applyBindings(model);
+    destinationsController.init()
     
 })
-function viewModel() {
-    let self = this
+// function viewModel() {
+//     let self = this
 
-    self.destinations =  destinations
-
-
-    self.hotels = new hotels()
-
-    self.flights= new flights()
+//     self.destinations =  
 
 
-    self.rentals = new rentals()
-        
+//     self.hotels = new hotels()
 
-}
+//     self.flights= new flights()
+
+
+//     self.rentals = new rentals()
+    
+
+// }
+window.addEventListener("hashchange", function(){
+    
+    switch(location.hash){
+       case ("#destinations"):
+            destinationsController.init()
+           
+    }
+
+})
 
 
 

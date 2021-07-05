@@ -12,22 +12,22 @@
             <th>Notes</th>
             <th>
             </th>
-            <th><button type="button" class="btn btn-primary" data-toggle="modal" data-bind="click: destinations.modal.clear"data-target="#createModal"   >
+            <th><button type="button" class="btn btn-primary" data-toggle="modal" sbind="on: click|destinations.modal.clear"data-target="#createModal"   >
                 <i class="fas fa-plus"></i>
               </button></td></th>
           </tr>
         </thead>
-        <tbody data-bind="foreach: destinations.destList.sorted(function (l, r) { return l.trip_order() > r.trip_order() ? 1: -1})">
+        <tbody zk-bind="for: dest of dataModel.destList">
             <tr >
-                <td data-bind="text: trip_order"></td>
-                <td data-bind="text: name"></td>
-                <td data-bind="text: days_there"></td>
-                <td data-bind="text: notes"></td>
+                <td zk-bind="value: dest.trip_order"></td>
+                <td zk-bind="value: dest.name"></td>
+                <td zk-bind="value: dest.days_there"></td>
+                <td zk-bind="value: dest.notes"></td>
                 <td ></td>
                 <!-- will add the following functions soon -->
-                <!-- data-bind="click: this.update()" -->
-                <!-- data-bind="click: this.delete()" -->
-                <td ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-bind="click: modal" >
+                <!-- zk-bind="click: this.update()" -->
+                <!-- zk-bind="click: this.delete()" -->
+                <td ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal"  >
                     Edit
                   </button></td>
 

@@ -32,7 +32,7 @@ function zk() {
             let binder = root.getAttribute('zk-bind')
             let splitBinder = binder.split(":")
 
-            if (splitBinder.length < 2) {throw new Error("Invalid binding at:", root)}
+            if (splitBinder.length < 2) {throw new Error("Invalid binding at:", binder)}
 
             // isolate bindMode string and object path (getting rid of preceding white space)
             let bindMode = splitBinder[0] 
@@ -172,7 +172,7 @@ function zk() {
                 }
                 
                 target[property] = value
-                updateOnStateChangeByOref(target, property,e)
+                updateOnStateChangeByOref(target, property)
 
                 
                 return true
@@ -216,7 +216,7 @@ function zk() {
         // Function receives the object which contains the updated property, and the property key
         function updateOnStateChangeByOref(oRefParent, property) {
             for (let element of receivers) {
-                if ((element.oRef._targetObject === oRefParent) && (property == element.property) ){
+                if ((element.target._targetObject === oRefParent) && (property == element.property) ){
                     element.update()
                 }
         
@@ -276,7 +276,7 @@ function zk() {
                         target[property] = new Proxy(new Date(nodeValue), handler)
                         return
                     }
-                    oRef[property] = nodeValue
+                    target[property] = nodeValue
             })
         }
 
@@ -303,7 +303,7 @@ function zk() {
             boundElement.objectPath = iterableObjectPath
 
             oRefPath = utils.prepareObjectPath(boundElement.objectPath)
-            boundElement.oRef = utils.returnTargetProperty(dataObject, oRefPath)
+            boundElement.target = iterable
             boundElement.observableChildren = []
             boundElement.templateNode = oldChild
             boundElement.iteratorKey = iteratorKey
@@ -353,7 +353,7 @@ function zk() {
             if (Number.parseInt(targetProperty) == NaN) {throw new Error("Array index must be an integer value")}
             
             for (let item of forEachComponents) {
-                if (returnTargetProperty(item.objectPath)._targetObject == targetArr){
+                if (item.target._targetObject == targetArr){
                     boundElement = item
                     break
                 }
@@ -385,7 +385,7 @@ function zk() {
             
             
             for (let item of forEachComponents) {
-                if (returnTargetProperty(item.objectPath)._targetObject == targetArr){
+                if (item.target._targetObject == targetArr){
                     boundElement = item
                     break
                 }
@@ -488,16 +488,15 @@ function zk() {
                 case "datetime":
                     transmitters.push(boundElement);
                     oRefPath = utils.prepareObjectPath(boundElement.objectPath)
-                    boundElement.oRef = utils.returnTargetProperty(dataObjectProxy, oRefPath, true)
+                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, oRefPath, true)
                     var splitPath = boundElement.objectPath.split(".")
                     boundElement.property = splitPath[(splitPath.length-1)]
                     initializeTransmitter(boundElement, bindMode);
                     break
                 case "value": 
                     
-                    transmitters.push(boundElement);
                     oRefPath = utils.prepareObjectPath(boundElement.objectPath)
-                    boundElement.oRef = utils.returnTargetProperty(dataObjectProxy, oRefPath, true)
+                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, oRefPath, true)
                     splitPath = boundElement.objectPath.split(".")
                     boundElement.property = splitPath[(splitPath.length-1)]
                     receivers.push(boundElement);
