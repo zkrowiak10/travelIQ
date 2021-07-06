@@ -1,113 +1,108 @@
-function modal(parent, fields, title, closeModalId, closeModalCreateId) {
-    let self = this
-    this.Fields = fields
+var workdir =  "/static/modules/tripBuilder/modal"
+export function Modal(parent, fields, title, target, update) {
     
-    this.parent = parent
-    this.title= title
-    self.visible = ko.observable()
     
-    for (let field of this.Fields) {
-        let key = field.key
-        
-        this[key] = ko.observable()
-        
+    
+    var that = this
+    // Current framework architecture requires an object with enumerable properties 
+    // as an argument to zk.ObservableObject
+    this.formModel = {
+        fields : fields,
+        title : title,
+        tempObj : {}
     }
-
-    this.render = function(obj) {
-        logging('testing this:', self)
-        for (field of self.Fields) {
-            try {
-                key = field.key
-                if (field.type == "date") {
-                    date = new Date(obj[key]())
-                    date = formatDate(date)
-                    self[key](date)
-                    logging('date ', date)
-                }
-                self[key](obj[key]())
-                
-            }
-            catch (e) {
-                logging('render failed for', key, "reason: ", e)
-                continue
-            }
-        
-      
-            
+    this.formModel = new zk.ObservableObject(this.formModel)
+    this.fieldContainer
+    this.html
+    if (!target) {
+        this,target = {}
+    }
+    
+    
+    this.render = async function(obj) {
+        var template = await fetch(`${workdir}/modal-template.html`, { headers: {"Content-Type" : "text/html"}})
+        var text = await template.text()
+        this.html = document.createElement('div')
+        this.html.innerHTML = text
+        document.querySelector(parent.containerId).append(this.html)
+        if (!update) {
+            document.querySelector('#deleteItem').remove()
         }
-        self.show()
-        self.obj = obj
+        
+        this.fieldContainer = document.querySelector("#model-body-container")
+
+        
+        // Todo: zk framework should be able to dynamically assign input field type.
+        for (let field of fields)  {
+            this.formModel.tempObj[field.key] = (target[field.key]) ? target[field.key] : undefined
+            let label = document.createElement("label")
+            let input = document.createElement("input")
+            let br = document.createElement("br")
+            input.name = field.key
+            input.id = field.key
+            label.innerHTML = `${field.pretty}: `
+            label.setAttribute("for", input.id)
+            input.setAttribute("type", field.type)
+            input.setAttribute("zk-bind", `text: formModel.tempObj.${field.key}`)
+            input.className = "form-control"
+            
+            this.fieldContainer.appendChild(label)
+            this.fieldContainer.appendChild(input)
+        }
+        zk.initiateModel(this, this.html)
     },
 
   
-    this.clear = function() {
-       
-        for (let i=0; i < self.fields.length; i++) {
-            key = self.fields[i]
-            self[key](null)
+   this.delete = async function() {
+        if (target) {
+            try {
+                status = await target.delete()
+                
+            }
+            catch (err){
+                console.log("error", err.message)
+            }
+            finally {
+                that.close()
+            }
         }
-        self.obj = null
-    },
+   }
 
     this.showCreate= function(){
         this.clear()
         this.show()
     }
 
-    close = function() {
-        self.visible(false)
+    this.close = function() {
+        that.html.remove()
     }
 
-    this.show= function(){
-        self.visible(true)
-    }
 
-    this.save = function() {
-        for (Field of self.Fields) {
-            key = Field.key
-            self.obj[key](self[key]())
+    this.save = async function() {
+       
+        for (let field of that.formModel.fields) {
+            key = field.key
+            target[key] = that.formModel.tempObj[key]
         }
-        self.obj.update()
+        if (update) {
+            try {
+                target.update()
+            }
+            catch (err){
+                console.log("error", err.message)
+            }
+            finally {
+                that.close()
+                return
+            }
+            
+        }
+        console.log("tes")
+        parent.appendItem(target)
         
-        self.close()
+        that.close()
     }
-    // this.create = async function() {
-    //     parent = self.parent
-    //     data = {}
-
-    //     console.log('in modal create')
-    //     for (let i=0; i < self.fields.length; i++) {
-    //         key = self.fields[i]
-    //         val = self[key]
-    //         console.log('val ' , val)
-    //         data[key] = val()
-    //     }
-    //     console.log("creating hotel with data: ", data)
-    //     obj = new parent.construct(data)
-    //     obj.save().then(()=>{
-    //             parent.list.push(obj)
-    //             $(self.closeModalCreateId).click()
-    //         }).catch((e) =>{
-    //             alert('something went wrong')
-    //             console.log(e)
-    //             console.log(self.closeModalCreateId)
-    //             $(self.closeModalCreateId).click()
-    //         })
-    // }
-
-    // this.delete = async function() {
-        
-    //     list = this.parent.list
-    //     this.obj.delete().then(()=>{
-    //         console.log("promise succeeded")
-    //         list.pop(this.obj)
-    //         $(closeModalId).click()
-    //     }, (e) => {
-    //         console.log(e)
-    //         alert("something went wrong. Item not deleted")
-    //         $(closeModalId).click()
-    //     })
-    // }
+   
 
 
 }

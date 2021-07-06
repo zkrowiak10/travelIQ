@@ -1,9 +1,10 @@
 import { api } from './modules/utils/api.js'
 import { destinationsController } from './modules/tripBuilder/destinations/destinations.js';
+import { hotelsController } from './modules/tripBuilder/hotels/hotels.js';
 
     
 $().ready(()=>{
-    destinationsController.init()
+    hashSwitcher(location.hash)
     
 })
 // function viewModel() {
@@ -23,13 +24,20 @@ $().ready(()=>{
 // }
 window.addEventListener("hashchange", function(){
     
-    switch(location.hash){
-       case ("#destinations"):
-            destinationsController.init()
-           
-    }
+   hashSwitcher(location.hash)
 
 })
+
+function hashSwitcher(hashValue){
+    switch(hashValue){
+        case ("#destinations"):
+             destinationsController.init()
+             break
+        case ('#hotels'):
+            hotelsController.init()
+            
+     }
+}
 
 
 

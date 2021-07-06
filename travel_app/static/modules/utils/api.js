@@ -14,42 +14,38 @@ var api = {
             
        
     },
-    post: function(endpoint, body) {
-            fetch (endpoint, {
+    post: async function(endpoint, body) {
+
+            var response = await fetch (endpoint, {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"
                 },
                 "body":  body 
-            }).then((res)=>{        
-                res.json()
-                .then((data)=> {resolve(data)},(e) => {
-                    console.log("in catch of api POST")
-                    reject(e)
-                })
-
             })
-        
+            if (!response.ok) {
+                throw new Error("Something went wrong: ", response.message)
+            }
+            var json = await response.json()        
+            return json
     },
-    patch: function(endpoint, body) {
-        return new Promise((resolve, reject)=>{
-            fetch (endpoint, {
+    patch: async function(endpoint, body) {
+        
+            var response = await fetch (endpoint, {
                 method: "PATCH",
                 headers: {
                     "Content-Type" : "application/json"
                 },
                 "body":  body 
     
-                }).then((res)=>{
-                        resolve(res)
-                    })
-
-        })
+                })
+            return response
+        
         
     },
-    delete: function(endpoint, body) {
+    delete: async function(endpoint, body) {
 
-            return fetch(endpoint, {
+            var response = await fetch(endpoint, {
                 method: "DELETE",
                 headers: {
                     "Content-Type" : "application/json"
@@ -57,6 +53,8 @@ var api = {
                 "body":  body 
     
                 })
+            return response
+            
 
         
         

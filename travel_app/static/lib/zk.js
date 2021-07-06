@@ -12,7 +12,13 @@ function zk() {
     // Root: An html node that is the root element of all observable objects
     zk_self.initiateModel = function initiateModel(model, root) {
 
-        self.root_model = model
+        zk_self.root_model = model
+
+        for (let object in model) {
+            if (model[object] instanceof zk.ObservableObject) {
+                model[object].$model = model
+            }
+        }
 
         if ((!root instanceof HTMLElement)) {
             throw new Error("Invalid argument: second parameter must be an HTML element")
@@ -97,7 +103,7 @@ function zk() {
         
         // iterate through children 
         walkIterator:
-        for (child of children) {
+        for (let child of children) {
 
             // Recursively parse all children of current root element
             ParseDOMforObservables(model, child) 
@@ -228,7 +234,14 @@ function zk() {
         function returnTargetProperty(pathToObject, getParent = false) {
             let targetChild = dataObjectProxy
             let splitPath = pathToObject.split('.')
-            if (splitPath[0]=="root")  {targetChild= self.root_model }
+            if (splitPath[0]=="root")  {targetChild= zk_self.root_model }
+            if (splitPath[0]=="$parentModel")  {
+                targetChild = self.parent
+                let i = 1
+                while (splitPath[i]=="$parentModel") {
+                    targetChild = targetChild.parent
+                }
+            }
             for (let i = 1; i < splitPath.length; i++) {
                 if  (getParent && (i == (splitPath.length - 1))) {return targetChild}
                 targetChild = targetChild[splitPath[i]]
@@ -267,7 +280,7 @@ function zk() {
                     }
                     else {throw new Error("Invalid value for 'Date' binding: ", updateValue)}
                 }
-                boundElement.DOMelement.value = updateValue
+                boundElement.DOMelement.value = (updateValue || "")
              
                 
                 boundElement.DOMelement.addEventListener("input", (KeyboardEvent) => { 
@@ -328,7 +341,7 @@ function zk() {
                 
                 
                 subModel[iteratorKey] = newObj
-
+                subModel.$parentModel = model
 
                 ParseDOMforObservables(subModel, clone)
 
@@ -413,6 +426,7 @@ function zk() {
                     value = new ObservableObject(value)
                     value.parent = self
                     subModel[boundElement.iteratorKey] = value
+                    subModel.$parentModel = self.$model
 
                     // Create submodel context that stores node-element pairing
                     subModelContext = {
@@ -436,7 +450,6 @@ function zk() {
                     })
 
                     boundElement.observableChildren[targetProperty]  = observableChild
-                    console.log(`setting ${targetProperty} to`, observableChild)
                     // Reminder: 'observableChild' refers to a subModelContext containing a submodel and a html node
                     insertNode = observableChild.node
 
@@ -585,7 +598,7 @@ function zk() {
                     object[item] = deepProxy(object[item], handler)
                 }
             }
-            if (typeof object == "object") {
+            if ((typeof object == "object") && object)  {
                 return new Proxy(object, handler)
 
             }
@@ -605,9 +618,15 @@ function zk() {
             let targetChild = dataObjectProxy
             let splitPath = pathToObject.split('.')
             if (splitPath[0]=="root")  {
-                targetChild= self.root_model
-                splitPath.splice(0,1)
+                
              }
+            let i = 0
+            while (splitPath[0]=="$parentModel") {
+                targetChild = targetChild.$parentModel
+                i++
+                splitPath.splice(0,1)
+            }
+             
             for (let i = 0; i < splitPath.length; i++) {
                 if  (getParent && (i == (splitPath.length - 1))) {return targetChild}
                 targetChild = targetChild[splitPath[i]]
