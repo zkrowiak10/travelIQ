@@ -15,7 +15,7 @@ function zk() {
         zk_self.root_model = model
 
         for (let object in model) {
-            if (model[object] instanceof zk.ObservableObject) {
+            if (model[object]._targetObject) {
                 model[object].$model = model
             }
         }
@@ -84,7 +84,7 @@ function zk() {
 
             if (!model[parentObject]) {throw new Error("Invald object path at ", parentObject)}
 
-            model[parentObject].registerElement(bindMode, boundElement)
+            model[parentObject]._observableObject.registerElement(bindMode, boundElement)
 
             // Some binders, such as 'for' binders, create a separate tree model for all of their children
             // This array contains a list of all 'uprooting' binders
@@ -165,6 +165,10 @@ function zk() {
                 // for certain operations, it is necessary to verify that the target object is the same spot in memory as 
                 // some other reference to it.
                 if (property == "_targetObject") {return target}
+                if (property == "_observableObject") {return self}
+                if (property == "$parentModel") {return self.$parentModel}
+                if (property == "$model") {return self.$model}
+                
                 return target[property]
             }, 
             set: function(target, property, value) {
@@ -176,7 +180,8 @@ function zk() {
                     // console.log("setting", property, "to ", value)
                     return true
                 }
-                
+                if (property == "$parentModel") { self.$parentModel = value}
+                if (property == "$model") {self.$model = value}
                 target[property] = value
                 updateOnStateChangeByOref(target, property)
 
@@ -200,22 +205,7 @@ function zk() {
         let dataObject = obj
 
         let dataObjectProxy = utils.deepProxy(dataObject, handler)
-        // All properties of the input object should be exposed as if they were native properties of the observable object
-        for (let property in dataObjectProxy) {
-
- 
-            Object.defineProperty(self, property, {
-                get(){return dataObjectProxy[property]},
-                set(value) {
-                    dataObjectProxy[property] = value
-                    return true
-                }
-
         
-            })
-            
-            
-        }
 
 
         // Function to update all elements on state change by oref
@@ -286,10 +276,10 @@ function zk() {
                 boundElement.DOMelement.addEventListener("input", (KeyboardEvent) => { 
                     let nodeValue = boundElement.DOMelement.value
                     if (bindMode == "date") {
-                        target[property] = new Proxy(new Date(nodeValue), handler)
+                        target[property] = new Date(nodeValue)
                         return
                     }
-                    target[property] = nodeValue
+                    target[property] = (nodeValue || "")
             })
         }
 
@@ -341,7 +331,7 @@ function zk() {
                 
                 
                 subModel[iteratorKey] = newObj
-                subModel.$parentModel = model
+                subModel.$parentModel = self.$model
 
                 ParseDOMforObservables(subModel, clone)
 
@@ -415,7 +405,7 @@ function zk() {
             if (boundElement) {
                 let insertNode 
                 // If value being set is not an observable object
-                if (!(value instanceof ObservableObject)) {
+                if (!(value._observableObject)) {
                      // construct new child node
                      insertNode = boundElement.templateNode.cloneNode(true)
 
@@ -426,6 +416,7 @@ function zk() {
                     value = new ObservableObject(value)
                     value.parent = self
                     subModel[boundElement.iteratorKey] = value
+                    console.log(self)
                     subModel.$parentModel = self.$model
 
                     // Create submodel context that stores node-element pairing
@@ -520,6 +511,7 @@ function zk() {
                     break
             }
         }
+        return dataObjectProxy
     }
     zk_self.subscribe = function(eventTypes, target, property, callback) {
         this.eventTypes = eventTypes
@@ -557,9 +549,14 @@ function zk() {
         for (key of parameters.split(',')){
             argArray.push(model[key])
         }
+        try {
+            let callback = utils.returnTargetProperty(model,methodName)
+            boundElement.DOMelement.addEventListener(eventType, function(){callback.apply(null,argArray)})
+        }
+        catch (err) {
+            console.error(`${err.name}: ${err.message}`)
+        }
         
-        let callback = utils.returnTargetProperty(model,methodName)
-        boundElement.DOMelement.addEventListener(eventType, function(){callback.apply(null,argArray)})
     }
 
     let utils = {
@@ -598,6 +595,7 @@ function zk() {
                     object[item] = deepProxy(object[item], handler)
                 }
             }
+            
             if ((typeof object == "object") && object)  {
                 return new Proxy(object, handler)
 

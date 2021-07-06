@@ -39,73 +39,75 @@ export function Destination () {
 }
 
 // collection handler for current destination
-function DestinationsController(){
-    var that = this
-    
-    var dataModel = {
-        destList: []
-    }
-    var fields = [
-        {type: "text", key: "name", pretty: "Name"},
-        {type: "number", key: "trip_order", pretty: "Trip Order"},
-        {type: "number", key: "days_there", pretty: "Days There"},
-        {type: "textarea", key: "notes", pretty: "Notes"}
-    ]
-    var title = "Create Destination"
-    this.containerId ='#destinations'
-    this.html
-    this.dataModel = new zk.ObservableObject(dataModel)
-    this.init = async function() {
-        
-        var template = await fetch(`${workdir}/destinations-template.html`, { headers: {"Content-Type" : "text/html"}})
-        var text = await template.text()
-        document.querySelector("#tabContent").innerHTML = text
-        this.html = document.querySelector(this.containerId)
-        zk.initiateModel(this, this.html)
-        this.get()
-    }
-    this.get =  async function() {
+class DestinationsController {
+    constructor() {
+        var that = this
+
+        var dataModel = {
+            destList: []
+        }
+        var fields = [
+            { type: "text", key: "name", pretty: "Name" },
+            { type: "number", key: "trip_order", pretty: "Trip Order" },
+            { type: "number", key: "days_there", pretty: "Days There" },
+            { type: "textarea", key: "notes", pretty: "Notes" }
+        ]
+        var title = "Create Destination"
+        this.containerId = '#destinations'
+        this.html
+        this.dataModel = new zk.ObservableObject(dataModel)
+        this.init = async function () {
+
+            var template = await fetch(`${workdir}/destinations-template.html`, { headers: { "Content-Type": "text/html" } })
+            var text = await template.text()
+            document.querySelector("#tabContent").innerHTML = text
+            this.html = document.querySelector(this.containerId)
+            zk.initiateModel(this, this.html)
+            this.get()
+        }
+        this.get = async function () {
 
             //get data through fetch
-            var data = await api.get(destinationsEndpoint , "GET")
-            
+            var data = await api.get(destinationsEndpoint, "GET")
+
             this.reset()
             for (let dest of data) {
                 Destination.apply(dest)
                 this.dataModel.destList.push(dest)
             }
         }
-    this.reset = function() {
-        // Remove current destinations from list
-        while (this.dataModel.destList.length > 0) {
-            this.dataModel.destList.pop()
-        }
-    }
-    this.createDestination = function() {
-        
-        var modal = new Modal(that, fields,title)
-        modal.render()
-    }
-    this.editItem = function(destination) {
-        var modal = new Modal(that, fields, title, destination,true)
-        modal.render()
-    }
-    this.appendItem =  async function(dest) {
-        Destination.apply(dest)
-        try {
-            var response = await dest.save()
-            if (!response.ok) {
-                throw Error('something went wrong when saving object', response.statusText)
+        this.reset = function () {
+            // Remove current destinations from list
+            while (this.dataModel.destList.length > 0) {
+                this.dataModel.destList.pop()
             }
         }
-        catch (err) {
-            console.log(err.message)
-        };
-        that.dataModel.destList.push(dest)
-    }
-    this.deleteItem = async function(id) {
-        let index = dataModel.destList.findIndex(x => x.id == id)
-        dataModel.destList.shift(index,1)
+        this.createDestination = function () {
+
+            var modal = new Modal(that, fields, title)
+            modal.render()
+        }
+        this.editItem = function (destination) {
+            var modal = new Modal(that, fields, title, destination, true)
+            modal.render()
+        }
+        this.appendItem = async function (dest) {
+            Destination.apply(dest)
+            try {
+                var response = await dest.save()
+                if (!response.ok) {
+                    throw Error('something went wrong when saving object', response.statusText)
+                }
+            }
+            catch (err) {
+                console.log(err.message)
+            };
+            that.dataModel.destList.push(dest)
+        }
+        this.deleteItem = async function (id) {
+            let index = dataModel.destList.findIndex(x => x.id == id)
+            dataModel.destList.shift(index, 1)
+        }
     }
 }
 

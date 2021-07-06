@@ -60,7 +60,7 @@ export function Modal(parent, fields, title, target, update) {
                 
             }
             catch (err){
-                console.log("error", err.message)
+                console.error("error", err.message)
             }
             finally {
                 that.close()
@@ -83,13 +83,17 @@ export function Modal(parent, fields, title, target, update) {
         for (let field of that.formModel.fields) {
             key = field.key
             target[key] = that.formModel.tempObj[key]
+            if (field.type == "date") {
+                target[key] = new Date(that.formModel.tempObj[key])
+            }
+            
         }
         if (update) {
             try {
                 target.update()
             }
             catch (err){
-                console.log("error", err.message)
+                console.error("error: ", err.message)
             }
             finally {
                 that.close()
@@ -97,7 +101,7 @@ export function Modal(parent, fields, title, target, update) {
             }
             
         }
-        console.log("tes")
+        
         parent.appendItem(target)
         
         that.close()
