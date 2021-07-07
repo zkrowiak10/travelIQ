@@ -8,10 +8,12 @@
       <thead>
 
         <tr>
+          <th>Origin</th>
+          <th>Destination</th>
           <th>Departure Time</th>
           <th>Arrival Time</th>
-          <th>Destination</th>
-          <th>Origin</th>
+          
+          
           
           <th><button type="button" class="btn btn-primary" zk-bind="on: click|createItem()">
               <i class="fas fa-plus"></i>
@@ -20,10 +22,12 @@
       </thead>
       <tbody zk-bind="for: item of itemList">
           <tr >
-              <td zk-bind="value: item.departure_time"></td>
-              <td zk-bind="value: item.eta"></td>
-              <td zk-bind="value: item.destination"></td>
-              <td zk-bind="value: item.departing_from"></td>
+            <td zk-bind="value: item.departing_from"></td>
+            <td zk-bind="value: item.destination"></td>
+            <td zk-bind="format: item.departure_time|root.utils.formatDate"></td>
+            <td zk-bind="format: item.eta|root.utils.formatDate"></td>
+              
+              
               <td ><button type="button" class="btn btn-primary" zk-bind="on: click|$parentModel.editItem(item)" >
                   Edit
                 </button></td>

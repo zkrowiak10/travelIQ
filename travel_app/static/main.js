@@ -2,9 +2,11 @@ import { api } from './modules/utils/api.js'
 import { destinationsController } from './modules/tripBuilder/destinations/destinations.js';
 import { hotelsController } from './modules/tripBuilder/hotels/hotels.js';
 import { FlightsController} from './modules/tripBuilder/flights/flights.js'
-
+import { RentalsController } from './modules/tripBuilder/rentals/rentals.js';
+import * as utils from './modules/utils/utilFunctions.js'
     
 $().ready(()=>{
+    zk.root_model.utils = utils
     hashSwitcher(location.hash)
     
 })
@@ -42,6 +44,9 @@ function hashSwitcher(hashValue){
             controller = new FlightsController()
             controller.init()
             break
+        case ('#rentals'):
+            controller = new RentalsController()
+            controller.init()
      }
 }
 

@@ -3,7 +3,8 @@
 function zk() {
     
     zk_self = this
-    root_model = {}
+    this.root_model = {}
+    
 
     // Function to initiate any object variables accessible to all zk objects
     // Then begin recursively parsing DOM for observable elements
@@ -12,11 +13,11 @@ function zk() {
     // Root: An html node that is the root element of all observable objects
     zk_self.initiateModel = function initiateModel(model, root) {
 
-        zk_self.root_model = model
+        
 
         for (let object in model) {
-            if (model[object]._targetObject) {
-                model[object].$model = model
+            if (model[object]._observableObject) {
+                model[object]._observableObject.$model = model
             }
         }
 
@@ -45,7 +46,7 @@ function zk() {
             let objectPath = splitBinder[1].trim()
 
             // Current array of valid bind modes for validity checking
-            validBindModes = ['text', 'value', 'for', 'on', 'date', 'checkbox', 'datetime', 'calc']
+            validBindModes = ['text', 'value', 'for', 'on', 'format', 'checkbox']
 
 
             // Verify that bind mode is valid
@@ -119,13 +120,14 @@ function zk() {
         this.target = undefined
         this.property = undefined
         this.observableChildren = undefined 
+        this.updateCallback
 
         this.update = function() {
 
             let value = this.target[this.property]
 
-            if (value instanceof Date) {
-                value = value._targetObject.toISOString()
+            if (this.updateCallback) {
+                value = this.updateCallback(value)
                 // TODO add configuration callbacks for date string formatting
             }
 
@@ -180,8 +182,8 @@ function zk() {
                     // console.log("setting", property, "to ", value)
                     return true
                 }
-                if (property == "$parentModel") { self.$parentModel = value}
-                if (property == "$model") {self.$model = value}
+                
+                if (property == "$model") {self[property] = value}
                 target[property] = value
                 updateOnStateChangeByOref(target, property)
 
@@ -466,19 +468,8 @@ function zk() {
 
         }
 
-        this.popFromForEach = function(arrayPath, index)  {
-                    // locate appropriate bound element in forEachComponents
-                    let component = forEachComponents.find(item => {return item.objectPath === arrayPath})
-                    if (!component) {throw new Error('The specified array does not exist')}
-                    let temp = component.observableChildren[index]
-                    if (!temp) {throw new Error('The specified index does not exist in the array')}
-                    component.observableChildren.splice(index,1)
-                    temp[component.iteratorKey].deleteAllReferences(null,true)
-
-                    let dataArray = returnTargetProperty(arrayPath)
-                    dataArray.splice(index,1)
-
-        }
+  
+        
 
 
 
@@ -487,7 +478,6 @@ function zk() {
 
             switch (bindMode) {
                 case "text" :
-                case "date" :
                 case "checked":
                 case "datetime":
                     transmitters.push(boundElement);
@@ -497,6 +487,16 @@ function zk() {
                     boundElement.property = splitPath[(splitPath.length-1)]
                     initializeTransmitter(boundElement, bindMode);
                     break
+                case 'format':
+                    // format binds have syntax "format: objectPath|callbackFunction"
+                    [objectPath, callBackPath] = boundElement.objectPath.split('|')
+                    try {
+                        boundElement.updateCallback = utils.returnTargetProperty(dataObjectProxy,callBackPath)
+                    }
+                    catch (err) {
+                        console.error(err.message)
+                    }
+                    boundElement.objectPath = objectPath
                 case "value": 
                     
                     oRefPath = utils.prepareObjectPath(boundElement.objectPath)
@@ -506,6 +506,8 @@ function zk() {
                     receivers.push(boundElement);
                     boundElement.update()
                     break
+                
+
                 case "for":
                     initializeForeach(boundElement);
                     break
@@ -612,29 +614,27 @@ function zk() {
 
         },
         // generalizing the method to access object property using string path such as "person.task.dueDate"
-        returnTargetProperty: function returnTargetProperty(dataObjectProxy, pathToObject, getParent) {
-            let targetChild = dataObjectProxy
+        returnTargetProperty: function returnTargetProperty(objectTarget, pathToObject, getParent) {
+            let targetChild = objectTarget
             let splitPath = pathToObject.split('.')
-            if (splitPath[0]=="root")  {
-                
-             }
+            
             let i = 0
-            while (splitPath[0]=="$parentModel") {
-                targetChild = targetChild.$parentModel
+            if (splitPath[0]=="root")  {
+                targetChild = zk_self.root_model
                 i++
-                splitPath.splice(0,1)
-            }
-             
-            for (let i = 0; i < splitPath.length; i++) {
+             }
+            
+            while (i < splitPath.length) {
+                
                 if  (getParent && (i == (splitPath.length - 1))) {return targetChild}
                 targetChild = targetChild[splitPath[i]]
                 if (!targetChild) {
                     throw new Error(pathToObject + " is an invalid property path")
                 }
-            
-            
-
+                i++
             }
+            
+            
             return targetChild
         },
         

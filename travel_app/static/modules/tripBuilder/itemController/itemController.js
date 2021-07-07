@@ -5,14 +5,14 @@ import {Modal} from "../modal/modal.js"
 
 var workdir =  "/static/modules/tripBuilder/destinations"
 export class Item {
-    constructor(fields) {
+    constructor(fields, endPoint) {
 
         var that = this
         this.fields = fields
-
+        this.endPoint = endPoint
         this.update = async function () {
             var data = this.stringify() 
-            var response = await api.patch(itemController.endPoint, data)
+            var response = await api.patch(this.endPoint, data)
             // will need to process potential erros down the road
             if (response.status != 200) {
                 alert('something went wrong')
@@ -25,25 +25,26 @@ export class Item {
         this.save = async function () {
             var data = this.stringify()
             // try {
-            var response = await api.post(itemController.endPoint, data)
+            var response = await api.post(this.endPoint, data)
             that.id = response.id
             return response
         }
 
         this.stringify = function () {
             let obj = {}
-            for (let field of this.itemController.fields) {
+            for (let field of this.fields) {
                 obj[field.key] = this[field.key]
             }
+            obj.id = (null || this.id)
             return JSON.stringify(obj)
         }
         this.delete = async function () {
             var body = this.stringify() 
-            var response = await api.delete(itemController.endPoint, body)
+            var response = await api.delete(this.endPoint, body)
             if (response.status != 200) {
                 throw Error("Resource not deleted")
             }
-            this.itemController.deleteItem(that.id)
+            
         }
     }
 }
@@ -77,7 +78,7 @@ export class ItemController {
 
             this.reset()
             for (let item of data) {
-                let itemObject = new Item(this.fields)
+                let itemObject = new Item(this.fields, this.endPoint)
                 Object.assign(itemObject,item)
                 this.itemList.push(itemObject)
             }
@@ -94,11 +95,11 @@ export class ItemController {
             modal.render()
         }
         this.editItem = function (item) {
-            var modal = new Modal(that, that.fields, that.title, true)
+            var modal = new Modal(that, that.fields, that.title, item, true)
             modal.render()
         }
         this.appendItem = async function (item) {
-            let itemObject = new Item(this.fields)
+            let itemObject = new Item(this.fields, this.endPoint)
             Object.assign(itemObject,item)
             
             try {

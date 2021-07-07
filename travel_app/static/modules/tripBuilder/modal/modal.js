@@ -57,11 +57,14 @@ export function Modal(parent, fields, title, target, update) {
         if (target) {
             try {
                 status = await target.delete()
-                
+                if (status.ok) {
+                    parent.deleteItem(target.id)
+                }
             }
             catch (err){
                 console.error("error", err.message)
             }
+            
             finally {
                 that.close()
             }
