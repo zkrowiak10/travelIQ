@@ -16,6 +16,7 @@ function zk() {
         
 
         for (let object in model) {
+            if(!model[object]) {continue}
             if (model[object]._observableObject) {
                 model[object]._observableObject.$model = model
             }

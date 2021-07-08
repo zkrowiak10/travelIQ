@@ -159,10 +159,8 @@ class Flight(Base):
 
 class Car_Rental (Base):
     id = db.Column(db.Integer, primary_key = True)
-    pickup_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
-    pickup = db.relationship(Contact, foreign_keys=[pickup_id])
-    dropoff_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
-    dropoff = db.relationship('Contact', foreign_keys=[dropoff_id], lazy=True)
+    pickup = db.Column(db.String(256))
+    dropoff = db.Column(db.String(256))
     company = db.Column(db.String(256))
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     trip = db.relationship('Trip', foreign_keys=[trip_id])

@@ -7,21 +7,20 @@ export class RentalsController extends ItemController {
         this.endPoint = rentalsEndpoint
         this.containerId = '#rentals'
         this.title = "Create Rentals"
-        
-      
         this.template = "rentals-template.html"
         this.workdir = "/static/modules/tripBuilder/rentals"
-        
-        this.Fields = [
+        this.fields = [
             {
                 key:"pickup",
                 pretty: "Pickup Location",
-                type: "text"
+                type: "text",
+            
             },
             {
-                key: "drop_off",
+                key: "dropoff",
                 pretty: "Drop Off Location",
-                type: "text"
+                type: "text",
+                
             },
             {
                 key: "company",
@@ -39,9 +38,9 @@ export class RentalsController extends ItemController {
                 type:"date"
             }
         
-            ],
-        
+            ]
         
     }
+    
 }
 

@@ -26,7 +26,7 @@ export class Item {
             var data = this.stringify()
             // try {
             var response = await api.post(this.endPoint, data)
-            that.id = response.id
+            this.id = response.id
             return response
         }
 
@@ -44,7 +44,7 @@ export class Item {
             if (response.status != 200) {
                 throw Error("Resource not deleted")
             }
-            
+            return response
         }
     }
 }
@@ -53,7 +53,7 @@ export class Item {
 export class ItemController {
     constructor() {
         var that = this
-
+        this.itemClass = Item
         this.itemList = new zk.ObservableObject([])
         this.endPoint
         this.fields = []
@@ -78,7 +78,7 @@ export class ItemController {
 
             this.reset()
             for (let item of data) {
-                let itemObject = new Item(this.fields, this.endPoint)
+                let itemObject = new this.itemClass(this.fields, this.endPoint)
                 Object.assign(itemObject,item)
                 this.itemList.push(itemObject)
             }
@@ -99,12 +99,12 @@ export class ItemController {
             modal.render()
         }
         this.appendItem = async function (item) {
-            let itemObject = new Item(this.fields, this.endPoint)
+            let itemObject = new this.itemClass(this.fields, this.endPoint)
             Object.assign(itemObject,item)
             
             try {
                 var id = await itemObject.save()
-               itemObject.id = id
+               
             }
             catch (err) {
                 console.error(err.message)

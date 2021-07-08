@@ -56,7 +56,8 @@ export function Modal(parent, fields, title, target, update) {
    this.delete = async function() {
         if (target) {
             try {
-                status = await target.delete()
+                let status = await target.delete()
+                
                 if (status.ok) {
                     parent.deleteItem(target.id)
                 }
@@ -89,6 +90,7 @@ export function Modal(parent, fields, title, target, update) {
             if (field.type == "date") {
                 target[key] = new Date(that.formModel.tempObj[key])
             }
+            
             
         }
         if (update) {

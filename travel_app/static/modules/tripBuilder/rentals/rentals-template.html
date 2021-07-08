@@ -1,4 +1,4 @@
-<div class="contentArea" id="flights">
+<div class="contentArea" id="rentals">
   <h1>Rentals</h1>
   <br>
   <p>All other activities (hotels, restaurants, etc...) are linked to a destination so you can organize your trip easily</p>
@@ -24,7 +24,7 @@
       <tbody zk-bind="for: item of itemList">
           <tr >
             <td zk-bind="value: item.pickup"></td>
-            <td zk-bind="value: item.drop_off"></td>
+            <td zk-bind="value: item.dropoff"></td>
             <td zk-bind="value: item.company"></td>
             <td zk-bind="format: item.pickup_day|root.utils.formatDate"></td>
             <td zk-bind="format: item.dropoff_day|root.utils.formatDate"></td>
