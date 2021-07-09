@@ -12,7 +12,7 @@ ajax = Blueprint('ajax', __name__, url_prefix='/ajax')
 
 
 #will need to update these methods to make sure user is authorized to modify resource
-@ajax.route('/destinations', methods=('GET', 'POST', 'PATCH', 'DELETE'))
+@ajax.route('/destinations/', methods=('GET', 'POST', 'PATCH', 'DELETE'))
 @login_required
 def destinations():
     
@@ -126,4 +126,10 @@ def hotels():
 @login_required
 def flights():
     api = utils.API(models.Flight)
+    return api.api_driver(request)
+
+@ajax.route('/rentals', methods=('GET', 'POST', 'PATCH', 'DELETE'))
+@login_required
+def rentals():
+    api = utils.API(models.Car_Rental)
     return api.api_driver(request)

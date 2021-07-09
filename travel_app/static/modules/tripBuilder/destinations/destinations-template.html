@@ -1,0 +1,38 @@
+<div class="contentArea" id="destinations">
+    <h1>Destinations</h1>
+    <br>
+    <p>All other activities (hotels, restaurants, etc...) are linked to a destination so you can organize your trip easily</p>
+    <br>
+    <table class="table border">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Destination Name</th>
+            <th>Days At Destination</th>
+            <th>Notes</th>
+            <th>
+            </th>
+            <th><button type="button" class="btn btn-primary" zk-bind="on: click|createDestination()">
+                <i class="fas fa-plus"></i>
+              </button></td></th>
+          </tr>
+        </thead>
+        <tbody zk-bind="for: dest of dataModel.destList">
+            <tr >
+                <td zk-bind="value: dest.trip_order"></td>
+                <td zk-bind="value: dest.name"></td>
+                <td zk-bind="value: dest.days_there"></td>
+                <td zk-bind="value: dest.notes"></td>
+                <td ></td>
+                <!-- will add the following functions soon -->
+                <!-- zk-bind="click: this.update()" -->
+                <!-- zk-bind="click: this.delete()" -->
+                <td ><button type="button" class="btn btn-primary" zk-bind="on: click|$parentModel.editItem(dest)" >
+                    Edit
+                  </button></td>
+
+            </tr>
+
+          </tbody>
+    </table>
+   

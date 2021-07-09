@@ -3,7 +3,7 @@ from flask import (
 )
 import logging
 import functools
-import models
+from travel_app import models
 import logging
 bp = Blueprint('welcome', __name__, url_prefix='/')
 
