@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 import click
 from flask.cli import with_appcontext
+from sqlalchemy.orm import backref
 from werkzeug.security import check_password_hash, generate_password_hash
 import logging
 db = SQLAlchemy()
@@ -64,7 +65,7 @@ class Trip(Base):
     name = db.Column(db.String(120), nullable=False)
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
-    user = db.relationship('User')
+    user = db.relationship('User', backref='trips')
     description = db.Column(db.Text)
 
     def __init__(self, user, name, start_date, end_date, description):
@@ -105,19 +106,19 @@ class Hotel_Reservation(Base):
     refundable = db.Column(db.Boolean)
     cancellation_date = db.Column(db.Date) 
     destination_id = db.Column(db.Integer, db.ForeignKey('destination.id'))
-    destination = db.relationship('Destination', backref='Hotel_Reservation')
+    destination = db.relationship('Destination', backref='hotel_reservations')
     breakfast_included = db.Column(db.Boolean)
     contact_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
     contact_info = db.relationship('Contact')
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
-    trip = db.relationship('Trip', backref='hotel_reservation')
+    trip = db.relationship('Trip', backref='hotel_reservations')
 
 #trips should be broken down into destination cities that segment out the stay
 class Destination (Base):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(256), nullable=False)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
-    trip = db.relationship('Trip')
+    trip = db.relationship('Trip', backref="destinations")
     notes = db.Column(db.String(256))
     trip_order = db.Column(db.Integer)
     days_there = db.Column(db.Integer)
@@ -172,7 +173,7 @@ class Activity(Base):
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     trip = db.relationship('Trip', backref='activity')
     destination_id = db.Column(db.Integer, db.ForeignKey('destination.id'))
-    destination = db.relationship('Destination', backref='Activity')
+    destination = db.relationship('Destination', backref='activities')
     name = db.Column(db.String(256))
     description = db.Column(db.Text)
     
