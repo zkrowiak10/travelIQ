@@ -75,13 +75,8 @@ iq = Blueprint('iq', __name__, url_prefix='/app')
 @login_required
 def iqPage():
     if request.method == 'GET':
-        try:
-            trips = models.Trip.query.filter_by(user_id = session['user_id']).all()
-            destinations = models.Destination.query.filter_by(trip_id = g.trip.id).all()
         
-        except Exception as e:
-            logging.debug(e)
-        return render_template('app/iqApp.html', trips = trips)
+        return render_template('app/iqApp.html')
 
 @iq.route('/g', methods=('GET',))
 @login_required
@@ -97,7 +92,9 @@ def create_trip():
         f = request.form
         name, start_date, end_date, description = f['TName'], f['TStart'], f['TEnd'], f['TDescription']
         try:
-            trip = models.Trip(g.user,name, start_date,end_date, description)
+            trip = models.Trip(name, start_date,end_date, description)
+            pairing = models.UserTripPair(trip=trip, user=g.user,admin = True)
+            trip.userPairings.append(pairing)
         except Exception as e:
             logging.error("Exception in creating trip: {}".format(e))
             flash('something went wrong: {}'.format(e))

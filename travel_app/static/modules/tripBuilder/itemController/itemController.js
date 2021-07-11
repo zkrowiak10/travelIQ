@@ -5,10 +5,10 @@ import {Modal} from "../modal/modal.js"
 
 var workdir =  "/static/modules/tripBuilder/destinations"
 export class Item {
-    constructor(fields, endPoint) {
+    constructor( endPoint) {
 
         var that = this
-        this.fields = fields
+        
         this.endPoint = endPoint
         this.update = async function () {
             var data = this.stringify() 
@@ -32,6 +32,7 @@ export class Item {
 
         this.stringify = function () {
             let obj = {}
+            console.log(this)
             for (let field of this.fields) {
                 obj[field.key] = this[field.key]
             }
@@ -56,17 +57,18 @@ export class ItemController {
         this.itemClass = Item
         this.itemList = new zk.ObservableObject([])
         this.endPoint
-        this.fields = []
+        this.fields 
         this.title 
         this.containerId 
         this.html
         this.template
         this.workdir
+        this.insertNode = "#tabContent"
         this.init = async function () {
 
             var template = await fetch(`${this.workdir}/${this.template}`, { headers: { "Content-Type": "text/html" } })
             var text = await template.text()
-            document.querySelector("#tabContent").innerHTML = text
+            document.querySelector(this.insertNode).innerHTML = text
             this.html = document.querySelector(this.containerId)
             zk.initiateModel(this, this.html)
             this.get()

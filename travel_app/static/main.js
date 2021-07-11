@@ -1,13 +1,22 @@
+
 import { api } from './modules/utils/api.js'
-import { destinationsController } from './modules/tripBuilder/destinations/destinations.js';
+import * as DestinationsController from './modules/tripBuilder/destinations/destinations.js';
 import { hotelsController } from './modules/tripBuilder/hotels/hotels.js';
 import { FlightsController} from './modules/tripBuilder/flights/flights.js'
 import { RentalsController } from './modules/tripBuilder/rentals/rentals.js';
+import {Header} from './modules/header/header.js'
 import * as utils from './modules/utils/utilFunctions.js'
     
+var hashSwitcher = new HashSwitcher()
+
 $().ready(()=>{
+    
     zk.root_model.utils = utils
-    hashSwitcher(location.hash)
+    var header = new Header()
+    header.init()
+    hashSwitcher.switch(location.hash)
+    
+    
     
 })
 // function viewModel() {
@@ -27,28 +36,32 @@ $().ready(()=>{
 // }
 window.addEventListener("hashchange", function(){
     
-   hashSwitcher(location.hash)
+   
+    hashSwitcher.switch(location.hash)
 
 })
 
-function hashSwitcher(hashValue){
-    var controller
-    switch(hashValue){
-        case ("#destinations"):
-             destinationsController.init()
-             break
-        case ('#hotels'):
-            hotelsController.init()
-            break
-        case ('#flights'):
-            controller = new FlightsController()
-            controller.init()
-            break
-        case ('#rentals'):
-            controller = new RentalsController()
-            controller.init()
-     }
-}
+
+function HashSwitcher(){
+    let that = this
+    this.trip
+    this.controller
+
+    this.switch = function(hashValue){
+        var hashvalueArray = hashValue.split('/')
+        // all urls derive from /app/
+        
+        switch(hashvalueArray.shift()){
+            case (''):
+                // todo
+                break
+            case ('#trip'):
+                TravelIQGlobal.trip = hashvalueArray.shift()
+                DestinationsController.route(hashvalueArray)
+         }
+    }
+    }
+   
 
 
 

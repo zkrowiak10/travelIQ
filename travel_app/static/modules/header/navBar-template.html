@@ -1,0 +1,33 @@
+<nav> 
+    <ul class="nav-bar">
+      <li id="iconlink">
+              <a  href='/app'><img src="/static/Assets/Logo_Text_200.png" style="width: 150px"/></a>
+      </li>
+      <li class="dropdown-toggle"  aria-haspopup="true" aria-expanded="false">
+              
+                      <a >Select Trip </a>
+                      <div class="dropdown-menu" zk-bind="for: trip of trips" aria-labelledby="navbarDropdown">
+                      
+                        <a class="dropdown-item" zk-bind="attr: href|trip.href"><span zk-bind="value:trip.name"></span></a>
+                       
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" href="/app/createTrip">Create A New Trip</a>
+                   </div>
+               
+      </li>
+      <li>
+              <a class=""  href="#">Plan</a>
+      </li>              
+      <li>
+              <a href="#">Budget</a>
+      </li>
+      <li class="nav-right" style="float:right">
+              <a  href="{{url_for('welcome.logout')}}">Logout</a>  
+      </li>
+                  
+    </ul>
+</nav>
+<!-- <div dat-bind="for: message of messages">
+    <div class="flash alert alert-primary" data-dismiss="alert" role="alert">{{ message }}</div>
+</div> -->
+

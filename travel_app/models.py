@@ -61,29 +61,25 @@ class User (Base):
 #Would like to add validation at some point to validate that it ends after it starts
 class Trip(Base):
     id  = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     name = db.Column(db.String(120), nullable=False)
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
-    user = db.relationship('User', backref='trips')
     description = db.Column(db.Text)
 
-    def __init__(self, user, name, start_date, end_date, description):
+    def __init__(self, name, start_date, end_date, description):
         if start_date > end_date:
             raise AssertionError('Trip end date must be after start date.')
         if name is "" or start_date is "" or end_date is "":
             raise AssertionError('A Trip must have a name, start and end dates')
         
         #check that user has no trips with that name
-        current_trips = Trip.query.filter_by(user= user).all()
-        for trip in current_trips:
-            if trip.name == name:
-                raise AssertionError("Must choose a unique name for your trip")
+        # current_trips = Trip.query.filter_by(user= user).all()
+        # for trip in current_trips:
+        #     if trip.name == name:
+        #         raise AssertionError("Must choose a unique name for your trip")
         self.end_date = end_date
         self.start_date = start_date
         self.name = name
-        self.user = user
-        self.user_id = user.id
         self.description = description
 
         db.session.add(self)
@@ -113,6 +109,23 @@ class Hotel_Reservation(Base):
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     trip = db.relationship('Trip', backref='hotel_reservations')
 
+class UserTripPair(Base):
+    id  = db.Column(db.Integer, primary_key=True)
+    trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
+    trip = db.relationship('Trip', backref='userPairings')
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship('User', backref='tripPairings')
+    admin = db.Column(db.Boolean)
+
+    @staticmethod
+    def getTripsByUser(user):
+        trips = [pairing.trip for pairing in user.tripPairings]
+        return trips
+    @staticmethod
+    def getUsersByTrip(trip):
+        trips = [pairing.trip for pairing in trip.userPairings]
+        return trips
+
 #trips should be broken down into destination cities that segment out the stay
 class Destination (Base):
     id = db.Column(db.Integer, primary_key = True)
@@ -124,18 +137,7 @@ class Destination (Base):
     days_there = db.Column(db.Integer)
 
 
-    def __init__(self, name, trip_id, notes, days_there, trip_order, commit = True):
-        
-        trip = trip_id
-        self.name = name
-        self.trip_id = trip
-        self.notes = notes
-        self.days_there = days_there
-        self.trip_order = trip_order
-
-        if commit:
-            db.session.add(self)
-            db.session.commit()
+ 
     
     def __str__(self):
         return "Destination {} on trip {}".format(self.name, self.trip.name)

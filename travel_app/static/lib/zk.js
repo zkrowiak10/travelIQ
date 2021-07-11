@@ -47,7 +47,7 @@ function zk() {
             let objectPath = splitBinder[1].trim()
 
             // Current array of valid bind modes for validity checking
-            validBindModes = ['text', 'value', 'for', 'on', 'format', 'checkbox']
+            validBindModes = ['text', 'value', 'for', 'on', 'format', 'checkbox', 'attr']
 
 
             // Verify that bind mode is valid
@@ -82,6 +82,9 @@ function zk() {
                 
                 registerListener(boundElement, model)
                 return
+            }
+            if ((bindMode == "attr")){
+                parentObject = objectPath.split('|')[1].split('.')[0]
             }
 
             if (!model[parentObject]) {throw new Error("Invald object path at ", parentObject)}
@@ -500,15 +503,29 @@ function zk() {
                     boundElement.objectPath = objectPath
                 case "value": 
                     
-                    oRefPath = utils.prepareObjectPath(boundElement.objectPath)
-                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, oRefPath, true)
+                    targetPath = utils.prepareObjectPath(boundElement.objectPath)
+                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
                     splitPath = boundElement.objectPath.split(".")
                     boundElement.property = splitPath[(splitPath.length-1)]
                     receivers.push(boundElement);
                     boundElement.update()
                     break
                 
-
+                case "attr":
+                    // attr bindings follow syntax "attr: targetAttr|binding"
+                    [attr,binding] = boundElement.objectPath.split('|')
+                    boundElement.objectPath = binding
+                    splitPath = boundElement.objectPath.split(".")
+                    boundElement.property = splitPath[(splitPath.length-1)]
+                    targetPath = utils.prepareObjectPath(boundElement.objectPath)
+                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
+                    splitPath = boundElement.objectPath.split(".")
+                    boundElement.update = function() {
+                        let value = boundElement.target[boundElement.property]
+                        boundElement.DOMelement.setAttribute(attr,value)
+                    }
+                    boundElement.update()
+                    break
                 case "for":
                     initializeForeach(boundElement);
                     break
@@ -554,7 +571,7 @@ function zk() {
         }
         try {
             let callback = utils.returnTargetProperty(model,methodName)
-            boundElement.DOMelement.addEventListener(eventType, function(){callback.apply(null,argArray)})
+            boundElement.DOMelement.addEventListener(eventType, function(){callback.apply(model,argArray)})
         }
         catch (err) {
             console.error(`${err.name}: ${err.message}`)

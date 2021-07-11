@@ -17,3 +17,4 @@ function formatDate(date) {
 
     return [year, month, day].join('-');
 }
+
