@@ -5,10 +5,23 @@
     </div>
     <div class="sideBar-container" zk-bind="for: item of itemList">
         <div class="destinationCard">
-            <i style="display: inline;" class="fas fa-caret-right"></i>
-            <i style="display:none;"class="fas fa-caret-down"></i>
+            <span zk-bind="hidden: item.focused">
+                <i zk-bind="on: click|item.toggleFocus(item)" class="fas fa-caret-right"></i>
+            </span>
+            <span zk-bind="visible: item.focused">
+                <i  zk-bind="on: click|item.toggleFocus(item)" class="fas fa-caret-down"></i>
+            </span>
+            
             <h1 style="display: inline;" zk-bind="value: item.name"></h1>
             <p style="display: inline;float:right;"><span zk-bind="value: item.days_there"></span> Days</p>
+            <div zk-bind="visible: item.focused">
+                <div  class="slideOut">
+                    <button><a zk-bind="attr: href|item.links.hotels">Hotels</a></button>
+                    <button><a zk-bind="attr: href|item.links.restaurants">Restaurants</a></button>
+                    <button><a zk-bind="attr: href|item.links.activities">Activities</a></button>
+                </div>
+            </div>
+            
         </div>
         
     </div>

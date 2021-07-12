@@ -28,7 +28,6 @@ export class Header {
         for (let item of data) {
             if (item.id == utils.g.trip.id) {
                 utils.g.trip.name = item.name
-                console.log(utils.g)
 
             }
             item.href = '#trip/' + item.id
