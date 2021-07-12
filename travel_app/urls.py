@@ -95,6 +95,8 @@ def create_trip():
             trip = models.Trip(name, start_date,end_date, description)
             pairing = models.UserTripPair(trip=trip, user=g.user,admin = True)
             trip.userPairings.append(pairing)
+            models.db.session.add(trip, pairing)
+            models.db.session.commit()
         except Exception as e:
             logging.error("Exception in creating trip: {}".format(e))
             flash('something went wrong: {}'.format(e))

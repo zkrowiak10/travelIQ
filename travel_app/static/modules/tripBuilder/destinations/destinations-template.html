@@ -5,7 +5,9 @@
     </div>
     <div class="sideBar-container" zk-bind="for: item of itemList">
         <div class="destinationCard">
-            <h1 zk-bind="value: item.name"></h1>
+            <i style="display: inline;" class="fas fa-caret-right"></i>
+            <i style="display:none;"class="fas fa-caret-down"></i>
+            <h1 style="display: inline;" zk-bind="value: item.name"></h1>
             <p style="display: inline;float:right;"><span zk-bind="value: item.days_there"></span> Days</p>
         </div>
         

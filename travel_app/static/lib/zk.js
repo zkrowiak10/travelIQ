@@ -40,14 +40,14 @@ function zk() {
             let binder = root.getAttribute('zk-bind')
             let splitBinder = binder.split(":")
 
-            if (splitBinder.length < 2) {throw new Error("Invalid binding at:", binder)}
+            if (splitBinder.length < 2) {throw new Error("Invalid binding at:", root)}
 
             // isolate bindMode string and object path (getting rid of preceding white space)
             let bindMode = splitBinder[0] 
             let objectPath = splitBinder[1].trim()
-
+            
             // Current array of valid bind modes for validity checking
-            validBindModes = ['text', 'value', 'for', 'on', 'format', 'checkbox', 'attr']
+            validBindModes = ['text', 'value', 'for', 'on', 'format', 'checkbox', 'attr', 'hidden', 'visible']
 
 
             // Verify that bind mode is valid
@@ -87,7 +87,7 @@ function zk() {
                 parentObject = objectPath.split('|')[1].split('.')[0]
             }
 
-            if (!model[parentObject]) {throw new Error("Invald object path at ", parentObject)}
+            if (typeof model[parentObject] == "undefined") {console.error("Invald object path at ", binder, "with model: ",model)}
 
             model[parentObject]._observableObject.registerElement(bindMode, boundElement)
 
@@ -422,7 +422,7 @@ function zk() {
                     value = new ObservableObject(value)
                     value.parent = self
                     subModel[boundElement.iteratorKey] = value
-                    console.log(self)
+                    
                     subModel.$parentModel = self.$model
 
                     // Create submodel context that stores node-element pairing
@@ -528,6 +528,31 @@ function zk() {
                     break
                 case "for":
                     initializeForeach(boundElement);
+                    break
+                case "hidden":
+                    targetPath = utils.prepareObjectPath(boundElement.objectPath)
+                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
+                    splitPath = boundElement.objectPath.split(".")
+                    boundElement.property = splitPath[(splitPath.length-1)]
+                    console.log(boundElement.property)
+                    receivers.push(boundElement);
+                    boundElement.update = function() {
+                        boundElement.DOMelement.hidden = boundElement.target[boundElement.property]
+                    }
+                    boundElement.update()
+                    break
+
+                case "visible":
+                    targetPath = utils.prepareObjectPath(boundElement.objectPath)
+                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
+                    splitPath = boundElement.objectPath.split(".")
+                    boundElement.property = splitPath[(splitPath.length-1)]
+                    
+                    receivers.push(boundElement);
+                    boundElement.update = function() {
+                        boundElement.DOMelement.hidden = !boundElement.target[boundElement.property]
+                    }
+                    boundElement.update()
                     break
             }
         }

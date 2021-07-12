@@ -1,7 +1,7 @@
 
 import {api} from "../../utils/api.js"
 import {Modal} from "../modal/modal.js"
-export {hotelsController}
+
 // constructor function for a Hotel object
 
 var workdir =  "/static/modules/tripBuilder/hotels"
@@ -116,7 +116,6 @@ function HotelsController(){
     }
 }
 
-var hotelsController = new HotelsController()
 
 
 // function hotels(){

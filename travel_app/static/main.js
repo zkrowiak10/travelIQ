@@ -1,23 +1,23 @@
 
+
 import { api } from './modules/utils/api.js'
 import * as DestinationsController from './modules/tripBuilder/destinations/destinations.js';
-import { hotelsController } from './modules/tripBuilder/hotels/hotels.js';
+// import { * } from './modules/tripBuilder/hotels/hotels.js';
 import { FlightsController} from './modules/tripBuilder/flights/flights.js'
 import { RentalsController } from './modules/tripBuilder/rentals/rentals.js';
 import {Header} from './modules/header/header.js'
 import * as utils from './modules/utils/utilFunctions.js'
     
 var hashSwitcher = new HashSwitcher()
-
+var header
+header = new Header()
+header.init()
 $().ready(()=>{
     
     zk.root_model.utils = utils
-    var header = new Header()
-    header.init()
-    hashSwitcher.switch(location.hash)
     
     
-    
+    hashSwitcher.switch(location.hash) 
 })
 // function viewModel() {
 //     let self = this
@@ -56,8 +56,11 @@ function HashSwitcher(){
                 // todo
                 break
             case ('#trip'):
-                TravelIQGlobal.trip = hashvalueArray.shift()
+                utils.g.trip.id = hashvalueArray.shift()
+                utils.g.trip.isDefined = true
+                header.updateTripName() 
                 DestinationsController.route(hashvalueArray)
+                
          }
     }
     }
