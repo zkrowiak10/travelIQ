@@ -52,12 +52,12 @@ body {
 }
 .nav-bar {
     list-style-type: none;
-    margin-bottom: 2px;
+    margin-bottom: 0px;
     padding: 0;
     overflow: hidden;
-    box-shadow: 3px 3px 3px grey;
     width: 100vw;
-    margin-top: 0px
+    margin-top: 0px;
+    border-bottom: 2px solid lightgray;
     
 }
 #iconlink {
@@ -82,6 +82,8 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    padding:0px;
+    margin: 0px
     
 }
 .destinationCard {
@@ -129,9 +131,11 @@ body {
     border-style: solid;
     border-width: 2px;
     font-size: xx-large;
-    font-weight: bolder;
     padding: 0px 0px 0px 10px;
-    box-shadow: 3px 3px 3px black;
+    background-color: #B4C6E7;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    margin: 0px
+    
     
     
 }
@@ -212,10 +216,9 @@ body {
     float: left;
     width: 20%;
     margin-left: 0;
-    border-style: solid;
-    border-width: 3px;
     border-color: darkgray;
-    padding: 3px;
+    padding-right: 5px;
+    border-right: 3px solid lightgray
     
 
 
