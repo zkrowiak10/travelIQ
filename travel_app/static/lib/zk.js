@@ -47,7 +47,7 @@ function zk() {
             let objectPath = splitBinder[1].trim()
             
             // Current array of valid bind modes for validity checking
-            validBindModes = ['text', 'value', 'for', 'on', 'format', 'checkbox', 'attr', 'hidden', 'visible']
+            validBindModes = ['text', 'value', 'for','date', 'on', 'format', 'checkbox', 'attr', 'hidden', 'visible']
 
 
             // Verify that bind mode is valid
@@ -263,18 +263,24 @@ function zk() {
                 let property = boundElement.property
                 let updateValue = target[property]
 
-                if (bindMode == "date") {
-                    if (updateValue instanceof Date) {
-                        updateValue = updateValue._targetObject.toISOString().split('T')[0]
-                        
+                if (bindMode == "date" && (updateValue)) {
+                    updateValue = new Date(updateValue)
+                    try {
+                        updateValue = updateValue.toISOString().split('T')[0]
                     }
-                    else {throw new Error("Invalid value for 'Date' binding: ", updateValue)}
+                    
+                    catch (err) {
+                        console.error("error converting date object", updateValue, err.message)
+                    }
+                    
+                    
+                
                 }
                 if (bindMode == "datetime-local")  {
-                    if (updatValue instanceof Date) {
-                        updateValue = updateValue._targetObject.toISOString()
-                    }
-                    else {throw new Error("Invalid value for 'Date' binding: ", updateValue)}
+                    updateValue = new Date(updateValue)
+                    updateValue = updateValue._targetObject.toISOString()
+                        
+                  
                 }
                 boundElement.DOMelement.value = (updateValue || "")
              
@@ -483,7 +489,7 @@ function zk() {
             switch (bindMode) {
                 case "text" :
                 case "checked":
-                case "datetime":
+                case "date":
                     transmitters.push(boundElement);
                     oRefPath = utils.prepareObjectPath(boundElement.objectPath)
                     boundElement.target = utils.returnTargetProperty(dataObjectProxy, oRefPath, true)
@@ -595,8 +601,9 @@ function zk() {
             argArray.push(model[key])
         }
         try {
+            let callbackParent = utils.returnTargetProperty(model,methodName,true)
             let callback = utils.returnTargetProperty(model,methodName)
-            boundElement.DOMelement.addEventListener(eventType, function(){callback.apply(model,argArray)})
+            boundElement.DOMelement.addEventListener(eventType, function(){callback.apply(callbackParent,argArray)})
         }
         catch (err) {
             console.error(`${err.name}: ${err.message}`)

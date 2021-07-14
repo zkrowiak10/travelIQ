@@ -26,15 +26,15 @@ class API ():
         
         return data
     
-    def serializeItem(obj_list):
+    def serializeItem(obj):
         dict = {}
-        for obj in obj_list:
-            logging.debug("this is the data __dict" + str(obj.__dict__))
+        
+        logging.debug("this is the data __dict" + str(obj.__dict__))
+        
+        for key, value in obj.__dict__.items():
             
-            for key, value in obj.__dict__.items():
-                
-                if key != "_sa_instance_state":
-                    dict[key] = value
+            if key != "_sa_instance_state":
+                dict[key] = value
             
         
         return dict

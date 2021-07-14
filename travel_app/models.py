@@ -102,7 +102,7 @@ class Hotel_Reservation(Base):
     refundable = db.Column(db.Boolean)
     cancellation_date = db.Column(db.Date) 
     destination_id = db.Column(db.Integer, db.ForeignKey('destination.id'))
-    destination = db.relationship('Destination', backref='hotel_reservations')
+    destination = db.relationship('Destination', backref='hotels')
     breakfast_included = db.Column(db.Boolean)
     contact_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
     contact_info = db.relationship('Contact')
@@ -123,8 +123,8 @@ class UserTripPair(Base):
         return trips
     @staticmethod
     def getUsersByTrip(trip):
-        trips = [pairing.trip for pairing in trip.userPairings]
-        return trips
+        users = [pairing.user for pairing in trip.userPairings]
+        return users
 
 #trips should be broken down into destination cities that segment out the stay
 class Destination (Base):

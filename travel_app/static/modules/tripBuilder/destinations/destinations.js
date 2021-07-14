@@ -63,19 +63,26 @@ export class DestinationsController extends ItemController {
     }
 }
 
-export function route(hashArray) {
-    if (hashArray.length ==0 ) {location.hash = location.hash + '/destinations'}
-    var destinationsController = new DestinationsController()
-    destinationsController.init()
-
+export async function route(hashArray) {
     let next = hashArray.shift()
-    // if (next != "destination") {
-    //     console.error("bad hash route at: ", location.hash)
-    // }
-    let destination = hashArray.shift()
-    destination = destinationsController.findDestinationByID(destination)
+    if (!next) {
+        location.hash = location.hash + '/destinations'
+        return 200
+    }
+    var destinationsController = new DestinationsController()
+    await destinationsController.init()
 
-    // hotels.route(hashArray, destination)
+    if (next != "destination") {
+        alert('no such destination')
+    }
+    next = hashArray.shift()
+    let destination = destinationsController.findDestinationByID(next)
+    destination.focused = true
+    if (!next) {
+        return 200
+    }
+
+    hotels.route(hashArray, destination)
 
 }
 

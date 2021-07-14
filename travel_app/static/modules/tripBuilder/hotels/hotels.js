@@ -6,6 +6,8 @@ import { Destination } from "../destinations/destinations.js"
 // constructor function for a Hotel object
 
 var workdir =  "/static/modules/tripBuilder/hotels"
+var getEndpoint
+var putEndpoint
 export class Hotel extends Item {
     fields = [
         { type: "text", key: "name", pretty: "Name" },
@@ -17,35 +19,46 @@ export class Hotel extends Item {
         { type: "checkbox", key: "breakfast_included", pretty: "Breakfast Included?" },
     ]
     constructor() {
-        
+        super()
+        this.endPoint = putEndpoint
 
     }
 }
 
 // collection handler for current hotels
 class HotelsController extends ItemController{
-    fields = [
-        { type: "text", key: "name", pretty: "Name" },
-        { type: "text", key: "link", pretty: "Link" },
-        { type: "date", key: "check_in", pretty: "Check In Date" },
-        { type: "date", key: "check_out", pretty: "Check Out Date" },
-        { type: "checkbox", key: "refundable", pretty: "Refundable Reservation?" },
-        { type: "date", key: "cancellation_date", pretty: "Last Day to Cancel" },
-        { type: "checkbox", key: "breakfast_included", pretty: "Breakfast Included?" },
-    ]
+    
     constructor(destination) {
+
+        let fields = [
+            { type: "text", key: "name", pretty: "Name" },
+            { type: "text", key: "link", pretty: "Link" },
+            { type: "date", key: "check_in", pretty: "Check In Date" },
+            { type: "date", key: "check_out", pretty: "Check Out Date" },
+            { type: "checkbox", key: "refundable", pretty: "Refundable Reservation?" },
+            { type: "date", key: "cancellation_date", pretty: "Last Day to Cancel" },
+            { type: "checkbox", key: "breakfast_included", pretty: "Breakfast Included?" },
+        ]
+        
+        console.log(destination)
+        
+        let title = "Create Hotel"
+        let containerId = '#hotels'
+        let insertNode = "#tabContent"
+        let templateFile = "hotels-template.html"
+        
+        super(Hotel,getEndpoint,fields,title,containerId,templateFile,workdir, insertNode)
         this.destination = destination
-        this.endpoint = destination.endpoint + "/hotels"
-        var title = "Create Hotel"
-        this.containerId = '#hotels'
-        this.html
-        this.dataModel = new zk.ObservableObject(dataModel)
+        
   
     }
 }
 
 export function route(hashArray, destination) {
-    controller = new HotelsController(destination)
+    
+    getEndpoint = `${destination.endPoint}/${destination.id}/hotels`
+    putEndpoint = `${destination.endPoint}/${destination.id}/hotel`
+    let controller = new HotelsController(destination)
     controller.init()
 
 }

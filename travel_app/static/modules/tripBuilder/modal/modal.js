@@ -43,11 +43,15 @@ export function Modal(parent, fields, title, target, update) {
             label.innerHTML = `${field.pretty}: `
             label.setAttribute("for", input.id)
             input.setAttribute("type", field.type)
-            input.setAttribute("zk-bind", `text: formModel.tempObj.${field.key}`)
+            let type = (field.type == 'date') ? 'date' : "text"
+            input.setAttribute("zk-bind", `${type}: formModel.tempObj.${field.key}`)
             input.className = "form-control"
+            let inputGroup = document.createElement('div')
+            inputGroup.setAttribute('class','inputGroup')
+            inputGroup.appendChild(label)
+            inputGroup.appendChild(input)
+            this.fieldContainer.appendChild(inputGroup)
             
-            this.fieldContainer.appendChild(label)
-            this.fieldContainer.appendChild(input)
         }
         zk.initiateModel(this, this.html)
     },
