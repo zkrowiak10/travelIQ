@@ -40,14 +40,14 @@ function zk() {
             let binder = root.getAttribute('zk-bind')
             let splitBinder = binder.split(":")
 
-            if (splitBinder.length < 2) {throw new Error("Invalid binding at:", binder)}
+            if (splitBinder.length < 2) {throw new Error("Invalid binding at:", root)}
 
             // isolate bindMode string and object path (getting rid of preceding white space)
             let bindMode = splitBinder[0] 
             let objectPath = splitBinder[1].trim()
-
+            
             // Current array of valid bind modes for validity checking
-            validBindModes = ['text', 'value', 'for', 'on', 'format', 'checkbox']
+            validBindModes = ['text', 'value', 'for','date', 'on', 'format', 'checkbox', 'attr', 'hidden', 'visible']
 
 
             // Verify that bind mode is valid
@@ -83,8 +83,11 @@ function zk() {
                 registerListener(boundElement, model)
                 return
             }
+            if ((bindMode == "attr")){
+                parentObject = objectPath.split('|')[1].split('.')[0]
+            }
 
-            if (!model[parentObject]) {throw new Error("Invald object path at ", parentObject)}
+            if (typeof model[parentObject] == "undefined") {console.error("Invald object path at ", binder, "with model: ",model)}
 
             model[parentObject]._observableObject.registerElement(bindMode, boundElement)
 
@@ -260,18 +263,24 @@ function zk() {
                 let property = boundElement.property
                 let updateValue = target[property]
 
-                if (bindMode == "date") {
-                    if (updateValue instanceof Date) {
-                        updateValue = updateValue._targetObject.toISOString().split('T')[0]
-                        
+                if (bindMode == "date" && (updateValue)) {
+                    updateValue = new Date(updateValue)
+                    try {
+                        updateValue = updateValue.toISOString().split('T')[0]
                     }
-                    else {throw new Error("Invalid value for 'Date' binding: ", updateValue)}
+                    
+                    catch (err) {
+                        console.error("error converting date object", updateValue, err.message)
+                    }
+                    
+                    
+                
                 }
                 if (bindMode == "datetime-local")  {
-                    if (updatValue instanceof Date) {
-                        updateValue = updateValue._targetObject.toISOString()
-                    }
-                    else {throw new Error("Invalid value for 'Date' binding: ", updateValue)}
+                    updateValue = new Date(updateValue)
+                    updateValue = updateValue._targetObject.toISOString()
+                        
+                  
                 }
                 boundElement.DOMelement.value = (updateValue || "")
              
@@ -419,7 +428,7 @@ function zk() {
                     value = new ObservableObject(value)
                     value.parent = self
                     subModel[boundElement.iteratorKey] = value
-                    console.log(self)
+                    
                     subModel.$parentModel = self.$model
 
                     // Create submodel context that stores node-element pairing
@@ -480,7 +489,7 @@ function zk() {
             switch (bindMode) {
                 case "text" :
                 case "checked":
-                case "datetime":
+                case "date":
                     transmitters.push(boundElement);
                     oRefPath = utils.prepareObjectPath(boundElement.objectPath)
                     boundElement.target = utils.returnTargetProperty(dataObjectProxy, oRefPath, true)
@@ -500,17 +509,56 @@ function zk() {
                     boundElement.objectPath = objectPath
                 case "value": 
                     
-                    oRefPath = utils.prepareObjectPath(boundElement.objectPath)
-                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, oRefPath, true)
+                    targetPath = utils.prepareObjectPath(boundElement.objectPath)
+                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
                     splitPath = boundElement.objectPath.split(".")
                     boundElement.property = splitPath[(splitPath.length-1)]
                     receivers.push(boundElement);
                     boundElement.update()
                     break
                 
-
+                case "attr":
+                    // attr bindings follow syntax "attr: targetAttr|binding"
+                    [attr,binding] = boundElement.objectPath.split('|')
+                    boundElement.objectPath = binding
+                    splitPath = boundElement.objectPath.split(".")
+                    boundElement.property = splitPath[(splitPath.length-1)]
+                    targetPath = utils.prepareObjectPath(boundElement.objectPath)
+                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
+                    splitPath = boundElement.objectPath.split(".")
+                    boundElement.update = function() {
+                        let value = boundElement.target[boundElement.property]
+                        boundElement.DOMelement.setAttribute(attr,value)
+                    }
+                    boundElement.update()
+                    break
                 case "for":
                     initializeForeach(boundElement);
+                    break
+                case "hidden":
+                    targetPath = utils.prepareObjectPath(boundElement.objectPath)
+                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
+                    splitPath = boundElement.objectPath.split(".")
+                    boundElement.property = splitPath[(splitPath.length-1)]
+                    console.log(boundElement.property)
+                    receivers.push(boundElement);
+                    boundElement.update = function() {
+                        boundElement.DOMelement.hidden = boundElement.target[boundElement.property]
+                    }
+                    boundElement.update()
+                    break
+
+                case "visible":
+                    targetPath = utils.prepareObjectPath(boundElement.objectPath)
+                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
+                    splitPath = boundElement.objectPath.split(".")
+                    boundElement.property = splitPath[(splitPath.length-1)]
+                    
+                    receivers.push(boundElement);
+                    boundElement.update = function() {
+                        boundElement.DOMelement.hidden = !boundElement.target[boundElement.property]
+                    }
+                    boundElement.update()
                     break
             }
         }
@@ -553,8 +601,9 @@ function zk() {
             argArray.push(model[key])
         }
         try {
+            let callbackParent = utils.returnTargetProperty(model,methodName,true)
             let callback = utils.returnTargetProperty(model,methodName)
-            boundElement.DOMelement.addEventListener(eventType, function(){callback.apply(null,argArray)})
+            boundElement.DOMelement.addEventListener(eventType, function(){callback.apply(callbackParent,argArray)})
         }
         catch (err) {
             console.error(`${err.name}: ${err.message}`)

@@ -5,14 +5,15 @@ import {Modal} from "../modal/modal.js"
 
 var workdir =  "/static/modules/tripBuilder/destinations"
 export class Item {
-    constructor(fields, endPoint) {
+    constructor( endPoint) {
 
         var that = this
-        this.fields = fields
+        
         this.endPoint = endPoint
         this.update = async function () {
             var data = this.stringify() 
-            var response = await api.patch(this.endPoint, data)
+            endPoint = `${this.endPoint}/${this.id}`
+            var response = await api.patch(endPoint, data)
             // will need to process potential erros down the road
             if (response.status != 200) {
                 alert('something went wrong')
@@ -32,6 +33,7 @@ export class Item {
 
         this.stringify = function () {
             let obj = {}
+            console.log(this)
             for (let field of this.fields) {
                 obj[field.key] = this[field.key]
             }
@@ -40,7 +42,8 @@ export class Item {
         }
         this.delete = async function () {
             var body = this.stringify() 
-            var response = await api.delete(this.endPoint, body)
+            endPoint = `${this.endPoint}/${this.id}`
+            var response = await api.delete(endPoint, body)
             if (response.status != 200) {
                 throw Error("Resource not deleted")
             }
@@ -51,25 +54,27 @@ export class Item {
 
 // collection handler for item collection
 export class ItemController {
-    constructor() {
+    constructor(itemClass, endPoint, fields, title, containerId, templateFile, workdir, insertNode)
+    {
         var that = this
-        this.itemClass = Item
+        this.itemClass = (itemClass)? itemClass : Item
         this.itemList = new zk.ObservableObject([])
-        this.endPoint
-        this.fields = []
-        this.title 
-        this.containerId 
+        this.endPoint = endPoint
+        this.fields = fields
+        this.title = title
+        this.containerId = containerId
         this.html
-        this.template
-        this.workdir
+        this.template =templateFile
+        this.workdir = workdir
+        this.insertNode = insertNode
         this.init = async function () {
 
             var template = await fetch(`${this.workdir}/${this.template}`, { headers: { "Content-Type": "text/html" } })
             var text = await template.text()
-            document.querySelector("#tabContent").innerHTML = text
+            document.querySelector(this.insertNode).innerHTML = text
             this.html = document.querySelector(this.containerId)
             zk.initiateModel(this, this.html)
-            this.get()
+            await this.get()
         }
         this.get = async function () {
 
@@ -95,7 +100,7 @@ export class ItemController {
             modal.render()
         }
         this.editItem = function (item) {
-            var modal = new Modal(that, that.fields, that.title, item, true)
+            var modal = new Modal(this, that.fields, that.title, item, true)
             modal.render()
         }
         this.appendItem = async function (item) {

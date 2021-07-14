@@ -17,3 +17,11 @@ function formatDate(date) {
 
     return [year, month, day].join('-');
 }
+
+export const g = new zk.ObservableObject({
+    trip: {
+        name : "",
+        isDefined: false,
+        id: undefined
+    } 
+})

@@ -1,42 +1,16 @@
 <div class="contentArea" id="hotels">
   <h1>Hotels</h1>
   <br>
-  <p>All other activities (hotels, restaurants, etc...) are linked to a destination so you can organize your trip easily</p>
+  <p>Keep track of the hotels you are interested in here. Once you book, you'll see that one first.</p>
   <br>
-  <table class="table border">
-   
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Link</th>
-          <th>Check In Date</th>
-          <th>Check Out Date</th>
-          <th>Refundable Reservation?</th>
-          <th>Last Day to Cancel</th>
-          <th>Breakfast Included?</th>
-          <th><button type="button" class="btn btn-primary" zk-bind="on: click|createHotel()">
-              <i class="fas fa-plus"></i>
-            </button></td></th>
-        </tr>
-      </thead>
-      <tbody zk-bind="for: hotel of dataModel.hotelsList">
-          <tr >
-              <td zk-bind="value: hotel.name"></td>
-              <td zk-bind="value: hotel.link"></td>
-              <td zk-bind="date: hotel.check_in"></td>
-              <td zk-bind="date: hotel.check_out"></td>
-              <td zk-bind="value: hotel.refundable"></td>
-              <td zk-bind="date: hotel.cancellation_date"></td>
-              <td zk-bind="value: hotel.breakfast_included"></td>
-              
-              <!-- will add the following functions soon -->
-              <!-- zk-bind="click: this.update()" -->
-              <!-- zk-bind="click: this.delete()" -->
-              <td ><button type="button" class="btn btn-primary" zk-bind="on: click|$parentModel.editItem(hotel)" >
-                  Edit
-                </button></td>
-
-          </tr>
-        </tbody>
-  </table>
+  <ul class="hotelList" zk-bind="for: hotel of itemList">
+    <li>
+      <div class="hotelBox">
+        <h2 zk-bind="value: hotel.name"></h2>
+        <button type="button" class="btn btn-primary" zk-bind="on: click|$parentModel.editItem(hotel)" >
+          Edit
+        </button>
+      </div>
+    </li>
+  </ul>
 </div> 

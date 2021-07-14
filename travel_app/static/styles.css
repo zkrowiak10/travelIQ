@@ -4,48 +4,169 @@ h1, h3, h4, p, a {
 }
 
 a {
-    color: black
+    color: black;
+    text-decoration: none;
 }
 
+body {
+    display: flex;
+    flex-direction: column;
+}
+.main {
 
-
-.popup {
-
-  display: block; 
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); 
 }
 
-.sideways {
-    float: left;
+.slideOut {
+    display: flex;
+    flex-direction: column;
+    margin-top: 5px;
+    background-color: F2F2F2;
+    
+
+}
+.slideOut > button {
+    flex: 3;
+    margin-bottom: 2px;
+    background-color: F2F2F2;
+    font-size: medium;
+    font-weight: bolder;
+}
+
+.flex-header {
+    flex: 1
+}
+.nav-link {
+    
+ 
+}
+.nav-bar {
+    list-style-type: none;
+    margin-bottom: 0px;
+    padding: 0;
+    overflow: hidden;
+    width: 100vw;
+    margin-top: 0px;
+    border-bottom: 2px solid lightgray;
+    
+}
+#iconlink {
+    margin: 0px 0px 0px 0px;
+
+}
+.dropdown-divider {
+    height: 0;
+    margin: .5rem 0;
+    overflow: hidden;
+    border-top: 1px solid #e9ecef;
+}
+.nav-bar li:not(.nav-right){
     display: inline;
-    max-width: 30%
+    float: left;
+    text-align:center;
+    margin: 20px 10px 0px 10px;
+    font-size: larger;
+    
 }
-#v-pills-tabContent {
-    padding-top: 20px
+.sideBar-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding:0px;
+    margin: 0px
+    
 }
-#nav-bar {
-    padding: 10px 10px 0px 10px
-}
-nav {
-    box-shadow: 5px 5px 10px #c6c6c6;
-    /* padding-top: 10px; */
-    padding-left: 30px;
-    z-index: +1
+.destinationCard {
+    box-shadow: 3px 3px 3px grey;
+    margin: 5px 5px 5px 5px;
+    background-color: #DAD8D8;
+    padding: 10px;
+    border-style: solid;
+    border-width: 1px;
 }
 
+.nav-bar li:hover:not(.active){
+    background-color: #ddd;
+}
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: -1;
+    text-align: start;
+}
+.dropdown-menu a {
+    margin: 3px 0 3px
+}
+.dropdown-menu a:hover:not(.active){
+    background-color: #ddd;
+}
+
+
+.dropdown-toggle:hover .dropdown-menu {
+    display: block;
+    z-index: 1; 
+}
+.dropdown-item {
+    margin-top: 3px;
+    margin-bottom: 3px;
+    padding: 2px;
+    border:blue
+}
+
+
+.sideBar-header{
+    border-style: solid;
+    border-width: 2px;
+    font-size: xx-large;
+    padding: 0px 0px 0px 10px;
+    background-color: #B4C6E7;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    margin: 0px
+    
+    
+    
+}
+.mainArea {
+    display:flex
+}
+.tooltip {
+    position: relative;
+    
+    
+  }
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 220px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    font-size: medium;
+    font-style: normal;
+    font-weight: lighter;
+    top:100%;
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+  }
+  
+  /* Show the tooltip text when you mouse over the tooltip container */
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+  }
 /* right now reffering to logout link */
-.nav-right {
+.nav-right{
+    margin-left: auto;
+    display: inline;
+    margin: 20px 10px 0px 10px;
     float: right;
-    color: black
+    margin-right: 30px;
+    color: black;
+    font-size: larger;
 }
 
 .nav-left {
@@ -83,10 +204,130 @@ nav {
 }
 
 .sideBar {
-    background-color: #F8F9FA;
-    height: 100%;
+    background-color: #e8f8ff;
+    height: 100vh;
+    float: left;
+    width: 20%;
     margin-left: 0;
-    padding-top: 20px
+    border-color: darkgray;
+    padding-right: 5px;
+    border-right: 3px solid lightgray
+    
 
 
 }
+.contentArea {
+    float:left
+}
+.popup {
+    display: flex;
+    position: fixed;
+    /* Stay in place */
+    z-index: 1;
+    /* Sit on top */
+    /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgb(0,0,0);
+    /* Fallback color */
+    background-color: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: space-around;
+    align-content: center;
+}
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    align-content: space-between;
+  }
+  .modal-dialog {
+      background-color: white;
+      max-width: 40%;
+      padding: 15px;
+      border: solid 2px black;
+      border-radius: 5px;
+      
+  }
+  .modal-header {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+    align-items: flex-start;
+
+  }
+  
+  .modal-body {
+    display:flex;
+    flex:2;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: space-between;
+    align-items: stretch;
+  }
+  .modal-body > .inputGroup {
+    margin:5px 5px 5px 5px;
+    flex:1
+  }
+  .modal-body > .inputGroup >  input {
+    float:right;
+    margin-left:10px;
+    margin-top:5px
+  }
+ 
+  .modal-footer {
+    display:flex;
+    flex:1;
+    align-content: space-around;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    margin-top:15px
+    
+  }
+  .modal-footer > button {
+    margin: 0px 5px 0px 5px
+  }
+  .btn {
+    background-color: white;
+    border-style: solid;
+    border-width:  1px;
+    border-color: #46A133;
+    border-radius:4px;
+    padding:5px;
+  }
+  .btn:hover {
+    background-color:#EEEEEE;
+    
+  }
+  .btn:click {
+    border:inset 2px;
+    
+  }
+  .hotelBox {
+    border:2px solid  green;
+    width:100%;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: flex-start;
+
+  }
+  .hotelBox > button {
+    float:right
+  }
+  .hotelBox > h2 {
+      display: inline;
+      margin-left: 10px;
+  }
+  .hotelList {
+      list-style-type: none;
+
+  }
