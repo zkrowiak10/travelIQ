@@ -63,20 +63,30 @@ export class DestinationsController extends ItemController {
     }
 }
 
+// receives /destinations or /destination/<id>/etc...
 export async function route(hashArray) {
     let next = hashArray.shift()
+    
     if (!next) {
         location.hash = location.hash + '/destinations'
-        return 200
+        
     }
     var destinationsController = new DestinationsController()
     await destinationsController.init()
 
-    if (next != "destination") {
-        alert('no such destination')
+    if ((next == "destinations")) {
+        return 200
     }
-    next = hashArray.shift()
+    if (next == "destination") {
+        next = hashArray.shift()
+    }
+    else {
+        alert("page not found: ", next)
+    }
     let destination = destinationsController.findDestinationByID(next)
+    if (!destination) {
+        console.log('no destination at current hash')
+    }
     destination.focused = true
     if (!next) {
         return 200

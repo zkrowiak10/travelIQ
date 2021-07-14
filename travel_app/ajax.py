@@ -233,6 +233,7 @@ def changeHotel(trip_id, dest_id,hotel_id ):
         
     if request.method =="DELETE":
         models.db.session.delete(hotel)
+        models.db.session.commit()
     return Response("Deleted", 200)
 
 

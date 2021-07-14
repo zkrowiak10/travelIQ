@@ -59,20 +59,10 @@ export function Modal(parent, fields, title, target, update) {
   
    this.delete = async function() {
         if (target) {
-            try {
-                let status = await target.delete()
-                
-                if (status.ok) {
-                    parent.deleteItem(target.id)
-                }
-            }
-            catch (err){
-                console.error("error", err.message)
-            }
+            parent.deleteItem(target)
+            this.close()
+
             
-            finally {
-                that.close()
-            }
         }
    }
 

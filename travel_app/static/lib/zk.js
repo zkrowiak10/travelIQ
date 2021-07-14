@@ -124,11 +124,20 @@ function zk() {
         this.target = undefined
         this.property = undefined
         this.observableChildren = undefined 
+        this.attr
         this.updateCallback
 
         this.update = function() {
-
             let value = this.target[this.property]
+            
+            switch (this.bindMode) {
+                case ("attr") : 
+                    this.DOMelement.setAttribute(this.attr, value)          
+                    
+                    return
+
+            }
+
 
             if (this.updateCallback) {
                 value = this.updateCallback(value)
@@ -526,10 +535,9 @@ function zk() {
                     targetPath = utils.prepareObjectPath(boundElement.objectPath)
                     boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
                     splitPath = boundElement.objectPath.split(".")
-                    boundElement.update = function() {
-                        let value = boundElement.target[boundElement.property]
-                        boundElement.DOMelement.setAttribute(attr,value)
-                    }
+                    receivers.push(boundElement);
+                    console.log("attre: ",boundElement)
+                    boundElement.attr = attr
                     boundElement.update()
                     break
                 case "for":

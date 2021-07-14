@@ -116,9 +116,21 @@ export class ItemController {
             };
             that.itemList.push(itemObject)
         }
-        this.deleteItem = async function (id) {
-            let index = this.itemList.findIndex(x => x.id == id)
-            this.itemList.shift(index, 1)
+        this.deleteItem = async function (target) {
+            let index = this.itemList.findIndex(x => x.id == target.id)
+            try {
+                let status = await target.delete()
+                
+                if (status.ok) {
+                    this.itemList.splice(index, 1)
+                }
+            }
+            catch (err){
+                console.error("error", err.message)
+            }
+            
+            
+            
         }
     }
 }
