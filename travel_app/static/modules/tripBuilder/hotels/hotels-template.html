@@ -1,0 +1,16 @@
+<div class="contentArea" id="hotels">
+  <h1>Hotels</h1>
+  <br>
+  <p>Keep track of the hotels you are interested in here. Once you book, you'll see that one first.</p>
+  <br>
+  <ul class="hotelList" zk-bind="for: hotel of itemList">
+    <li>
+      <div class="hotelBox">
+        <h2 zk-bind="value: hotel.name"></h2>
+        <button type="button" class="btn btn-primary" zk-bind="on: click|$parentModel.editItem(hotel)" >
+          Edit
+        </button>
+      </div>
+    </li>
+  </ul>
+</div> 

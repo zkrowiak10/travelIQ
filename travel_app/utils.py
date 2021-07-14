@@ -11,28 +11,44 @@ class API ():
     
     def __init__(self, className):
         self.className = className
-        
     
+    @staticmethod
+    def serializeList(obj_list):
+        data = []
+        for obj in obj_list:
+            logging.debug("this is the data __dict" + str(obj.__dict__))
+            dict = {}
+            for key, value in obj.__dict__.items():
+                
+                if key != "_sa_instance_state":
+                    dict[key] = value
+            data.append(dict)
+        
+        return data
+    
+    def serializeItem(obj):
+        dict = {}
+        
+        logging.debug("this is the data __dict" + str(obj.__dict__))
+        
+        for key, value in obj.__dict__.items():
+            
+            if key != "_sa_instance_state":
+                dict[key] = value
+            
+        
+        return dict
+        
     def api_driver(self, request):
         if request.method == "GET":
             logging.debug("In api_driver")
             try:
-                obj_list = self.className.query.filter_by(trip_id = g.trip.id).all()
+                obj_list = self.className.query.filter_by().all()
             
             except Exception as e:
                 logging.error("There was an error in loading json GET request: " + str(e))
                 return abort(400)
             
-            data = []
-            
-            for obj in obj_list:
-                logging.debug("this is the data __dict" + str(obj.__dict__))
-                dict = {}
-                for key, value in obj.__dict__.items():
-                    
-                    if key != "_sa_instance_state":
-                        dict[key] = value
-                data.append(dict)
                 
             return jsonify(data)
 
@@ -120,3 +136,4 @@ class API ():
                 return abort(400)
             
             return Response("Deleted", 200)
+        
