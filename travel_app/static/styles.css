@@ -335,3 +335,16 @@ body {
       float: right;
     
   }
+  .detailsBox {
+    margin-top:5%;
+    background-color: #E6E9EB;
+    border: 2px solid black;
+    border-radius: 4px;
+    width:85%;
+    height:85%;
+    padding-left:3%
+
+  }
+  #hotelDetailView {
+    flex:2;
+  }

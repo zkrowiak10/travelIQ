@@ -32,78 +32,93 @@ function zk() {
     function ParseDOMforObservables(model, root) 
     {       
 
+        var independentElement
         // if HTML element contains binder
         if (root.getAttribute('zk-bind')){
-
             // parse the bind command
             // bind syntax is '<bindMode>: <object path'
-            let binder = root.getAttribute('zk-bind')
-            let splitBinder = binder.split(":")
+            let zkbind = root.getAttribute('zk-bind')
+            bindingExpressions = zkbind.split(';')
 
-            if (splitBinder.length < 2) {throw new Error("Invalid binding at:", root)}
+            for (let binder of bindingExpressions) {
 
-            // isolate bindMode string and object path (getting rid of preceding white space)
-            let bindMode = splitBinder[0] 
-            let objectPath = splitBinder[1].trim()
             
-            // Current array of valid bind modes for validity checking
-            validBindModes = ['text', 'value', 'for','date', 'on', 'format', 'checkbox', 'attr', 'hidden', 'visible']
+                let splitBinder = binder.split(":")
 
+                if (splitBinder.length < 2) {throw new Error("Invalid binding at:", root)}
 
-            // Verify that bind mode is valid
-            if (!validBindModes.includes(bindMode)) 
-            {
-                throw new Error(bindMode + " is not a valid bind mode")
-            } 
-
-
-            // Parent object in path is expected to be an attribute of the model parameter of this function
-            // Parse parent object, and add this element to the appropriate list
-            let parentObject = objectPath.split('.')[0]
-
-            // A little messy, but 'for' binders receive an argument of 'indexKey of iterable' where
-            // iterable is the typical objectpaty. 
-            if (bindMode === 'for') {
-                parentObject = objectPath
-                                .split('of')[1]
-                                .trim()
-                                .split('.')[0]  
-            }
-            // Check that bind reference exists in model
-            if ((typeof model[parentObject] === undefined)) {
-                throw new Error (parentObject + "Is not a registered observable")
-            }
-            
-
-            // Push the element to the appropriate list 
-            boundElement = new BoundElement(root, objectPath, bindMode)
-
-            if ((bindMode == 'on')) {
+                // isolate bindMode string and object path (getting rid of preceding white space)
+                let bindMode = splitBinder[0] 
+                let objectPath = splitBinder[1].trim()
                 
-                registerListener(boundElement, model)
-                return
-            }
-            if ((bindMode == "attr")){
-                parentObject = objectPath.split('|')[1].split('.')[0]
-            }
+                // Current array of valid bind modes for validity checking
+                validBindModes = ['text', 'value', 'for','date', 'on', 'format', 'checkbox', 'attr', 'hidden', 'visible']
 
-            if (typeof model[parentObject] == "undefined") {console.error("Invald object path at ", binder, "with model: ",model)}
 
-            model[parentObject]._observableObject.registerElement(bindMode, boundElement)
+                // Verify that bind mode is valid
+                if (!validBindModes.includes(bindMode)) 
+                {
+                    console.error(bindMode + " is not a valid bind mode")
+                    continue
+                } 
 
-            // Some binders, such as 'for' binders, create a separate tree model for all of their children
-            // This array contains a list of all 'uprooting' binders
-            let uprootingBinders = ['for']
 
-            // This root becomes a new tree, so now further exploration of this branch can happen to avoid duplicate bindings
-            if (uprootingBinders.includes(bindMode)) {
+                // Parent object in path is expected to be an attribute of the model parameter of this function
+                // Parse parent object, and add this element to the appropriate list
+                let parentObject = objectPath.split('.')[0]
+
+                // A little messy, but 'for' binders receive an argument of 'indexKey of iterable' where
+                // iterable is the typical objectpaty. 
+                if (bindMode === 'for') {
+                    parentObject = objectPath
+                                    .split('of')[1]
+                                    .trim()
+                                    .split('.')[0]  
+                }
+              
                 
-                return
-            }
+
+                // Push the element to the appropriate list 
+                boundElement = new BoundElement(root, objectPath, bindMode)
+
+                if ((bindMode == 'on')) {
+                    
+                    registerListener(boundElement, model)
+                    continue
+                }
+                if ((bindMode == "attr")){
+                    parentObject = objectPath.split('|')[1].split('.')[0]
+                }
+
+                if (typeof model[parentObject] == "undefined") {
+                    console.error("Invald object path at ", binder, "with model: ",model)
+                    continue
+                }
+
+                // populate non-observable fields just once
+                if (!model[parentObject]._observableObject) {
+                    if (bindMode == "value") {
+                        root.innerText = utils.returnTargetProperty(model, objectPath)
+                        continue
+                    }
+                }
+                model[parentObject]._observableObject.registerElement(bindMode, boundElement)
+
+                // Some binders, such as 'for' binders, create a separate tree model for all of their children
+                // This array contains a list of all 'uprooting' binders
+                let uprootingBinders = ['for']
+
+                // This root becomes a new tree, so now further exploration of this branch can happen to avoid duplicate bindings
+                if (uprootingBinders.includes(bindMode)) {
+                    
+                    independentElement = true
+                }
 
 
-            }
+                }
+        }
 
+        if (independentElement) {return}
         children = root.children
         
         // iterate through children 
@@ -188,11 +203,9 @@ function zk() {
             }, 
             set: function(target, property, value) {
                 
-                // console.log('setting', target, "prop ", property, "to: ", value)
 
                 if (Array.isArray(target)) {
                     updateArrayOnSet(target, property, value)
-                    // console.log("setting", property, "to ", value)
                     return true
                 }
                 
@@ -207,7 +220,6 @@ function zk() {
             deleteProperty(target, property){
                 if (Array.isArray(target)) {
                     updateArrayOnDelete(target, property)
-                    // console.log('deleting', property, "from", target)
                     return true
                 }
                 delete target[prop]
@@ -536,7 +548,6 @@ function zk() {
                     boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
                     splitPath = boundElement.objectPath.split(".")
                     receivers.push(boundElement);
-                    console.log("attre: ",boundElement)
                     boundElement.attr = attr
                     boundElement.update()
                     break
@@ -548,7 +559,6 @@ function zk() {
                     boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
                     splitPath = boundElement.objectPath.split(".")
                     boundElement.property = splitPath[(splitPath.length-1)]
-                    console.log(boundElement.property)
                     receivers.push(boundElement);
                     boundElement.update = function() {
                         boundElement.DOMelement.hidden = boundElement.target[boundElement.property]
