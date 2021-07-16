@@ -5,14 +5,16 @@ export class Destination extends Item {
     fields = [
         { type: "text", key: "name", pretty: "Name" },
         { type: "number", key: "days_there", pretty: "Days There" },
-        { type: "textarea", key: "notes", pretty: "Notes" }
+        { type: "textarea", key: "notes", pretty: "Notes" },
+        { type: "number", key: "trip_order", pretty: "Order in Trip"},
+        
     ]
     focused = false
     
     constructor(trip_id){
         super()
         this.trip_id = trip_id
-        this.fields = Destination.fields
+        
         this.endPoint = `/ajax/trip/${utils.g.trip.id}/destination`
         var linkPaths = `#trip/${utils.g.trip.id}/destination/${this.id}`
 
@@ -45,7 +47,8 @@ export class DestinationsController extends ItemController {
     fields = [
         { type: "text", key: "name", pretty: "Name" },
         { type: "number", key: "days_there", pretty: "Days There" },
-        { type: "textarea", key: "notes", pretty: "Notes" }
+        { type: "textarea", key: "notes", pretty: "Notes" },
+        { type: "number", key: "trip_order", pretty: "Order in Trip"}
     ]
     constructor(){
         super()

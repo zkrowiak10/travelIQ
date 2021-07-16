@@ -394,6 +394,8 @@ function zk() {
                     break
                 }
             }
+
+            // Presence of boundElement means that this array is bound to a DOM element
             if(boundElement) {
 
                 // find the node in the for element to delete and delete it from DOM
@@ -434,7 +436,7 @@ function zk() {
                 return
                 
             }
-           // no action if there are no elements in model observing
+           // Presence of boundElement means that this array is bound to a DOM element
             if (boundElement) {
                 let insertNode 
                 // If value being set is not an observable object
@@ -462,6 +464,7 @@ function zk() {
                     ParseDOMforObservables(subModel, insertNode)
                 }
                 
+                // this makes assumption that if it is NOT an observable object, it is an existing item in the array.
                 else {
                     // Locate the observable child of the bound 'for' element where
                     // the observable object at observableChild.subModel[iteratorKey]
@@ -660,7 +663,10 @@ function zk() {
                     object[item] = new Proxy(object[item], handler)
                     continue
                 }
-
+                // do not remake observable objects
+                if (object._observableObject) {
+                    continue
+                }
                 if (typeof object[item] == "object"){
                     object[item] = deepProxy(object[item], handler)
                 }

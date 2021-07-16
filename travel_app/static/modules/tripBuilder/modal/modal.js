@@ -1,111 +1,101 @@
 var workdir =  "/static/modules/tripBuilder/modal"
-export function Modal(parent, fields, title, target, update) {
-    
-    
-    
-    var that = this
-    // Current framework architecture requires an object with enumerable properties 
-    // as an argument to zk.ObservableObject
-    this.formModel = {
-        fields : fields,
-        title : title,
-        tempObj : {}
+export class Modal {
+    fields
+    title
+    fieldContainer
+    html
+    target
+    parent
+    constructor(parent, fields, title, target, update) {
+        
+
+        this.target = target ? target : {}
+        for (let field of fields) {
+            // undefined, or value of target
+            if (target) {
+                if (field.key in target) {
+                    field.value = target[field.key]
+                }
+            }
+            
+            else {
+                field.value = undefined
+            }
+            field.id = `modal-${field.key}`
+        }
+        console.log('fieds', fields)
+        this.fields = new zk.ObservableObject(fields)
+        this.title = title
+        this.parent = parent
+        this.update = update
     }
-    this.formModel = new zk.ObservableObject(this.formModel)
-    this.fieldContainer
-    this.html
-    if (!target) {
-        this,target = {}
-    }
-    
-    
-    this.render = async function(obj) {
-        var template = await fetch(`${workdir}/modal-template.html`, { headers: {"Content-Type" : "text/html"}})
+
+    async render(obj) {
+        var template = await fetch(`${workdir}/modal-template.html`, { headers: { "Content-Type": "text/html" } })
         var text = await template.text()
         this.html = document.createElement('div')
         this.html.innerHTML = text
-        document.querySelector(parent.containerId).append(this.html)
-        if (!update) {
+        document.querySelector(this.parent.containerId).append(this.html)
+        if (!this.update) {
             document.querySelector('#deleteItem').remove()
         }
-        
+
         this.fieldContainer = document.querySelector("#model-body-container")
 
-        
-        // Todo: zk framework should be able to dynamically assign input field type.
-        for (let field of fields)  {
-            this.formModel.tempObj[field.key] = (target[field.key]) ? target[field.key] : undefined
-            let label = document.createElement("label")
-            let input = document.createElement("input")
-            let br = document.createElement("br")
-            input.name = field.key
-            input.id = field.key
-            label.innerHTML = `${field.pretty}: `
-            label.setAttribute("for", input.id)
-            input.setAttribute("type", field.type)
-            let type = (field.type == 'date') ? 'date' : "text"
-            input.setAttribute("zk-bind", `${type}: formModel.tempObj.${field.key}`)
-            input.className = "form-control"
-            let inputGroup = document.createElement('div')
-            inputGroup.setAttribute('class','inputGroup')
-            inputGroup.appendChild(label)
-            inputGroup.appendChild(input)
-            this.fieldContainer.appendChild(inputGroup)
-            
-        }
         zk.initiateModel(this, this.html)
-    },
+    }
 
-  
-   this.delete = async function() {
-        if (target) {
-            parent.deleteItem(target)
+
+    async delete () {
+        if (this.target) {
+            this.parent.deleteItem(this.target)
             this.close()
 
-            
-        }
-   }
 
-    this.showCreate= function(){
+        }
+    }
+
+    showCreate() {
         this.clear()
         this.show()
     }
 
-    this.close = function() {
-        that.html.remove()
+    close () {
+        this.html.remove()
     }
 
 
-    this.save = async function() {
-       
-        for (let field of that.formModel.fields) {
+    async save () {
+
+        for (let field of this.fields) {
             key = field.key
-            target[key] = that.formModel.tempObj[key]
+            this.target[key] = field.value
             if (field.type == "date") {
-                target[key] = new Date(that.formModel.tempObj[key])
+                target[key] = new Date(this.formModel.tempObj[key])
             }
-            
-            
+
+
         }
-        if (update) {
+        if (this.update) {
             try {
-                target.update()
+                this.target.update()
             }
-            catch (err){
+            catch (err) {
                 console.error("error: ", err.message)
             }
             finally {
-                that.close()
+                this.close()
                 return
             }
-            
+
         }
-        
-        parent.appendItem(target)
-        
-        that.close()
+
+        this.parent.appendItem(this.target)
+
+        this.close()
     }
-   
 
 
+
+    
 }

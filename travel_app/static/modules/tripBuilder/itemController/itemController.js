@@ -97,6 +97,7 @@ export class ItemController {
         this.createItem = function () {
 
             var modal = new Modal(that, JSON.parse(JSON.stringify(that.fields)), that.title)
+            console.log('source fields', this.fields)
             modal.render()
         }
         this.editItem = function (item) {

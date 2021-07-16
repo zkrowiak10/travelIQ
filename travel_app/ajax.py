@@ -145,7 +145,7 @@ def destinationUpdates(trip_id, dest_id):
     if not data['id']:
         raise Exception("No trip id")
     
-    dest = [dest for dest in currentTrip.destinations if dest.id == dest_id][0]
+    dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
     if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
         # if not OAUTH():
         return abort(401)
