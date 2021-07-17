@@ -36,7 +36,7 @@ $().ready(()=>{
 
 // }
 window.addEventListener("hashchange", function(){
-    
+    wipe()
    
     hashSwitcher.switch(location.hash)
 
@@ -54,7 +54,7 @@ function HashSwitcher(){
         
         switch(hashvalueArray.shift()){
             case (''):
-                // todo
+                DestinationsController.wipe()
                 break
             case ('#trip'):
                 utils.g.trip.id = hashvalueArray.shift()
@@ -65,7 +65,14 @@ function HashSwitcher(){
          }
     }
     }
-   
+
+function wipe(){
+    // document.querySelector("#left-sidebar").innerHTML=""
+    document.querySelector("#tabContent").innerHTML=""
+
+    document.querySelector("#hotelDetailView").innerHTML=""
+
+}
 
 
 

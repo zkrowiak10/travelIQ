@@ -115,6 +115,9 @@ body {
     padding: 2px;
     border:blue
 }
+.dropdown-toggle > p {
+    margin:auto
+  }
 
 
 .sideBar-header{

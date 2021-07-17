@@ -64,7 +64,9 @@ export class DestinationsController extends ItemController {
     findDestinationByID(destID) {
         return this.itemList.find(dest => dest.id == destID)
     }
+    
 }
+
 
 // receives /destinations or /destination/<id>/etc...
 export async function route(hashArray) {
@@ -72,6 +74,7 @@ export async function route(hashArray) {
     
     if (!next) {
         location.hash = location.hash + '/destinations'
+        return
         
     }
     var destinationsController = new DestinationsController()
@@ -85,6 +88,7 @@ export async function route(hashArray) {
     }
     else {
         alert("page not found: ", next)
+        console.log(next)
     }
     let destination = destinationsController.findDestinationByID(next)
     if (!destination) {
