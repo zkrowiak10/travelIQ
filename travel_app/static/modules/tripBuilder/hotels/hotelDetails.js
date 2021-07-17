@@ -8,7 +8,7 @@ export class DetailsComponent {
     target
     templateFile
     update
-    constructor(parent, fields, title, target, targetElement, templateFile, update) {
+    constructor(controller, fields, title, target, targetElement, templateFile, update) {
 
         this.fields = new zk.ObservableObject(fields)
         this.title =  title
@@ -17,6 +17,7 @@ export class DetailsComponent {
         this.templateFile = templateFile
         this.update = new zk.ObservableObject(update)
         this.targetElement = targetElement
+        this.controller = controller
     }
 
     async render() {

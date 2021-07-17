@@ -76,6 +76,7 @@ export class Modal {
                 }
                 
                 this.target[field.parent][key] = field.value
+                
                 continue
             }
             this.target[key] = field.value

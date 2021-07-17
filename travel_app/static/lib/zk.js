@@ -152,6 +152,7 @@ function zk() {
                     return
 
             }
+
           
 
 
@@ -310,8 +311,11 @@ function zk() {
                 boundElement.DOMelement.addEventListener("input", (KeyboardEvent) => { 
                     let nodeValue = boundElement.DOMelement.value
                     if (bindMode == "date") {
-                        target[property] = new Date(nodeValue)
+                        tnodeValue = new Date(nodeValue)
                         return
+                    }
+                    if (boundElement.DOMelement.type == "checkbox") {
+                        nodeValue = boundElement.DOMelement.checked
                     }
                     target[property] = (nodeValue || "")
             })

@@ -110,6 +110,7 @@ class Hotel_Reservation(Base):
     phone = db.Column(db.String)
     address = db.Column(db.String)
     city = db.Column(db.String)
+    rate = db.Column(db.Float)
 
 class UserTripPair(Base):
     id  = db.Column(db.Integer, primary_key=True)

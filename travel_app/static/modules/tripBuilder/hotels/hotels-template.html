@@ -1,7 +1,7 @@
 <div class="contentArea" id="hotels">
   <button type="button" role="button" class="btn createButton" zk-bind="on: click|createItem()"><i class="fas fa-plus" ></i></button>
   <h1>Hotels</h1>
-  <br>
+
   <p>Keep track of the hotels you are interested in here. Once you book, you'll see that one first.</p>
   
   <br>
@@ -11,10 +11,8 @@
         <a zk-bind="attr:href|hotel.link">
           <h2 zk-bind="value: hotel.name"></h2>
         </a>
-        <p>From  <span zk-bind="format: hotel.check_in|root.utils.formatDatePretty"></span><br> to <span zk-bind="format: hotel.check_out|root.utils.formatDatePretty"></span></p>
-        <button type="button" class="btn btn-primary" zk-bind="on: click|$parentModel.editItem(hotel)" >
-          Edit
-        </button>
+        <p zk-bind="format: hotel.check_in|root.utils.formatDatePretty"> </p>
+        
         <button class="btn" zk-bind="on: click|$parentModel.showDetails(hotel)"><i class="far fa-list-alt"></i></button>
       </div>
     </li>

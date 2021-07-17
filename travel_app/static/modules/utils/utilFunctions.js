@@ -33,6 +33,14 @@ export function formatDatePretty(date) {
     return [ month, day,year].join('/');
 }
 
+export function formatPrice(price) {
+    price = Number.parseFloat(price)
+    if (!price){
+        return "No data"
+    }
+    let str = "$" + price.toFixed(2)
+    return str
+}
 export const g = new zk.ObservableObject({
     trip: {
         name : "",
