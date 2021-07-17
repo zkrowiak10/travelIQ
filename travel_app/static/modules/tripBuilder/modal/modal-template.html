@@ -4,7 +4,7 @@
     <div class="modal-content">
 
       <div class="modal-header">
-        <h2 class="modal-title flex-header" zk-bind="value: formModel.title" ></h2>
+        <h2 class="modal-title flex-header" zk-bind="value: title" ></h2>
         <button type="button flex-header" class="close" zk-bind="on: click|close()">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -12,7 +12,13 @@
 
 
       <!-- this will change to sub component eventually for reusability -->
-      <div class="modal-body form-group" id="model-body-container">     
+      <div class="modal-body form-group" zk-bind="for: field of fields" id="model-body-container">    
+        <div class="inputGroup">
+          <label zk-bind="attr: for|field.id;value:field.pretty"></label> 
+          <input class="form-control" zk-bind="attr: type|field.type;text:field.value">
+        </div>
+        
+        <br>
       </div>
 
       <div class="modal-footer">

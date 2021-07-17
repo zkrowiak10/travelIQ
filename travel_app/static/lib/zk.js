@@ -32,78 +32,93 @@ function zk() {
     function ParseDOMforObservables(model, root) 
     {       
 
+        var independentElement
         // if HTML element contains binder
         if (root.getAttribute('zk-bind')){
-
             // parse the bind command
             // bind syntax is '<bindMode>: <object path'
-            let binder = root.getAttribute('zk-bind')
-            let splitBinder = binder.split(":")
+            let zkbind = root.getAttribute('zk-bind')
+            bindingExpressions = zkbind.split(';')
 
-            if (splitBinder.length < 2) {throw new Error("Invalid binding at:", root)}
+            for (let binder of bindingExpressions) {
 
-            // isolate bindMode string and object path (getting rid of preceding white space)
-            let bindMode = splitBinder[0] 
-            let objectPath = splitBinder[1].trim()
             
-            // Current array of valid bind modes for validity checking
-            validBindModes = ['text', 'value', 'for','date', 'on', 'format', 'checkbox', 'attr', 'hidden', 'visible']
+                let splitBinder = binder.split(":")
 
+                if (splitBinder.length < 2) {throw new Error("Invalid binding at:", root)}
 
-            // Verify that bind mode is valid
-            if (!validBindModes.includes(bindMode)) 
-            {
-                throw new Error(bindMode + " is not a valid bind mode")
-            } 
-
-
-            // Parent object in path is expected to be an attribute of the model parameter of this function
-            // Parse parent object, and add this element to the appropriate list
-            let parentObject = objectPath.split('.')[0]
-
-            // A little messy, but 'for' binders receive an argument of 'indexKey of iterable' where
-            // iterable is the typical objectpaty. 
-            if (bindMode === 'for') {
-                parentObject = objectPath
-                                .split('of')[1]
-                                .trim()
-                                .split('.')[0]  
-            }
-            // Check that bind reference exists in model
-            if ((typeof model[parentObject] === undefined)) {
-                throw new Error (parentObject + "Is not a registered observable")
-            }
-            
-
-            // Push the element to the appropriate list 
-            boundElement = new BoundElement(root, objectPath, bindMode)
-
-            if ((bindMode == 'on')) {
+                // isolate bindMode string and object path (getting rid of preceding white space)
+                let bindMode = splitBinder[0] 
+                let objectPath = splitBinder[1].trim()
                 
-                registerListener(boundElement, model)
-                return
-            }
-            if ((bindMode == "attr")){
-                parentObject = objectPath.split('|')[1].split('.')[0]
-            }
+                // Current array of valid bind modes for validity checking
+                validBindModes = ['text', 'value', 'for','date', 'on', 'format', 'checkbox', 'attr', 'hidden', 'visible']
 
-            if (typeof model[parentObject] == "undefined") {console.error("Invald object path at ", binder, "with model: ",model)}
 
-            model[parentObject]._observableObject.registerElement(bindMode, boundElement)
+                // Verify that bind mode is valid
+                if (!validBindModes.includes(bindMode)) 
+                {
+                    console.error(bindMode + " is not a valid bind mode")
+                    continue
+                } 
 
-            // Some binders, such as 'for' binders, create a separate tree model for all of their children
-            // This array contains a list of all 'uprooting' binders
-            let uprootingBinders = ['for']
 
-            // This root becomes a new tree, so now further exploration of this branch can happen to avoid duplicate bindings
-            if (uprootingBinders.includes(bindMode)) {
+                // Parent object in path is expected to be an attribute of the model parameter of this function
+                // Parse parent object, and add this element to the appropriate list
+                let parentObject = objectPath.split('.')[0]
+
+                // A little messy, but 'for' binders receive an argument of 'indexKey of iterable' where
+                // iterable is the typical objectpaty. 
+                if (bindMode === 'for') {
+                    parentObject = objectPath
+                                    .split('of')[1]
+                                    .trim()
+                                    .split('.')[0]  
+                }
+              
                 
-                return
-            }
+
+                // Push the element to the appropriate list 
+                boundElement = new BoundElement(root, objectPath, bindMode)
+
+                if ((bindMode == 'on')) {
+                    
+                    registerListener(boundElement, model)
+                    continue
+                }
+                if ((bindMode == "attr")){
+                    parentObject = objectPath.split('|')[1].split('.')[0]
+                }
+
+                if (typeof model[parentObject] == "undefined") {
+                    console.error("Invald object path at ", binder, "with model: ",model)
+                    continue
+                }
+
+                // populate non-observable fields just once
+                if (!model[parentObject]._observableObject) {
+                    if (bindMode == "value") {
+                        root.innerText = utils.returnTargetProperty(model, objectPath)
+                        continue
+                    }
+                }
+                model[parentObject]._observableObject.registerElement(bindMode, boundElement)
+
+                // Some binders, such as 'for' binders, create a separate tree model for all of their children
+                // This array contains a list of all 'uprooting' binders
+                let uprootingBinders = ['for']
+
+                // This root becomes a new tree, so now further exploration of this branch can happen to avoid duplicate bindings
+                if (uprootingBinders.includes(bindMode)) {
+                    
+                    independentElement = true
+                }
 
 
-            }
+                }
+        }
 
+        if (independentElement) {return}
         children = root.children
         
         // iterate through children 
@@ -124,11 +139,22 @@ function zk() {
         this.target = undefined
         this.property = undefined
         this.observableChildren = undefined 
+        this.attr
         this.updateCallback
 
         this.update = function() {
-
             let value = this.target[this.property]
+            
+            switch (this.bindMode) {
+                case ("attr") : 
+                    this.DOMelement.setAttribute(this.attr, value)          
+                    
+                    return
+
+            }
+
+          
+
 
             if (this.updateCallback) {
                 value = this.updateCallback(value)
@@ -179,11 +205,9 @@ function zk() {
             }, 
             set: function(target, property, value) {
                 
-                // console.log('setting', target, "prop ", property, "to: ", value)
 
                 if (Array.isArray(target)) {
                     updateArrayOnSet(target, property, value)
-                    // console.log("setting", property, "to ", value)
                     return true
                 }
                 
@@ -198,7 +222,6 @@ function zk() {
             deleteProperty(target, property){
                 if (Array.isArray(target)) {
                     updateArrayOnDelete(target, property)
-                    // console.log('deleting', property, "from", target)
                     return true
                 }
                 delete target[prop]
@@ -209,7 +232,8 @@ function zk() {
         }
 
         let dataObject = obj
-
+      
+        
         let dataObjectProxy = utils.deepProxy(dataObject, handler)
         
 
@@ -232,10 +256,10 @@ function zk() {
             let splitPath = pathToObject.split('.')
             if (splitPath[0]=="root")  {targetChild= zk_self.root_model }
             if (splitPath[0]=="$parentModel")  {
-                targetChild = self.parent
+                targetChild = self.$parentModel
                 let i = 1
                 while (splitPath[i]=="$parentModel") {
-                    targetChild = targetChild.parent
+                    targetChild = targetChild.$parentModel
                 }
             }
             for (let i = 1; i < splitPath.length; i++) {
@@ -263,7 +287,7 @@ function zk() {
                 let property = boundElement.property
                 let updateValue = target[property]
 
-                if (bindMode == "date" && (updateValue)) {
+                if (boundElement.DOMelement.type=="date") {
                     updateValue = new Date(updateValue)
                     try {
                         updateValue = updateValue.toISOString().split('T')[0]
@@ -272,10 +296,9 @@ function zk() {
                     catch (err) {
                         console.error("error converting date object", updateValue, err.message)
                     }
-                    
-                    
-                
                 }
+                
+                
                 if (bindMode == "datetime-local")  {
                     updateValue = new Date(updateValue)
                     updateValue = updateValue._targetObject.toISOString()
@@ -288,8 +311,11 @@ function zk() {
                 boundElement.DOMelement.addEventListener("input", (KeyboardEvent) => { 
                     let nodeValue = boundElement.DOMelement.value
                     if (bindMode == "date") {
-                        target[property] = new Date(nodeValue)
+                        tnodeValue = new Date(nodeValue)
                         return
+                    }
+                    if (boundElement.DOMelement.type == "checkbox") {
+                        nodeValue = boundElement.DOMelement.checked
                     }
                     target[property] = (nodeValue || "")
             })
@@ -331,7 +357,6 @@ function zk() {
             // Do not reflect changes to the object model they are descendent from
             let index = 0;
             for (let item of iterable) {
-                
                 // Create clone of template node for each bound element
                 let clone = oldChild.cloneNode(true)
                 boundElement.DOMelement.appendChild(clone)
@@ -340,6 +365,7 @@ function zk() {
                 // a sub model
                 let subModel = {}
                 let newObj = new ObservableObject(item,self)
+              
                 
                 
                 subModel[iteratorKey] = newObj
@@ -373,6 +399,8 @@ function zk() {
                     break
                 }
             }
+
+            // Presence of boundElement means that this array is bound to a DOM element
             if(boundElement) {
 
                 // find the node in the for element to delete and delete it from DOM
@@ -413,7 +441,7 @@ function zk() {
                 return
                 
             }
-           // no action if there are no elements in model observing
+           // Presence of boundElement means that this array is bound to a DOM element
             if (boundElement) {
                 let insertNode 
                 // If value being set is not an observable object
@@ -426,7 +454,6 @@ function zk() {
                     // creat subModel for child node observable scope and add the observable to the array
                     let subModel = {}
                     value = new ObservableObject(value)
-                    value.parent = self
                     subModel[boundElement.iteratorKey] = value
                     
                     subModel.$parentModel = self.$model
@@ -441,6 +468,7 @@ function zk() {
                     ParseDOMforObservables(subModel, insertNode)
                 }
                 
+                // this makes assumption that if it is NOT an observable object, it is an existing item in the array.
                 else {
                     // Locate the observable child of the bound 'for' element where
                     // the observable object at observableChild.subModel[iteratorKey]
@@ -526,10 +554,8 @@ function zk() {
                     targetPath = utils.prepareObjectPath(boundElement.objectPath)
                     boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
                     splitPath = boundElement.objectPath.split(".")
-                    boundElement.update = function() {
-                        let value = boundElement.target[boundElement.property]
-                        boundElement.DOMelement.setAttribute(attr,value)
-                    }
+                    receivers.push(boundElement);
+                    boundElement.attr = attr
                     boundElement.update()
                     break
                 case "for":
@@ -540,7 +566,6 @@ function zk() {
                     boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
                     splitPath = boundElement.objectPath.split(".")
                     boundElement.property = splitPath[(splitPath.length-1)]
-                    console.log(boundElement.property)
                     receivers.push(boundElement);
                     boundElement.update = function() {
                         boundElement.DOMelement.hidden = boundElement.target[boundElement.property]
@@ -613,41 +638,41 @@ function zk() {
 
     let utils = {
         deepClone : function deepClone(object) {
+            
+            if (Array.isArray(object)) {
+                let newArray = []
+                for (let item of object) {
+                    cloneItem = deepClone(item)
+                    newArray.push(cloneItem) 
+            }
             let newObject = {}
             if (typeof object != "object") {
                 return object}
-            for (property in object) {
-                if (Array.isArray(property)) {
-                    let newArray = []
-                    for (item of array) {
-                        cloneItem = deepClone(item)
-                        newArray.push(cloneItem)
-                    }
-                }
+            }
+            for (let property in object) {
                 newObject[property] = deepClone(object[property])
             }
             return newObject
 
         },
         deepProxy:  function deepProxy(object, handler) {
+            // do not remake observable objects
             if (typeof object == "function") {return new Proxy(object, handler)}
-            for (let item in object) {
-                
-                if (Array.isArray(object[item])) {
+            if (Array.isArray(object)) {
                     
 
-                    for (let i = 0; i < object[item].length; i++) {
-                        object[item][i] = deepProxy(object[item][i], handler)
-                    }
-                    object[item] = new Proxy(object[item], handler)
-                    continue
+                for (let i = 0; i < object.length; i++) {
+                    object[i] = deepProxy(object[i], handler)
                 }
-
+                object = new Proxy(object, handler)
+                return object
+            }
+            for (let item in object) {
                 if (typeof object[item] == "object"){
                     object[item] = deepProxy(object[item], handler)
                 }
             }
-            
+
             if ((typeof object == "object") && object)  {
                 return new Proxy(object, handler)
 
@@ -690,6 +715,7 @@ function zk() {
         
         
     }
+    this.utils = utils
 }
 zk = new zk()
 

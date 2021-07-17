@@ -12,9 +12,10 @@ var hashSwitcher = new HashSwitcher()
 var header
 header = new Header()
 header.init()
+zk.root_model.utils = utils
 $().ready(()=>{
     
-    zk.root_model.utils = utils
+    
     
     
     hashSwitcher.switch(location.hash) 

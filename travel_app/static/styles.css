@@ -1,6 +1,6 @@
 h1, h3, h4, p, a {
     font-family: 'Anton', sans-serif;
-    margin: 0px
+    
 }
 
 a {
@@ -314,20 +314,48 @@ body {
     border:2px solid  green;
     width:100%;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-start;
     margin-bottom: 5px;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
 
   }
   .hotelBox > button {
-    float:right
+    margin-left: auto;
+    margin-right: 1%;
   }
-  .hotelBox > h2 {
+  .hotelBox > * {
       display: inline;
       margin-left: 10px;
   }
   .hotelList {
       list-style-type: none;
 
+  }
+  .createButton {
+      float: right;
+    
+  }
+  .detailsBox {
+    margin-top:5%;
+    background-color: #E6E9EB;
+    border: 2px solid black;
+    border-radius: 4px;
+    width:85%;
+    height:85%;
+    padding-left:3%
+
+  }
+  #hotelDetailView {
+    flex:2;
+  }
+  .corner-buttons {
+    float: right;
+    margin: 1% 1% 1% 1%;
+  }
+  .textGroupLabel {
+      margin-bottom: 1%;
+  }
+  .textGroupProperty {
+      margin-top: 1%;
   }

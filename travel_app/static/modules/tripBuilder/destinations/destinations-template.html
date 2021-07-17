@@ -14,6 +14,7 @@
             
             <h1 style="display: inline;" zk-bind="value: item.name"></h1>
             <p style="display: inline;float:right;"><span zk-bind="value: item.days_there"></span> Days</p>
+            <button type="button" class="btn btn-primary" zk-bind="on: click|$parentModel.editItem(item)">Edit</button>
             <div zk-bind="visible: item.focused">
                 <div  class="slideOut">
                     <button><a zk-bind="attr: href|item.links.hotels">Hotels</a></button>

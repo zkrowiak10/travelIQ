@@ -145,7 +145,7 @@ def destinationUpdates(trip_id, dest_id):
     if not data['id']:
         raise Exception("No trip id")
     
-    dest = [dest for dest in currentTrip.destinations if dest.id == dest_id][0]
+    dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
     if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
         # if not OAUTH():
         return abort(401)
@@ -209,7 +209,10 @@ def addHotel(trip_id,dest_id):
         return abort(401)
     data = request.get_json()
     logging.debug(data)
-    hotel = models.Hotel_Reservation(**request.get_json())
+    contact = models.Contact(**data['contact_info'])
+    data = [item for item in data if item != "contact_info"]
+    hotel = models.Hotel_Reservation(**data)
+    hotel.contact_info = contact
     dest.hotels.append(hotel)
     models.db.session.commit()
     data = {"id": hotel.id}
@@ -233,6 +236,7 @@ def changeHotel(trip_id, dest_id,hotel_id ):
         
     if request.method =="DELETE":
         models.db.session.delete(hotel)
+        models.db.session.commit()
     return Response("Deleted", 200)
 
 

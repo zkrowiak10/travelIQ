@@ -5,14 +5,16 @@ export class Destination extends Item {
     fields = [
         { type: "text", key: "name", pretty: "Name" },
         { type: "number", key: "days_there", pretty: "Days There" },
-        { type: "textarea", key: "notes", pretty: "Notes" }
+        { type: "textarea", key: "notes", pretty: "Notes" },
+        { type: "number", key: "trip_order", pretty: "Order in Trip"},
+        
     ]
     focused = false
     
     constructor(trip_id){
         super()
         this.trip_id = trip_id
-        this.fields = Destination.fields
+        
         this.endPoint = `/ajax/trip/${utils.g.trip.id}/destination`
         var linkPaths = `#trip/${utils.g.trip.id}/destination/${this.id}`
 
@@ -45,7 +47,8 @@ export class DestinationsController extends ItemController {
     fields = [
         { type: "text", key: "name", pretty: "Name" },
         { type: "number", key: "days_there", pretty: "Days There" },
-        { type: "textarea", key: "notes", pretty: "Notes" }
+        { type: "textarea", key: "notes", pretty: "Notes" },
+        { type: "number", key: "trip_order", pretty: "Order in Trip"}
     ]
     constructor(){
         super()
@@ -63,20 +66,30 @@ export class DestinationsController extends ItemController {
     }
 }
 
+// receives /destinations or /destination/<id>/etc...
 export async function route(hashArray) {
     let next = hashArray.shift()
+    
     if (!next) {
         location.hash = location.hash + '/destinations'
-        return 200
+        
     }
     var destinationsController = new DestinationsController()
     await destinationsController.init()
 
-    if (next != "destination") {
-        alert('no such destination')
+    if ((next == "destinations")) {
+        return 200
     }
-    next = hashArray.shift()
+    if (next == "destination") {
+        next = hashArray.shift()
+    }
+    else {
+        alert("page not found: ", next)
+    }
     let destination = destinationsController.findDestinationByID(next)
+    if (!destination) {
+        console.log('no destination at current hash')
+    }
     destination.focused = true
     if (!next) {
         return 200
