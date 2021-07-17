@@ -209,7 +209,10 @@ def addHotel(trip_id,dest_id):
         return abort(401)
     data = request.get_json()
     logging.debug(data)
-    hotel = models.Hotel_Reservation(**request.get_json())
+    contact = models.Contact(**data['contact_info'])
+    data = [item for item in data if item != "contact_info"]
+    hotel = models.Hotel_Reservation(**data)
+    hotel.contact_info = contact
     dest.hotels.append(hotel)
     models.db.session.commit()
     data = {"id": hotel.id}

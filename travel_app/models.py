@@ -69,7 +69,7 @@ class Trip(Base):
     def __init__(self, name, start_date, end_date, description):
         if start_date > end_date:
             raise AssertionError('Trip end date must be after start date.')
-        if name is "" or start_date is "" or end_date is "":
+        if name == "" or start_date == "" or end_date == "":
             raise AssertionError('A Trip must have a name, start and end dates')
         
         #check that user has no trips with that name
@@ -105,9 +105,11 @@ class Hotel_Reservation(Base):
     destination = db.relationship('Destination', backref='hotels')
     breakfast_included = db.Column(db.Boolean)
     contact_id = db.Column(db.Integer, db.ForeignKey('contact.id'))
-    contact_info = db.relationship('Contact')
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     trip = db.relationship('Trip', backref='hotel_reservations')
+    phone = db.Column(db.String)
+    address = db.Column(db.String)
+    city = db.Column(db.String)
 
 class UserTripPair(Base):
     id  = db.Column(db.Integer, primary_key=True)

@@ -11,7 +11,7 @@ export class Item {
         
         this.endPoint = endPoint
         this.update = async function () {
-            var data = this.stringify() 
+            var data = JSON.stringify(this)
             endPoint = `${this.endPoint}/${this.id}`
             var response = await api.patch(endPoint, data)
             // will need to process potential erros down the road
@@ -24,22 +24,22 @@ export class Item {
             //creates new item on server and returns json of created resource
             // with id attribute
         this.save = async function () {
-            var data = this.stringify()
+            var data = JSON.stringify(this)
             // try {
             var response = await api.post(this.endPoint, data)
             this.id = response.id
             return response
         }
 
-        this.stringify = function () {
-            let obj = {}
-            console.log(this)
-            for (let field of this.fields) {
-                obj[field.key] = this[field.key]
-            }
-            obj.id = (null || this.id)
-            return JSON.stringify(obj)
-        }
+        // this.stringify = function () {
+        //     let obj = {}
+        //     console.log(this)
+        //     for (let field of this.fields) {
+        //         obj[field.key] = this[field.key]
+        //     }
+        //     obj.id = (null || this.id)
+        //     return JSON.stringify(obj)
+        // }
         this.delete = async function () {
             var body = this.stringify() 
             endPoint = `${this.endPoint}/${this.id}`
@@ -83,7 +83,7 @@ export class ItemController {
 
             this.reset()
             for (let item of data) {
-                let itemObject = new this.itemClass(this.fields, this.endPoint)
+                let itemObject = new this.itemClass(this.endPoint)
                 Object.assign(itemObject,item)
                 this.itemList.push(itemObject)
             }
@@ -101,6 +101,7 @@ export class ItemController {
             modal.render()
         }
         this.editItem = function (item) {
+            console.log('that', that)
             var modal = new Modal(this, that.fields, that.title, item, true)
             modal.render()
         }

@@ -152,6 +152,7 @@ function zk() {
                     return
 
             }
+          
 
 
             if (this.updateCallback) {
@@ -230,7 +231,8 @@ function zk() {
         }
 
         let dataObject = obj
-
+      
+        
         let dataObjectProxy = utils.deepProxy(dataObject, handler)
         
 
@@ -253,10 +255,10 @@ function zk() {
             let splitPath = pathToObject.split('.')
             if (splitPath[0]=="root")  {targetChild= zk_self.root_model }
             if (splitPath[0]=="$parentModel")  {
-                targetChild = self.parent
+                targetChild = self.$parentModel
                 let i = 1
                 while (splitPath[i]=="$parentModel") {
-                    targetChild = targetChild.parent
+                    targetChild = targetChild.$parentModel
                 }
             }
             for (let i = 1; i < splitPath.length; i++) {
@@ -284,7 +286,7 @@ function zk() {
                 let property = boundElement.property
                 let updateValue = target[property]
 
-                if (bindMode == "date" && (updateValue)) {
+                if (boundElement.DOMelement.type=="date") {
                     updateValue = new Date(updateValue)
                     try {
                         updateValue = updateValue.toISOString().split('T')[0]
@@ -293,10 +295,9 @@ function zk() {
                     catch (err) {
                         console.error("error converting date object", updateValue, err.message)
                     }
-                    
-                    
-                
                 }
+                
+                
                 if (bindMode == "datetime-local")  {
                     updateValue = new Date(updateValue)
                     updateValue = updateValue._targetObject.toISOString()
@@ -352,7 +353,6 @@ function zk() {
             // Do not reflect changes to the object model they are descendent from
             let index = 0;
             for (let item of iterable) {
-                
                 // Create clone of template node for each bound element
                 let clone = oldChild.cloneNode(true)
                 boundElement.DOMelement.appendChild(clone)
@@ -361,6 +361,7 @@ function zk() {
                 // a sub model
                 let subModel = {}
                 let newObj = new ObservableObject(item,self)
+              
                 
                 
                 subModel[iteratorKey] = newObj
@@ -449,7 +450,6 @@ function zk() {
                     // creat subModel for child node observable scope and add the observable to the array
                     let subModel = {}
                     value = new ObservableObject(value)
-                    value.parent = self
                     subModel[boundElement.iteratorKey] = value
                     
                     subModel.$parentModel = self.$model
@@ -634,44 +634,41 @@ function zk() {
 
     let utils = {
         deepClone : function deepClone(object) {
+            
+            if (Array.isArray(object)) {
+                let newArray = []
+                for (let item of object) {
+                    cloneItem = deepClone(item)
+                    newArray.push(cloneItem) 
+            }
             let newObject = {}
             if (typeof object != "object") {
                 return object}
-            for (property in object) {
-                if (Array.isArray(property)) {
-                    let newArray = []
-                    for (item of array) {
-                        cloneItem = deepClone(item)
-                        newArray.push(cloneItem)
-                    }
-                }
+            }
+            for (let property in object) {
                 newObject[property] = deepClone(object[property])
             }
             return newObject
 
         },
         deepProxy:  function deepProxy(object, handler) {
+            // do not remake observable objects
             if (typeof object == "function") {return new Proxy(object, handler)}
-            for (let item in object) {
-                
-                if (Array.isArray(object[item])) {
+            if (Array.isArray(object)) {
                     
 
-                    for (let i = 0; i < object[item].length; i++) {
-                        object[item][i] = deepProxy(object[item][i], handler)
-                    }
-                    object[item] = new Proxy(object[item], handler)
-                    continue
+                for (let i = 0; i < object.length; i++) {
+                    object[i] = deepProxy(object[i], handler)
                 }
-                // do not remake observable objects
-                if (object._observableObject) {
-                    continue
-                }
+                object = new Proxy(object, handler)
+                return object
+            }
+            for (let item in object) {
                 if (typeof object[item] == "object"){
                     object[item] = deepProxy(object[item], handler)
                 }
             }
-            
+
             if ((typeof object == "object") && object)  {
                 return new Proxy(object, handler)
 
@@ -714,6 +711,7 @@ function zk() {
         
         
     }
+    this.utils = utils
 }
 zk = new zk()
 

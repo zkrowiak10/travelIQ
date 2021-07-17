@@ -16,7 +16,6 @@ export class Header {
         this.trips = new zk.ObservableObject([])
         this.messages = new zk.ObservableObject([])
         this.g = utils.g
-        console.log(utils.g.trip.isDefined)
     }
    async get() {
 

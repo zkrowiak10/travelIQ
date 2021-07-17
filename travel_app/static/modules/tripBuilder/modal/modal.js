@@ -2,10 +2,10 @@ var workdir =  "/static/modules/tripBuilder/modal"
 export class Modal {
     fields
     title
-    fieldContainer
     html
     target
     parent
+    templateFile = "modal-template.html"
     constructor(parent, fields, title, target, update) {
         
 
@@ -23,15 +23,15 @@ export class Modal {
             }
             field.id = `modal-${field.key}`
         }
-        console.log('fieds', fields)
         this.fields = new zk.ObservableObject(fields)
         this.title = title
         this.parent = parent
         this.update = update
+        this.workdir = workdir
     }
 
     async render(obj) {
-        var template = await fetch(`${workdir}/modal-template.html`, { headers: { "Content-Type": "text/html" } })
+        var template = await fetch(`${this.workdir}/${this.templateFile}`, { headers: { "Content-Type": "text/html" } })
         var text = await template.text()
         this.html = document.createElement('div')
         this.html.innerHTML = text
@@ -39,8 +39,6 @@ export class Modal {
         if (!this.update) {
             document.querySelector('#deleteItem').remove()
         }
-
-        this.fieldContainer = document.querySelector("#model-body-container")
 
         zk.initiateModel(this, this.html)
     }
@@ -68,10 +66,28 @@ export class Modal {
     async save () {
 
         for (let field of this.fields) {
-            key = field.key
+            let key = field.key
+
+            // this enables one level of object nesting for generic form use. For deeper nesting,
+            // I would prefer to use sub-components.
+            if (field.parent) {
+                if(!this.target[field.parent]){
+                    this.target[field.parent] = {}
+                }
+                
+                this.target[field.parent][key] = field.value
+                continue
+            }
             this.target[key] = field.value
             if (field.type == "date") {
-                target[key] = new Date(this.formModel.tempObj[key])
+                try {
+                    this.target[key] = new Date(field.value)
+                }
+                catch (err) {
+                    console.error(err.message)
+                    alert('Error, item not saved')
+                    this.close()
+                }
             }
 
 

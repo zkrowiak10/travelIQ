@@ -15,8 +15,22 @@ export class Hotel extends Item {
         { type: "date", key: "check_out", pretty: "Check Out Date" },
         { type: "checkbox", key: "refundable", pretty: "Refundable Reservation?" },
         { type: "date", key: "cancellation_date", pretty: "Last Day to Cancel" },
+        { type: "number", key: "rate", pretty: "Nightly Rate" },
         { type: "checkbox", key: "breakfast_included", pretty: "Breakfast Included?" },
+        { type: "text", key: "address", pretty: "Address"},
+        { type: "text", key: "city", pretty: "City"},
+        { type: "tel", key: "phone", pretty: "Phone"},
     ]
+    name
+    link
+    check_in
+    check_out
+    refundable
+    cancellation_date
+    breakfast_included
+    contact_info
+    trip
+    rate
     constructor() {
         super()
         this.endPoint = putEndpoint
@@ -36,7 +50,11 @@ class HotelsController extends ItemController{
             { type: "date", key: "check_out", pretty: "Check Out Date" },
             { type: "checkbox", key: "refundable", pretty: "Refundable Reservation?" },
             { type: "date", key: "cancellation_date", pretty: "Last Day to Cancel" },
+            { type: "number", key: "rate", pretty: "Nightly Rate" },
             { type: "checkbox", key: "breakfast_included", pretty: "Breakfast Included?" },
+            { type: "text", key: "address", pretty: "Address"},
+            { type: "text", key: "city", pretty: "City"},
+            { type: "tel", key: "phone", pretty: "Phone"},
         ]
         
         
