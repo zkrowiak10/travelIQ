@@ -3,7 +3,7 @@
 /*
 Master list of binding syntax:
 
-attr: <attr>|<valueObjet>
+attr: <attr>|<valueObjet>|<formatCallback>
 for: key of <iterable>
 text: <object>
 format: <object>|<callback>
@@ -157,13 +157,7 @@ function zk() {
         this.update = function() {
             let value = this.target[this.property]
             
-            switch (this.bindMode) {
-                case ("attr") : 
-                    this.DOMelement.setAttribute(this.attr, value)          
-                    
-                    return
-
-            }
+           
 
           
 
@@ -171,6 +165,13 @@ function zk() {
             if (this.updateCallback) {
                 value = this.updateCallback(value)
                 // TODO add configuration callbacks for date string formatting
+            }
+            switch (this.bindMode) {
+                case ("attr") : 
+                    this.DOMelement.setAttribute(this.attr, value)          
+                    
+                    return
+
             }
 
             this.DOMelement.innerText = value
@@ -597,7 +598,16 @@ function zk() {
                 
                 case "attr":
                     // attr bindings follow syntax "attr: targetAttr|binding"
-                    [attr,binding] = boundElement.objectPath.split('|')
+                    [attr,binding, callBackPath] = boundElement.objectPath.split('|')
+                    if(callBackPath) {
+                        try {
+                            boundElement.updateCallback = utils.returnTargetProperty(dataObjectProxy,callBackPath)
+                        }
+                        catch (err) {
+                            console.error(err.message)
+                        }
+                    }
+                  
                     boundElement.objectPath = binding
                     splitPath = boundElement.objectPath.split(".")
                     boundElement.property = splitPath[(splitPath.length-1)]
