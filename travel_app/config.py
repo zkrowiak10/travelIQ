@@ -1,6 +1,6 @@
 #this substitutes for the .from_mapping config design for subsequent versions of this app
 import os
-
+import re
 # class Config():
 #     """Base config, uses staging database server."""
 #     DEBUG = False
@@ -26,4 +26,9 @@ import os
 
 class Production():
     SECRET_KEY = os.urandom(24)
-    SQLALCHEMY_DATABASE_URI= os.environ['DATABASE_URL']
+    @property
+    def SQLALCHEMY_DATABASE_URI: 
+        uri = os.getenv("DATABASE_URL")  # or other relevant config var
+        if uri.startswith("postgres://"):
+            uri = uri.replace("postgres://", "postgresql://", 1)
+         
