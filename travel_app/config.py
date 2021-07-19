@@ -25,7 +25,7 @@ import re
 #     # SQLALCHEMY_ECHO = True
 
 class Production():
-    SECRET_KEY = os.urandom(24)
+    SECRET_KEY = os.environ['SECRET_KEY']
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     @property
     def SQLALCHEMY_DATABASE_URI(self): 
