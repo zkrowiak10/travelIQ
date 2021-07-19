@@ -65,6 +65,7 @@ function HashSwitcher(){
                 DestinationsController.wipe()
                 break
             case ('#trips'):
+                document.querySelector("#left-sidebar").innerHTML=""
                 let tripController = new TripsController()
                 tripController.init()
                 break
