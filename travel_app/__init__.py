@@ -9,13 +9,15 @@ import logging
 logging.basicConfig(level=logging.DEBUG, filename='app.log', format="%(levelname)s - %(message)s")
 
 def create_app(configParam = None):
-    configEnv = os.environ('FLASK_ENV')
+    configEnv = os.environ['FLASK_ENV']
     if configEnv == "production":
         configParam = config.Production()
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(configParam)
     app.cli.add_command(models.init_db_command)
+    
     models.db.init_app(app)
+    # models.init_db_command()
     migrate = Migrate(app, models.db)
     # ensure the instance folder exists
     try:

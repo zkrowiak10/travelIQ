@@ -198,7 +198,6 @@ class Activity(Base):
 @click.command('create')
 @with_appcontext
 def init_db_command():
-    db.drop_all()
     db.create_all()
     click.echo("Created database")
 
