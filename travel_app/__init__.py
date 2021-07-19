@@ -6,14 +6,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import logging
 
-logging.basicConfig(level=logging.DEBUG, filename='app.log', format="%(levelname)s - %(message)s")
+logging.basicConfig(level=logging.DEBUG, format="%(levelname)s - %(message)s")
 
 def create_app(configParam = None):
     configEnv = os.environ['FLASK_ENV']
-    if configEnv == "production":
-        configParam = config.Production()
+    # if configEnv == "production":
+    #     configParam = 
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_object(configParam)
+    app.config.from_object(config.Production())
     app.cli.add_command(models.init_db_command)
     
     models.db.init_app(app)

@@ -46,7 +46,7 @@ def register():
         flash('Username {} created'.format(username))
         return redirect(url_for('welcome.welcome'))
     except Exception as e:
-        flash('something went wrong')
+        flash('something went wrong', str(e))
         logging.debug("Exception in creating new user", e)
         return redirect(url_for('welcome.welcome'))
         
