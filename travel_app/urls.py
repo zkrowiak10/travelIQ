@@ -42,12 +42,12 @@ def register():
         flash('Make sure passwords match')
         return redirect(url_for('welcome.welcome'))
     try:
-        models.User.register(username,username,password)
+        models.User.register(username,email,password)
         flash('Username {} created'.format(username))
         return redirect(url_for('welcome.welcome'))
     except Exception as e:
         flash('something went wrong', str(e))
-        logging.debug("Exception in creating new user", e)
+        logging.error("Exception in creating new user", e)
         return redirect(url_for('welcome.welcome'))
         
 @bp.route('/logout')
