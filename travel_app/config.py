@@ -25,5 +25,5 @@ import os
 #     # SQLALCHEMY_ECHO = True
 
 class Production():
-    SECRET_KEY = os.urandom(24)j
+    SECRET_KEY = os.urandom(24)
     SQLALCHEMY_DATABASE_URI= os.environ['DATABASE_URL']
