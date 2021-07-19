@@ -5,9 +5,10 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import logging
+import sys
 
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)s - %(message)s")
-
+logging.StreamHandler(sys.stdout)
 def create_app(configParam = None):
     configEnv = os.environ['FLASK_ENV']
     # if configEnv == "production":
