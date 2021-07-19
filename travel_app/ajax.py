@@ -1,3 +1,4 @@
+import re
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app, jsonify, abort, Response
 )
@@ -13,12 +14,40 @@ ajax = Blueprint('ajax', __name__, url_prefix='/ajax')
 
 
 
-@ajax.route('/trips',methods=('GET',))
+@ajax.route('/trips',methods=('GET','POST'))
 @login_required
 def trips():
-    trips = models.UserTripPair.getTripsByUser(g.user)
-    data = utils.API.serializeList(trips)
-    return jsonify(data)
+    if request.method == "GET":
+        trips = models.UserTripPair.getTripsByUser(g.user)
+        data = utils.API.serializeList(trips)
+        return jsonify(data)
+
+    if request.method == 'POST':
+        data = request.get_json()
+        try:
+            trip = models.Trip(**data)
+            pairing = models.UserTripPair(trip=trip, user=g.user,admin = True)
+            trip.userPairings.append(pairing)
+            models.db.session.add(trip, pairing)
+            models.db.session.commit()
+        except Exception as e:
+            logging.error("Exception in creating trip: {}".format(e))
+            flash('something went wrong: {}'.format(e))
+            return redirect(url_for('iq.iqPage'))
+        flash('Created Trip')   
+    if request.method == 'PATCH':
+        data = request.get_json()
+        try:
+            trips = models.UserTripPair.getTripsByUser(g.user)
+            trip = [trip for trip in trips if trip.id == data.id][0]
+            trip.update(data)
+            models.db.session.add(trip)
+            models.db.session.commit()
+        except Exception as e:
+            logging.error("Exception in creating trip: {}".format(e))
+            flash('something went wrong: {}'.format(e))
+            return redirect(url_for('iq.iqPage'))
+        return Response('updated', 200) 
 
 # @ajax.route('/trip/<trip_id>/destinations',methods=('GET',))
 # @login_required

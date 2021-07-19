@@ -5,7 +5,7 @@
     </div>
     <div class="sideBar-container" zk-bind="for: item of itemList">
         <div class="destinationCard">
-            <div class="destinationTop">
+            <div class="destinationTop" zk-bind="on: click|item.toggleFocus(item)" >
                 <span zk-bind="hidden: item.focused">
                     <i zk-bind="on: click|item.toggleFocus(item)" class="fas fa-caret-right"></i>
                 </span>
@@ -22,7 +22,7 @@
                     <a zk-bind="attr: href|item.links.hotels"><button>Hotels</button></a>
                     
                     <a zk-bind="attr: href|item.links.restaurants"><button>Restaurants</button></a>
-                    <a zk-bind="attr: href|item.links.activities"><button>Activities</button></a>
+                    <!-- <a zk-bind="attr: href|item.links.activities"><button>Activities</button></a> -->
                 </div>
             </div>
             

@@ -81,7 +81,6 @@ class Trip(Base):
         self.end_date = end_date
         self.start_date = start_date
         self.name = name
-        self.description = description
 
         db.session.add(self)
         db.session.commit()

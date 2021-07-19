@@ -7,7 +7,8 @@ import { FlightsController} from './modules/tripBuilder/flights/flights.js'
 import { RentalsController } from './modules/tripBuilder/rentals/rentals.js';
 import {Header} from './modules/header/header.js'
 import * as utils from './modules/utils/utilFunctions.js'
-    
+import {TripsController} from './modules/trips/trips.js'
+
 var hashSwitcher = new HashSwitcher()
 var header
 header = new Header()
@@ -62,6 +63,10 @@ function HashSwitcher(){
         switch(hashvalueArray.shift()){
             case (''):
                 DestinationsController.wipe()
+                break
+            case ('#trips'):
+                let tripController = new TripsController()
+                tripController.init()
                 break
             case ('#trip'):
                 utils.g.trip.id = hashvalueArray.shift()
