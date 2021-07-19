@@ -13,6 +13,13 @@ var header
 header = new Header()
 header.init()
 zk.root_model.utils = utils
+function wipe(){
+    // document.querySelector("#left-sidebar").innerHTML=""
+    document.querySelector("#tabContent").innerHTML=""
+
+    document.querySelector("#hotelDetailView").innerHTML=""
+
+}
 $().ready(()=>{
     
     
@@ -66,13 +73,7 @@ function HashSwitcher(){
     }
     }
 
-function wipe(){
-    // document.querySelector("#left-sidebar").innerHTML=""
-    document.querySelector("#tabContent").innerHTML=""
 
-    document.querySelector("#hotelDetailView").innerHTML=""
-
-}
 
 
 

@@ -41,7 +41,7 @@ export class Item {
         //     return JSON.stringify(obj)
         // }
         this.delete = async function () {
-            var body = this.stringify() 
+            var body = JSON.stringify(this)
             endPoint = `${this.endPoint}/${this.id}`
             var response = await api.delete(endPoint, body)
             if (response.status != 200) {
@@ -54,6 +54,7 @@ export class Item {
 
 // collection handler for item collection
 export class ItemController {
+    modalClass = Modal
     constructor(itemClass, endPoint, fields, title, containerId, templateFile, workdir, insertNode)
     {
         var that = this
@@ -67,45 +68,46 @@ export class ItemController {
         this.template =templateFile
         this.workdir = workdir
         this.insertNode = insertNode
-        this.init = async function () {
+        
+    }
+    async init () {
 
-            var template = await fetch(`${this.workdir}/${this.template}`, { headers: { "Content-Type": "text/html" } })
-            var text = await template.text()
-            document.querySelector(this.insertNode).innerHTML = text
-            this.html = document.querySelector(this.containerId)
-            zk.initiateModel(this, this.html)
-            await this.get()
-        }
-        this.get = async function () {
+        var template = await fetch(`${this.workdir}/${this.template}`, { headers: { "Content-Type": "text/html" } })
+        var text = await template.text()
+        document.querySelector(this.insertNode).innerHTML = text
+        this.html = document.querySelector(this.containerId)
+        zk.initiateModel(this, this.html)
+        await this.get()
+    }
+    async get () {
 
-            //get data through fetch
-            var data = await api.get(this.endPoint, "GET")
+        //get data through fetch
+        var data = await api.get(this.endPoint, "GET")
 
-            this.reset()
-            for (let item of data) {
-                let itemObject = new this.itemClass(this.endPoint)
-                Object.assign(itemObject,item)
-                this.itemList.push(itemObject)
-            }
+        this.reset()
+        for (let item of data) {
+            let itemObject = new this.itemClass(this.endPoint)
+            Object.assign(itemObject,item)
+            this.itemList.push(itemObject)
         }
-        this.reset = function () {
-            // Remove current destinations from list
-            while (this.itemList.length > 0) {
-                this.itemList.pop()
-            }
+    }
+    reset () {
+        // Remove current destinations from list
+        while (this.itemList.length > 0) {
+            this.itemList.pop()
         }
-        this.createItem = function () {
+    }
+    createItem() {
 
-            var modal = new Modal(that, JSON.parse(JSON.stringify(that.fields)), that.title)
-            console.log('source fields', this.fields)
-            modal.render()
-        }
-        this.editItem = function (item) {
-            console.log('that', that)
-            var modal = new Modal(this, that.fields, that.title, item, true)
-            modal.render()
-        }
-        this.appendItem = async function (item) {
+        var modal = new this.modalClass(this, JSON.parse(JSON.stringify(this.fields)), this.title)
+        console.log('source fields', this.fields)
+        modal.render()
+    }
+    editItem (item) {
+        var modal = new this.modalClass(this, this.fields, this.title, item, true)
+        modal.render()
+    }
+    async appendItem (item) {
             let itemObject = new this.itemClass(this.fields, this.endPoint)
             Object.assign(itemObject,item)
             
@@ -116,24 +118,28 @@ export class ItemController {
             catch (err) {
                 console.error(err.message)
             };
-            that.itemList.push(itemObject)
+            this.itemList.push(itemObject)
         }
-        this.deleteItem = async function (target) {
-            let index = this.itemList.findIndex(x => x.id == target.id)
-            try {
-                let status = await target.delete()
-                
-                if (status.ok) {
-                    this.itemList.splice(index, 1)
-                }
+    async updateItem (item) {
+        item.update()
+
+    }
+    async deleteItem (target) {
+        let index = this.itemList.findIndex(x => x.id == target.id)
+        try {
+            let status = await target.delete()
+            
+            if (status.ok) {
+                this.itemList.splice(index, 1)
             }
-            catch (err){
-                console.error("error", err.message)
-            }
-            
-            
-            
         }
+        catch (err){
+            console.error("error", err.message)
+        }
+        
+            
+            
+        
     }
 }
 

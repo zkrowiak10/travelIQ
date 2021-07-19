@@ -1,3 +1,4 @@
+from travel_app.ajax import destinations
 from flask_sqlalchemy import SQLAlchemy
 import click
 from flask.cli import with_appcontext
@@ -139,11 +140,23 @@ class Destination (Base):
     trip_order = db.Column(db.Integer)
     days_there = db.Column(db.Integer)
 
-
- 
-    
+        
     def __str__(self):
         return "Destination {} on trip {}".format(self.name, self.trip.name)
+
+class Restaurant (Base):
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(256))
+    address = db.Column(db.String(256))
+    city = db.Column(db.String(256))
+    reservation = db.Column(db.DateTime())
+    link = db.Column(db.String())
+    mealType = db.Column(db.String(256))
+    day = db.Column(db.Integer())
+    destination_id = db.Column(db.Integer, db.ForeignKey('destination.id'))
+    destination = db.relationship('Destination', backref='restaurants')
+
+
 
 #a generalized way to store contact info to share common attributes such ass address, phone number, 
 # etc between hotels, flights, etc

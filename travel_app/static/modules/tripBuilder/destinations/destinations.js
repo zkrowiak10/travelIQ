@@ -1,6 +1,7 @@
 import { ItemController, Item} from "../itemController/itemController.js";
 import * as hotels from "../hotels/hotels.js";
 import * as utils from '../../utils/utilFunctions.js'
+import * as restaurants from "../restaurants/restaurant.js"
 export class Destination extends Item {
     fields = [
         { type: "text", key: "name", pretty: "Name" },
@@ -95,11 +96,21 @@ export async function route(hashArray) {
         console.log('no destination at current hash')
     }
     destination.focused = true
+    next = hashArray.shift()
     if (!next) {
         return 200
     }
-
-    hotels.route(hashArray, destination)
+    switch (next) {
+        case "hotels":
+        case "hotel":
+            hotels.route(hashArray, destination)
+            break
+        case "restaurants":
+        case "restaurant":
+            restaurants.route(hashArray,destination)
+            break
+    }
+    
 
 }
 

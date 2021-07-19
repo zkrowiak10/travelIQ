@@ -209,10 +209,8 @@ def addHotel(trip_id,dest_id):
         return abort(401)
     data = request.get_json()
     logging.debug(data)
-    contact = models.Contact(**data['contact_info'])
-    data = [item for item in data if item != "contact_info"]
+    data = {key: data[key] for key in data if key in  models.Hotel_Reservation.__dict__}
     hotel = models.Hotel_Reservation(**data)
-    hotel.contact_info = contact
     dest.hotels.append(hotel)
     models.db.session.commit()
     data = {"id": hotel.id}
@@ -251,3 +249,60 @@ def flights():
 def rentals():
     api = utils.API(models.Car_Rental)
     return api.api_driver(request)
+
+@ajax.route('/trip/<trip_id>/destination/<dest_id>/restaurants', methods=('GET',))
+@login_required
+def getRestaurants(trip_id,dest_id):
+
+    trips = models.UserTripPair.getTripsByUser(g.user)
+    currentTrip = [trip for trip in trips if trip.id == int(trip_id)][0]
+    dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
+
+    logging.debug(models.UserTripPair.getUsersByTrip(currentTrip)[0])
+    if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
+        # if not OAUTH():
+        return abort(401)
+    data = dest.restaurants
+    serial = utils.API.serializeList(data)
+
+    return jsonify(serial)
+
+@ajax.route('/trip/<trip_id>/destination/<dest_id>/restaurant', methods=('POST',))
+@login_required
+def addRestaurant(trip_id,dest_id):
+    trips = models.UserTripPair.getTripsByUser(g.user)
+    currentTrip = [trip for trip in trips if trip.id == int(trip_id)][0]
+    dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
+    if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
+        # if not OAUTH():
+        return abort(401)
+    data = request.get_json()
+    data = {key: data[key] for key in data if key in  models.Restaurant.__dict__}
+
+    logging.debug(data)
+    restaurant = models.Restaurant(**data)
+    dest.restaurants.append(restaurant)
+    models.db.session.commit()
+    data = {"id": restaurant.id}
+    logging.debug("response" + str(data))
+    return  jsonify(data), 201
+
+@ajax.route('/trip/<trip_id>/destination/<dest_id>/restaurant/<restaurant_id>', methods=( 'PATCH', 'DELETE'))
+@login_required
+def changerRstaurant(trip_id, dest_id,restaurant_id):
+    trips = models.UserTripPair.getTripsByUser(g.user)
+    currentTrip = [trip for trip in trips if trip.id == int(trip_id)][0]
+    dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
+    restaurant = [restaurant for restaurant in dest.restaurants if restaurant.id == int(restaurant_id)][0]
+    if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
+        # if not OAUTH():
+        return abort(401)
+    if request.method == "PATCH":
+        restaurant.update(request.get_json())
+        models.db.session.commit()
+        return Response("updated",200)
+        
+    if request.method =="DELETE":
+        models.db.session.delete(restaurant)
+        models.db.session.commit()
+    return Response("Deleted", 200)
