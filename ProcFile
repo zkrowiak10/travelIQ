@@ -1,1 +1,1 @@
-web: flask run
+web: gunicorn 'travel_app:create_app()'
