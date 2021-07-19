@@ -26,8 +26,9 @@ import re
 
 class Production():
     SECRET_KEY = os.urandom(24)
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     @property
-    def SQLALCHEMY_DATABASE_URI: 
+    def SQLALCHEMY_DATABASE_URI(self): 
         uri = os.getenv("DATABASE_URL")  # or other relevant config var
         if uri.startswith("postgres://"):
             uri = uri.replace("postgres://", "postgresql://", 1)
