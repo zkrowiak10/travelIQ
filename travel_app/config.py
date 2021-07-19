@@ -23,3 +23,7 @@ class Development(Testing):
     DATABASE="postgres"
     dbhost = 'postgres:5432'
     # SQLALCHEMY_ECHO = True
+
+class Production(Development):
+    
+    SQLALCHEMY_DATABASE_URI= os.environ['DATABASE_URL']
