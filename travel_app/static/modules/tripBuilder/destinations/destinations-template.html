@@ -5,21 +5,24 @@
     </div>
     <div class="sideBar-container" zk-bind="for: item of itemList">
         <div class="destinationCard">
-            <span zk-bind="hidden: item.focused">
-                <i zk-bind="on: click|item.toggleFocus(item)" class="fas fa-caret-right"></i>
-            </span>
-            <span zk-bind="visible: item.focused">
-                <i  zk-bind="on: click|item.toggleFocus(item)" class="fas fa-caret-down"></i>
-            </span>
+            <div class="destinationTop" zk-bind="on: click|item.toggleFocus(item)" >
+                <span zk-bind="hidden: item.focused">
+                    <i zk-bind="on: click|item.toggleFocus(item)" class="fas fa-caret-right"></i>
+                </span>
+                <span zk-bind="visible: item.focused">
+                    <i  zk-bind="on: click|item.toggleFocus(item)" class="fas fa-caret-down"></i>
+                </span>
+                <h1 style="display: inline;" zk-bind="value: item.name"></h1>
+                <p ><span zk-bind="value: item.days_there"></span> Days</p>
+                <button type="button" class="btn btn-primary" zk-bind="on: click|$parentModel.editItem(item)">Edit</button>
+            </div>
             
-            <h1 style="display: inline;" zk-bind="value: item.name"></h1>
-            <p style="display: inline;float:right;"><span zk-bind="value: item.days_there"></span> Days</p>
-            <button type="button" class="btn btn-primary" zk-bind="on: click|$parentModel.editItem(item)">Edit</button>
             <div zk-bind="visible: item.focused">
                 <div  class="slideOut">
-                    <button><a zk-bind="attr: href|item.links.hotels">Hotels</a></button>
-                    <button><a zk-bind="attr: href|item.links.restaurants">Restaurants</a></button>
-                    <button><a zk-bind="attr: href|item.links.activities">Activities</a></button>
+                    <a zk-bind="attr: href|item.links.hotels"><button>Hotels</button></a>
+                    
+                    <a zk-bind="attr: href|item.links.restaurants"><button>Restaurants</button></a>
+                    <!-- <a zk-bind="attr: href|item.links.activities"><button>Activities</button></a> -->
                 </div>
             </div>
             

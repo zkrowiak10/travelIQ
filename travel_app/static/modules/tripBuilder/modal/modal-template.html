@@ -22,7 +22,7 @@
       </div>
 
       <div class="modal-footer">
-        <button type="button" id="dest-modal-close" class="btn btn-secondary" data-bind="click: close()">Close</button>
+        <button type="button" id="dest-modal-close" class="btn btn-secondary" zk-bind="on: click|close()">Close</button>
         <button type="button" class="btn btn-primary" id="deleteItem" zk-bind="on: click|delete()" >Delete Item</button>
         <button type="button" class="btn btn-primary" zk-bind="on: click|save()" >Save changes</button>
       </div>

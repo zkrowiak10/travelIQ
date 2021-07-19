@@ -1,4 +1,15 @@
 
+
+/*
+Master list of binding syntax:
+
+attr: <attr>|<valueObjet>|<formatCallback>
+for: key of <iterable>
+text: <object>
+format: <object>|<callback>
+
+
+*/
 // parent function to store entire framework as singleton
 function zk() {
     
@@ -52,7 +63,7 @@ function zk() {
                 let objectPath = splitBinder[1].trim()
                 
                 // Current array of valid bind modes for validity checking
-                validBindModes = ['text', 'value', 'for','date', 'on', 'format', 'checkbox', 'attr', 'hidden', 'visible']
+                validBindModes = ['text', 'value', 'for','date', 'on', 'format', 'checkbox', 'attr', 'hidden', 'visible', 'radio']
 
 
                 // Verify that bind mode is valid
@@ -141,17 +152,12 @@ function zk() {
         this.observableChildren = undefined 
         this.attr
         this.updateCallback
+        this.valueList
 
         this.update = function() {
             let value = this.target[this.property]
             
-            switch (this.bindMode) {
-                case ("attr") : 
-                    this.DOMelement.setAttribute(this.attr, value)          
-                    
-                    return
-
-            }
+           
 
           
 
@@ -159,6 +165,13 @@ function zk() {
             if (this.updateCallback) {
                 value = this.updateCallback(value)
                 // TODO add configuration callbacks for date string formatting
+            }
+            switch (this.bindMode) {
+                case ("attr") : 
+                    this.DOMelement.setAttribute(this.attr, value)          
+                    
+                    return
+
             }
 
             this.DOMelement.innerText = value
@@ -297,6 +310,21 @@ function zk() {
                         console.error("error converting date object", updateValue, err.message)
                     }
                 }
+                if (bindMode == "radio") {
+                    let options = boundElement.DOMelement.querySelectorAll('input')
+                    for (let option of options) {
+                        if (option.value == updateValue) {
+                            option.checked = true
+                        }
+                        option.addEventListener('input', function() {
+                            if (option.checked) {
+                                target[property] = option.value
+                            }
+                            
+                        })
+                    }
+                    return
+                }
                 
                 
                 if (bindMode == "datetime-local")  {
@@ -305,6 +333,7 @@ function zk() {
                         
                   
                 }
+               
                 boundElement.DOMelement.value = (updateValue || "")
              
                 
@@ -370,7 +399,7 @@ function zk() {
                 
                 subModel[iteratorKey] = newObj
                 subModel.$parentModel = self.$model
-
+                newObj._observableObject.$model = subModel
                 ParseDOMforObservables(subModel, clone)
 
                 
@@ -454,10 +483,10 @@ function zk() {
                     // creat subModel for child node observable scope and add the observable to the array
                     let subModel = {}
                     value = new ObservableObject(value)
-                    subModel[boundElement.iteratorKey] = value
                     
+                    subModel[boundElement.iteratorKey] = value
+                    value._observableObject.$model = subModel
                     subModel.$parentModel = self.$model
-
                     // Create submodel context that stores node-element pairing
                     subModelContext = {
                         "subModel": subModel,
@@ -479,10 +508,30 @@ function zk() {
                     let observableChild = boundElement.observableChildren.find((item)=> {
                         return item.subModel[iteratorKey] == value
                     })
+                    // if the inserted object is an observable, but is not currently in the bound array
+                    if (!observableChild) {
+                        insertNode = boundElement.templateNode.cloneNode(true)
+                        let subModel = {}
+                        subModel[boundElement.iteratorKey] = value
+                        value._observableObject.$model = subModel
+                        subModel.$parentModel = self.$model
+                        // Create submodel context that stores node-element pairing
+                        subModelContext = {
+                            "subModel": subModel,
+                            "node" : insertNode
+                        }
+    
+                        boundElement.observableChildren[targetProperty] = subModelContext
+                        ParseDOMforObservables(subModel, insertNode)
+                        
+                    }
+                    else{
+                        boundElement.observableChildren[targetProperty]  = observableChild
+                        // Reminder: 'observableChild' refers to a subModelContext containing a submodel and a html node
+                        insertNode = observableChild.node
+                    }
 
-                    boundElement.observableChildren[targetProperty]  = observableChild
-                    // Reminder: 'observableChild' refers to a subModelContext containing a submodel and a html node
-                    insertNode = observableChild.node
+                   
 
                 }
                 // Insert node in appropriate index position
@@ -517,6 +566,7 @@ function zk() {
             switch (bindMode) {
                 case "text" :
                 case "checked":
+                case "radio":
                 case "date":
                     transmitters.push(boundElement);
                     oRefPath = utils.prepareObjectPath(boundElement.objectPath)
@@ -525,6 +575,7 @@ function zk() {
                     boundElement.property = splitPath[(splitPath.length-1)]
                     initializeTransmitter(boundElement, bindMode);
                     break
+                
                 case 'format':
                     // format binds have syntax "format: objectPath|callbackFunction"
                     [objectPath, callBackPath] = boundElement.objectPath.split('|')
@@ -547,7 +598,16 @@ function zk() {
                 
                 case "attr":
                     // attr bindings follow syntax "attr: targetAttr|binding"
-                    [attr,binding] = boundElement.objectPath.split('|')
+                    [attr,binding, callBackPath] = boundElement.objectPath.split('|')
+                    if(callBackPath) {
+                        try {
+                            boundElement.updateCallback = utils.returnTargetProperty(dataObjectProxy,callBackPath)
+                        }
+                        catch (err) {
+                            console.error(err.message)
+                        }
+                    }
+                  
                     boundElement.objectPath = binding
                     splitPath = boundElement.objectPath.split(".")
                     boundElement.property = splitPath[(splitPath.length-1)]
@@ -627,7 +687,11 @@ function zk() {
         }
         try {
             let callbackParent = utils.returnTargetProperty(model,methodName,true)
+            
             let callback = utils.returnTargetProperty(model,methodName)
+            if (!callback) {
+                throw new Error('callback not found at ', methodSignature, 'in model: ', model)
+            }
             boundElement.DOMelement.addEventListener(eventType, function(){callback.apply(callbackParent,argArray)})
         }
         catch (err) {

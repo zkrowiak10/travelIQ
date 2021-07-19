@@ -7,12 +7,20 @@ import { FlightsController} from './modules/tripBuilder/flights/flights.js'
 import { RentalsController } from './modules/tripBuilder/rentals/rentals.js';
 import {Header} from './modules/header/header.js'
 import * as utils from './modules/utils/utilFunctions.js'
-    
+import {TripsController} from './modules/trips/trips.js'
+
 var hashSwitcher = new HashSwitcher()
 var header
 header = new Header()
 header.init()
 zk.root_model.utils = utils
+function wipe(){
+    // document.querySelector("#left-sidebar").innerHTML=""
+    document.querySelector("#tabContent").innerHTML=""
+
+    document.querySelector("#hotelDetailView").innerHTML=""
+
+}
 $().ready(()=>{
     
     
@@ -56,6 +64,11 @@ function HashSwitcher(){
             case (''):
                 DestinationsController.wipe()
                 break
+            case ('#trips'):
+                document.querySelector("#left-sidebar").innerHTML=""
+                let tripController = new TripsController()
+                tripController.init()
+                break
             case ('#trip'):
                 utils.g.trip.id = hashvalueArray.shift()
                 utils.g.trip.isDefined = true
@@ -66,13 +79,7 @@ function HashSwitcher(){
     }
     }
 
-function wipe(){
-    // document.querySelector("#left-sidebar").innerHTML=""
-    document.querySelector("#tabContent").innerHTML=""
 
-    document.querySelector("#hotelDetailView").innerHTML=""
-
-}
 
 
 
