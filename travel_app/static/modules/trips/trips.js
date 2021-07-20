@@ -1,6 +1,13 @@
-import { ItemController} from "../tripBuilder/itemController/itemController.js";
+import { ItemController, Item} from "../tripBuilder/itemController/itemController.js";
+import {hashSwitcher} from "../../main.js"
 
-
+export class Trip extends Item {
+    
+    constructor(){
+        super()
+        this.endPoint  = "/ajax/trip"
+    }
+}
 
 export class TripsController extends ItemController {
     constructor(){
@@ -8,7 +15,7 @@ export class TripsController extends ItemController {
         this.endPoint = "/ajax/trips"
         this.containerId = '#tabContent'
         this.title = "Create Trips"
-        
+        this.itemClass = Trip
         this.insertNode = '#tabContent'
         this.template = "trips-template.html"
         this.workdir = "/static/modules/trips"
@@ -19,6 +26,18 @@ export class TripsController extends ItemController {
         
         ]
         
-    }
+    
+   
+        
+        
+    
 }
+ 
+    
+        
+        
+    
+}
+
+
 

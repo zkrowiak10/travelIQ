@@ -5,6 +5,9 @@ from flask.cli import with_appcontext
 from sqlalchemy.orm import backref
 from werkzeug.security import check_password_hash, generate_password_hash
 import logging
+from flask import (
+   flash
+)
 db = SQLAlchemy()
 
 
@@ -36,12 +39,15 @@ class User (Base):
         if username == "" or email == "" or password =="":
             logging.info('Not all fields filled out')
             raise AssertionError('All fields must be filled out')
-        if User.query.filter_by(username=username).first() != None:
-            print("this is the user"+User.query.filter_by(username=username).first())
-            raise AssertionError('Username Already Exists')
+        existingUser = User.query.filter_by(username=username).first()
+        if  existingUser != None:
+            logging.debug("this is the user"+ str(existingUser))
+            flash('User already exists')
+            return False
         user = User(username = username,password = generate_password_hash(password), email = email)
         db.session.add(user)
         db.session.commit()
+        return True
         
 
     @classmethod
@@ -67,23 +73,23 @@ class Trip(Base):
     end_date = db.Column(db.Date, nullable=False)
     description = db.Column(db.Text)
 
-    def __init__(self, name, start_date, end_date, description):
-        if start_date > end_date:
-            raise AssertionError('Trip end date must be after start date.')
-        if name == "" or start_date == "" or end_date == "":
-            raise AssertionError('A Trip must have a name, start and end dates')
+    # def __init__(self, name, start_date, end_date, description):
+    #     if start_date > end_date:
+    #         raise AssertionError('Trip end date must be after start date.')
+    #     if name == "" or start_date == "" or end_date == "":
+    #         raise AssertionError('A Trip must have a name, start and end dates')
         
-        #check that user has no trips with that name
-        # current_trips = Trip.query.filter_by(user= user).all()
-        # for trip in current_trips:
-        #     if trip.name == name:
-        #         raise AssertionError("Must choose a unique name for your trip")
-        self.end_date = end_date
-        self.start_date = start_date
-        self.name = name
+    #     #check that user has no trips with that name
+    #     # current_trips = Trip.query.filter_by(user= user).all()
+    #     # for trip in current_trips:
+    #     #     if trip.name == name:
+    #     #         raise AssertionError("Must choose a unique name for your trip")
+    #     self.end_date = end_date
+    #     self.start_date = start_date
+    #     self.name = name
 
-        db.session.add(self)
-        db.session.commit()
+    #     db.session.add(self)
+    #     db.session.commit()
 
     def __str__(self):
         return "Vacation to {} from {} to {}".format(self.name, self.start_date, self.end_date)
@@ -198,7 +204,6 @@ class Activity(Base):
 @click.command('create')
 @with_appcontext
 def init_db_command():
-    db.drop_all()
     db.create_all()
     click.echo("Created database")
 

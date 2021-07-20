@@ -16,13 +16,14 @@ class API ():
     def serializeList(obj_list):
         data = []
         for obj in obj_list:
-            logging.debug("this is the data __dict" + str(obj.__dict__))
-            dict = {}
-            for key, value in obj.__dict__.items():
-                
-                if key != "_sa_instance_state":
-                    dict[key] = value
-            data.append(dict)
+            if obj != None:
+                logging.debug("this is the data __dict" + str(obj.__dict__))
+                dict = {}
+                for key, value in obj.__dict__.items():
+                    
+                    if key != "_sa_instance_state":
+                        dict[key] = value
+                data.append(dict)
         
         return data
     

@@ -301,7 +301,8 @@ function zk() {
                 let updateValue = target[property]
 
                 if (boundElement.DOMelement.type=="date") {
-                    updateValue = new Date(updateValue)
+                    if (updateValue) {
+                        updateValue = new Date(updateValue)
                     try {
                         updateValue = updateValue.toISOString().split('T')[0]
                     }
@@ -309,6 +310,8 @@ function zk() {
                     catch (err) {
                         console.error("error converting date object", updateValue, err.message)
                     }
+                    }
+                    
                 }
                 if (bindMode == "radio") {
                     let options = boundElement.DOMelement.querySelectorAll('input')

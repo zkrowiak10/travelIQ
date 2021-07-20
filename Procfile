@@ -1,0 +1,1 @@
+web: gunicorn 'travel_app:create_app()'

@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app, Response
 )
 import logging
 import functools
@@ -41,13 +41,16 @@ def register():
     if password != request.form.get('confirmPassword'):
         flash('Make sure passwords match')
         return redirect(url_for('welcome.welcome'))
+    
     try:
-        models.User.register(username,username,password)
-        flash('Username {} created'.format(username))
+        status = models.User.register(username,email,password)
+        if not status:
+            flash('Username {} created'.format(username))
         return redirect(url_for('welcome.welcome'))
+        
     except Exception as e:
-        flash('something went wrong')
-        logging.debug("Exception in creating new user", e)
+        flash('something went wrong', str(e))
+        logging.error("Exception in creating new user", e)
         return redirect(url_for('welcome.welcome'))
         
 @bp.route('/logout')
@@ -90,7 +93,7 @@ def change_g():
 def create_trip():
     if request.method == 'POST':
         f = request.form
-        name, start_date, end_date, description = f['TName'], f['TStart'], f['TEnd'], f['TDescription']
+        name, start_date, end_date = f['TName'], f['TStart'], f['TEnd']
         try:
             trip = models.Trip(name, start_date,end_date, description)
             pairing = models.UserTripPair(trip=trip, user=g.user,admin = True)
