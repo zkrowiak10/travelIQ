@@ -92,10 +92,13 @@ def change_g():
 @login_required
 def create_trip():
     if request.method == 'POST':
-        f = request.form
-        name, start_date, end_date = f['TName'], f['TStart'], f['TEnd']
+        form = request.form
+        name, start_date, end_date = form['TName'], form['TStart'], form['TEnd']
         try:
-            trip = models.Trip(name, start_date,end_date, description)
+            trip = models.Trip()
+            trip.name = name
+            trip.start_date = start_date
+            trip.end_date = end_date
             pairing = models.UserTripPair(trip=trip, user=g.user,admin = True)
             trip.userPairings.append(pairing)
             models.db.session.add(trip, pairing)
