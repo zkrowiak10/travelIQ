@@ -88,17 +88,14 @@ def destinations(trip_id):
 @ajax.route('/trip/<trip_id>/destination',methods=('POST', ))
 @login_required
 def destination(trip_id):
-
-    trips = models.UserTripPair.getTripsByUser(g.user)
             
     currentTrip = models.Trip.query.filter_by(id=trip_id).first()
     #if POST add new destination
     if request.method == "POST":
         try:
             data = request.get_json()
+            data = {key:data[key] for key in data if key in models.Destination.__dict__}
             logging.debug("request data: " + str(data))
-
-            
             logging.debug('setting trip_id: ' + str(trip_id))
             # if data['trip_id'] is not None:
             #     trip_id = data['trip_id']
