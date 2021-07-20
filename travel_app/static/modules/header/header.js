@@ -24,14 +24,28 @@ export class Header {
         while (this.trips.length > 0) {
             this.trips.pop()
         }
+        if (location.hash != "#trips") {
+            if (data.length == 0) {
+                document.querySelector('#noTrips').hidden = false
+            }
+            else  if (!this.g.trip.isDefined) {
+                document.querySelector('#selectTrip').hidden = false
+            } 
+            else {
+                document.querySelector('#noTrips').hidden = true
+                document.querySelector('#selectTrip').hidden = true
+            }
+        }
+        
+        
         for (let item of data) {
             if (item.id == utils.g.trip.id) {
                 utils.g.trip.name = item.name
-
             }
             item.href = '#trip/' + item.id
             this.trips.push(item)
         } 
+       
     
    }
    async init () {
@@ -40,6 +54,7 @@ export class Header {
         document.querySelector(this.insertNode).innerHTML = text
         this.html = document.querySelector(this.insertNode)
         zk.initiateModel(this, this.html)
+       
         this.get()
    }
    async updateTripName() {

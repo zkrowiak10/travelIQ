@@ -55,6 +55,7 @@ export class Item {
 // collection handler for item collection
 export class ItemController {
     modalClass = Modal
+    
     constructor(itemClass, endPoint, fields, title, containerId, templateFile, workdir, insertNode)
     {
         var that = this
@@ -119,10 +120,16 @@ export class ItemController {
                 console.error(err.message)
             };
             this.itemList.push(itemObject)
+            this.onListChange()
         }
+    // abstract method
+    onListChange() {
+        return true
+    }
     async updateItem (item) {
-        item.update()
-
+        await item.update()
+        this.onListChange()
+       
     }
     async deleteItem (target) {
         let index = this.itemList.findIndex(x => x.id == target.id)
@@ -131,12 +138,13 @@ export class ItemController {
             
             if (status.ok) {
                 this.itemList.splice(index, 1)
+                this.onListChange()
             }
         }
         catch (err){
             console.error("error", err.message)
         }
-        
+     
             
             
         

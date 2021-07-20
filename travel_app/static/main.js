@@ -49,6 +49,8 @@ export class HashSwitcher {
                 case (''):
                     break;
                 case ('#trips'):
+                    document.querySelector('#noTrips').hidden = true
+                    document.querySelector('#selectTrip').hidden = true
                     document.querySelector("#left-sidebar").innerHTML = "";
                     let tripController = new TripsController();
                     tripController.init();
@@ -68,6 +70,7 @@ export class HashSwitcher {
 export var hashSwitcher = new HashSwitcher()
 
 
+console.log(header)
 
 
 
