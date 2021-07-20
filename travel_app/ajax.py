@@ -1,3 +1,4 @@
+from operator import mod
 import re
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app, jsonify, abort, Response
@@ -13,8 +14,31 @@ login_required = urls.login_required
 ajax = Blueprint('ajax', __name__, url_prefix='/ajax')
 
 
+@ajax.route('/trip/<trip_id>', methods=('PATCH','DELETE'))
+@login_required
+def change_trips(trip_id):
+    data = request.get_json()
+    trip = models.Trip.query.filter_by(id=trip_id).first()
+    if request.method == 'PATCH':
+        try:            
+            trip.update(data)
+            models.db.session.add(trip)
+            models.db.session.commit()
+        except Exception as e:
+            logging.error("Exception in editing trip: {}".format(e))
+            flash('something went wrong: {}'.format(e))
+        return Response('updated', 200) 
+    if request.method == 'DELETE':
+        data = request.get_json()
+        try:
+            models.db.session.delete(trip)
+            models.db.session.commit()
+        except Exception as e:
+            logging.error("Exception in deleting trip: {}".format(e))
+            flash('something went wrong: {}'.format(e))
+        return Response('deleted', 200)
 
-@ajax.route('/trips',methods=('GET','POST'))
+@ajax.route('/trips',methods=('GET',))
 @login_required
 def trips():
     if request.method == "GET":
@@ -22,39 +46,25 @@ def trips():
         data = utils.API.serializeList(trips)
         return jsonify(data)
 
-    if request.method == 'POST':
-        data = request.get_json()
-        try:
-            trip = models.Trip(**data)
-            pairing = models.UserTripPair(trip=trip, user=g.user,admin = True)
-            trip.userPairings.append(pairing)
-            models.db.session.add(trip, pairing)
-            models.db.session.commit()
-        except Exception as e:
-            logging.error("Exception in creating trip: {}".format(e))
-            flash('something went wrong: {}'.format(e))
-            return redirect(url_for('iq.iqPage'))
-        flash('Created Trip')   
-    if request.method == 'PATCH':
-        data = request.get_json()
-        try:
-            trips = models.UserTripPair.getTripsByUser(g.user)
-            trip = [trip for trip in trips if trip.id == data.id][0]
-            trip.update(data)
-            models.db.session.add(trip)
-            models.db.session.commit()
-        except Exception as e:
-            logging.error("Exception in creating trip: {}".format(e))
-            flash('something went wrong: {}'.format(e))
-            return redirect(url_for('iq.iqPage'))
-        return Response('updated', 200) 
+    
+    
 
-# @ajax.route('/trip/<trip_id>/destinations',methods=('GET',))
-# @login_required
-# def trip():
-#     api = utils.API(models.Trip)
-#     return api.api_driver(request)
-
+@ajax.route('/trip', methods=('POST',))
+@login_required
+def add_trip():
+    data = request.get_json()
+    data = {key: data[key] for key in data if key in models.Trip.__dict__ }
+    trip = models.Trip(**data)
+    try:
+        pairing = models.UserTripPair(trip=trip, user=g.user,admin = True)
+        trip.userPairings.append(pairing)
+        models.db.session.add(trip, pairing)
+        models.db.session.commit()
+        retValue = {'id': trip.id}
+        return jsonify(retValue), 201
+    except Exception as e:
+        logging.error("Exception in creating trip: {}".format(e))
+        return Response('Something went wrong',500)      
 
 #will need to update these methods to make sure user is authorized to modify resource
 @ajax.route('/trip/<trip_id>/destinations', methods=('GET',))
@@ -66,9 +76,9 @@ def destinations(trip_id):
         try:
             trips = models.UserTripPair.getTripsByUser(g.user)
             
-            currentTrip = [trip for trip in trips if trip.id == int(trip_id)]
+            currentTrip = models.Trip.query.filter_by(id=trip_id).first()
             logging.debug(trip_id)
-            data =  utils.API.serializeList(currentTrip[0].destinations)
+            data =  utils.API.serializeList(currentTrip.destinations)
             return jsonify(data)
         
         except Exception as e:
@@ -81,7 +91,7 @@ def destination(trip_id):
 
     trips = models.UserTripPair.getTripsByUser(g.user)
             
-    currentTrip = [trip for trip in trips if trip.id == int(trip_id)][0]
+    currentTrip = models.Trip.query.filter_by(id=trip_id).first()
     #if POST add new destination
     if request.method == "POST":
         try:
@@ -166,7 +176,7 @@ def destinationUpdates(trip_id, dest_id):
 
     trips = models.UserTripPair.getTripsByUser(g.user)
             
-    currentTrip = [trip for trip in trips if trip.id == int(trip_id)][0]
+    currentTrip = models.Trip.query.filter_by(id=trip_id).first()
     
     data = request.get_json()
             
@@ -215,7 +225,7 @@ def destinationUpdates(trip_id, dest_id):
 def getHotels(trip_id,dest_id):
 
     trips = models.UserTripPair.getTripsByUser(g.user)
-    currentTrip = [trip for trip in trips if trip.id == int(trip_id)][0]
+    currentTrip = models.Trip.query.filter_by(id=trip_id).first()
     dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
 
     logging.debug(models.UserTripPair.getUsersByTrip(currentTrip)[0])
@@ -231,7 +241,7 @@ def getHotels(trip_id,dest_id):
 @login_required
 def addHotel(trip_id,dest_id):
     trips = models.UserTripPair.getTripsByUser(g.user)
-    currentTrip = [trip for trip in trips if trip.id == int(trip_id)][0]
+    currentTrip = models.Trip.query.filter_by(id=trip_id).first()
     dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
     if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
         # if not OAUTH():
@@ -250,7 +260,7 @@ def addHotel(trip_id,dest_id):
 @login_required
 def changeHotel(trip_id, dest_id,hotel_id ):
     trips = models.UserTripPair.getTripsByUser(g.user)
-    currentTrip = [trip for trip in trips if trip.id == int(trip_id)][0]
+    currentTrip = models.Trip.query.filter_by(id=trip_id).first()
     dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
     hotel = [hotel for hotel in dest.hotels if hotel.id == int(hotel_id)][0]
     if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
@@ -284,7 +294,7 @@ def rentals():
 def getRestaurants(trip_id,dest_id):
 
     trips = models.UserTripPair.getTripsByUser(g.user)
-    currentTrip = [trip for trip in trips if trip.id == int(trip_id)][0]
+    currentTrip = models.Trip.query.filter_by(id=trip_id).first()
     dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
 
     logging.debug(models.UserTripPair.getUsersByTrip(currentTrip)[0])
@@ -300,7 +310,7 @@ def getRestaurants(trip_id,dest_id):
 @login_required
 def addRestaurant(trip_id,dest_id):
     trips = models.UserTripPair.getTripsByUser(g.user)
-    currentTrip = [trip for trip in trips if trip.id == int(trip_id)][0]
+    currentTrip = models.Trip.query.filter_by(id=trip_id).first()
     dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
     if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
         # if not OAUTH():
@@ -320,7 +330,7 @@ def addRestaurant(trip_id,dest_id):
 @login_required
 def changerRstaurant(trip_id, dest_id,restaurant_id):
     trips = models.UserTripPair.getTripsByUser(g.user)
-    currentTrip = [trip for trip in trips if trip.id == int(trip_id)][0]
+    currentTrip = models.Trip.query.filter_by(id=trip_id).first()
     dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
     restaurant = [restaurant for restaurant in dest.restaurants if restaurant.id == int(restaurant_id)][0]
     if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):

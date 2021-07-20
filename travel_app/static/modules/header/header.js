@@ -48,3 +48,5 @@ export class Header {
        utils.g.trip.name = trip.name
    }
 }
+
+export var header = new Header()

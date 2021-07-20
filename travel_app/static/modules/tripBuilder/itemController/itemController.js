@@ -108,7 +108,7 @@ export class ItemController {
         modal.render()
     }
     async appendItem (item) {
-            let itemObject = new this.itemClass(this.fields, this.endPoint)
+            let itemObject = new this.itemClass(this.endPoint)
             Object.assign(itemObject,item)
             
             try {

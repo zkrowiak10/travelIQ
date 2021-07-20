@@ -95,7 +95,7 @@ export class Modal {
         }
         if (this.update) {
             try {
-                this.parent.updateItem(target)
+                this.parent.updateItem(this.target)
             }
             catch (err) {
                 console.error("error: ", err.message)

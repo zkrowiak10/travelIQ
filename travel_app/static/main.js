@@ -5,13 +5,12 @@ import * as DestinationsController from './modules/tripBuilder/destinations/dest
 // import { * } from './modules/tripBuilder/hotels/hotels.js';
 import { FlightsController} from './modules/tripBuilder/flights/flights.js'
 import { RentalsController } from './modules/tripBuilder/rentals/rentals.js';
-import {Header} from './modules/header/header.js'
+import {header} from './modules/header/header.js'
 import * as utils from './modules/utils/utilFunctions.js'
 import {TripsController} from './modules/trips/trips.js'
 
-var hashSwitcher = new HashSwitcher()
-var header
-header = new Header()
+
+
 header.init()
 zk.root_model.utils = utils
 function wipe(){
@@ -28,21 +27,7 @@ $().ready(()=>{
     
     hashSwitcher.switch(location.hash) 
 })
-// function viewModel() {
-//     let self = this
 
-//     self.destinations =  
-
-
-//     self.hotels = new hotels()
-
-//     self.flights= new flights()
-
-
-//     self.rentals = new rentals()
-    
-
-// }
 window.addEventListener("hashchange", function(){
     wipe()
    
@@ -51,35 +36,36 @@ window.addEventListener("hashchange", function(){
 })
 
 
-function HashSwitcher(){
-    let that = this
-    this.trip
-    this.controller
+export class HashSwitcher {
+    constructor() {
+        this.trip;
+        this.controller;
 
-    this.switch = function(hashValue){
-        var hashvalueArray = hashValue.split('/')
-        // all urls derive from /app/
-        
-        switch(hashvalueArray.shift()){
-            case (''):
-                DestinationsController.wipe()
-                break
-            case ('#trips'):
-                document.querySelector("#left-sidebar").innerHTML=""
-                let tripController = new TripsController()
-                tripController.init()
-                break
-            case ('#trip'):
-                utils.g.trip.id = hashvalueArray.shift()
-                utils.g.trip.isDefined = true
-                header.updateTripName() 
-                DestinationsController.route(hashvalueArray)
-                
-         }
+        this.switch = function (hashValue) {
+            header.get()
+            var hashvalueArray = hashValue.split('/');
+            // all urls derive from /app/
+            switch (hashvalueArray.shift()) {
+                case (''):
+                    break;
+                case ('#trips'):
+                    document.querySelector("#left-sidebar").innerHTML = "";
+                    let tripController = new TripsController();
+                    tripController.init();
+                    break;
+                case ('#trip'):
+                    utils.g.trip.id = hashvalueArray.shift();
+                    utils.g.trip.isDefined = true;
+                    header.updateTripName();
+                    DestinationsController.route(hashvalueArray);
+
+            }
+        };
     }
-    }
+}
 
 
+export var hashSwitcher = new HashSwitcher()
 
 
 
