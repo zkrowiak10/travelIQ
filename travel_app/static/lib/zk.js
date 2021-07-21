@@ -143,155 +143,155 @@ function zk() {
     }
 
     // instantiates a bound element storing the DOM element and the object path to which it is linked
-    function BoundElement(DOMelement, objectPath, bindMode) {
-        this.DOMelement = DOMelement
-        this.objectPath = objectPath
-        this.bindMode = bindMode
-        this.target = undefined
-        this.property = undefined
-        this.observableChildren = undefined 
-        this.attr
-        this.updateCallback
-        this.valueList
+    class BoundElement {
+        constructor(DOMelement, objectPath, bindMode) {
+            this.DOMelement = DOMelement
+            this.objectPath = objectPath
+            this.bindMode = bindMode
+            this.target = undefined
+            this.property = undefined
+            this.observableChildren = undefined
+            this.attr
+            this.updateCallback
+            this.valueList
 
-        this.update = function() {
-            let value = this.target[this.property]
-            
-           
-
-          
+            this.update = function () {
+                let value = this.target[this.property]
 
 
-            if (this.updateCallback) {
-                value = this.updateCallback(value)
-                // TODO add configuration callbacks for date string formatting
+
+
+
+
+                if (this.updateCallback) {
+                    value = this.updateCallback(value)
+                    // TODO add configuration callbacks for date string formatting
+                }
+                switch (this.bindMode) {
+                    case ("attr"):
+                        this.DOMelement.setAttribute(this.attr, value)
+
+                        return
+
+                }
+
+                this.DOMelement.innerText = value
+
+
             }
-            switch (this.bindMode) {
-                case ("attr") : 
-                    this.DOMelement.setAttribute(this.attr, value)          
-                    
-                    return
-
-            }
-
-            this.DOMelement.innerText = value
-                
-            
         }
     }
 
-    // takes a standard JSON object as a parameter, instantiate an observable object
-    zk_self.ObservableObject = function ObservableObject(obj, parent) {
-        
-        let self = this;
+    class ObservableObject {
+        constructor(obj, parent) {
 
-        self.parent = parent
+            let self = this
 
-        
+            self.parent = parent
 
-        // Create empty array for both text and value elements as well as components
-        let receivers = []
-        let transmitters = []
-        let forEachComponents = []
-        let subscribers = []
-        
-        
-        let handler = {
-            get: function(target, property,receiver) {
-                
-                if (typeof target[property] == "function") {
-                    
-                    if (target instanceof Date) {
-                        return target[property].bind(target)
+
+
+            // Create empty array for both text and value elements as well as components
+            let receivers = []
+            let transmitters = []
+            let forEachComponents = []
+            let subscribers = []
+
+
+            let handler = {
+                get: function (target, property, receiver) {
+
+                    if (typeof target[property] == "function") {
+
+                        if (target instanceof Date) {
+                            return target[property].bind(target)
+                        }
+
                     }
 
-                }   
-                        
-                // for certain operations, it is necessary to verify that the target object is the same spot in memory as 
-                // some other reference to it.
-                if (property == "_targetObject") {return target}
-                if (property == "_observableObject") {return self}
-                if (property == "$parentModel") {return self.$parentModel}
-                if (property == "$model") {return self.$model}
-                
-                return target[property]
-            }, 
-            set: function(target, property, value) {
-                
+                    // for certain operations, it is necessary to verify that the target object is the same spot in memory as 
+                    // some other reference to it.
+                    if (property == "_targetObject") { return target} 
+                    if (property == "_observableObject") { return self} 
+                    if (property == "$parentModel") { return self.$parentModel} 
+                    if (property == "$model") { return self.$model} 
 
-                if (Array.isArray(target)) {
-                    updateArrayOnSet(target, property, value)
+                    return target[property]
+                },
+                set: function (target, property, value) {
+
+
+                    if (Array.isArray(target)) {
+                        updateArrayOnSet(target, property, value)
+                        return true
+                    }
+
+                    if (property == "$model") { self[property] = value} 
+                    target[property] = value
+                    updateOnStateChangeByOref(target, property)
+
+
+                    return true
+                },
+
+                deleteProperty(target, property) {
+                    if (Array.isArray(target)) {
+                        updateArrayOnDelete(target, property)
+                        return true
+                    }
+                    delete target[prop]
                     return true
                 }
-                
-                if (property == "$model") {self[property] = value}
-                target[property] = value
-                updateOnStateChangeByOref(target, property)
-
-                
-                return true
-            },
-
-            deleteProperty(target, property){
-                if (Array.isArray(target)) {
-                    updateArrayOnDelete(target, property)
-                    return true
-                }
-                delete target[prop]
-                return true
             }
-            
-        
-        }
 
-        let dataObject = obj
-      
-        
-        let dataObjectProxy = utils.deepProxy(dataObject, handler)
-        
+            let dataObject = obj
 
 
-        // Function to update all elements on state change by oref
-        // Function receives the object which contains the updated property, and the property key
-        function updateOnStateChangeByOref(oRefParent, property) {
-            for (let element of receivers) {
-                if ((element.target._targetObject === oRefParent) && (property == element.property) ){
-                    element.update()
-                }
-        
-            }
-        }
- 
-        
-        // Parse property path of binding and return object at that location
-        function returnTargetProperty(pathToObject, getParent = false) {
-            let targetChild = dataObjectProxy
-            let splitPath = pathToObject.split('.')
-            if (splitPath[0]=="root")  {targetChild= zk_self.root_model }
-            if (splitPath[0]=="$parentModel")  {
-                targetChild = self.$parentModel
-                let i = 1
-                while (splitPath[i]=="$parentModel") {
-                    targetChild = targetChild.$parentModel
+            let dataObjectProxy = utils.deepProxy(dataObject, handler)
+
+
+
+            // Function to update all elements on state change by oref
+            // Function receives the object which contains the updated property, and the property key
+            function updateOnStateChangeByOref(oRefParent, property) {
+                for (let element of receivers) {
+                    if ((element.target._targetObject === oRefParent) && (property == element.property)) {
+                        element.update()
+                    }
+
                 }
             }
-            for (let i = 1; i < splitPath.length; i++) {
-                if  (getParent && (i == (splitPath.length - 1))) {return targetChild}
-                targetChild = targetChild[splitPath[i]]
-                if (typeof targetChild === "undefined") {
-                    throw new Error(pathToObject + " is an invalid property path")
+
+
+            // Parse property path of binding and return object at that location
+            function returnTargetProperty(pathToObject, getParent = false) {
+                let targetChild = dataObjectProxy
+                let splitPath = pathToObject.split('.')
+                if (splitPath[0] == "root") { targetChild = zk_self.root_model} 
+                if (splitPath[0] == "$parentModel") {
+                    targetChild = self.$parentModel
+                    let i = 1
+                    while (splitPath[i] == "$parentModel") {
+                        targetChild = targetChild.$parentModel
+                    }
                 }
+                for (let i = 1; i < splitPath.length; i++) {
+                    if (getParent && (i == (splitPath.length - 1))) { return targetChild} 
+                    targetChild = targetChild[splitPath[i]]
+                    if (typeof targetChild === "undefined") {
+                        throw new Error(pathToObject + " is an invalid property path")
+                    }
+                }
+                return targetChild
             }
-            return targetChild
-        }
 
 
-        // take a bound 'transmitter' element and add an event lister to update model object and transmit to receivers
-        function initializeTransmitter(boundElement, bindMode) {
+            // take a bound 'transmitter' element and add an event lister to update model object and transmit to receivers
+            function initializeTransmitter(boundElement, bindMode) {
 
                 // A transmitter should always be an input element in HTML. Currently, the supported elemetns
                 // Are text, date, datetime, checked
-                if(!(boundElement instanceof BoundElement)) {throw new Error('Invalid argument to initialize transmitter')}
+                if (!(boundElement instanceof BoundElement)) { throw new Error('Invalid argument to initialize transmitter')} 
 
                 if (!(boundElement.DOMelement.tagName != "input")) {
                     throw new Error(`Invalid html element binding: "${bindMode}" must be bound to an input element`)
@@ -300,18 +300,18 @@ function zk() {
                 let property = boundElement.property
                 let updateValue = target[property]
 
-                if (boundElement.DOMelement.type=="date") {
+                if (boundElement.DOMelement.type == "date") {
                     if (updateValue) {
                         updateValue = new Date(updateValue)
-                    try {
-                        updateValue = updateValue.toISOString().split('T')[0]
+                        try {
+                            updateValue = updateValue.toISOString().split('T')[0]
+                        }
+
+                        catch (err) {
+                            console.error("error converting date object", updateValue, err.message)
+                        }
                     }
-                    
-                    catch (err) {
-                        console.error("error converting date object", updateValue, err.message)
-                    }
-                    }
-                    
+
                 }
                 if (bindMode == "radio") {
                     let options = boundElement.DOMelement.querySelectorAll('input')
@@ -319,28 +319,28 @@ function zk() {
                         if (option.value == updateValue) {
                             option.checked = true
                         }
-                        option.addEventListener('input', function() {
+                        option.addEventListener('input', function () {
                             if (option.checked) {
                                 target[property] = option.value
                             }
-                            
+
                         })
                     }
                     return
                 }
-                
-                
-                if (bindMode == "datetime-local")  {
+
+
+                if (bindMode == "datetime-local") {
                     updateValue = new Date(updateValue)
                     updateValue = updateValue._targetObject.toISOString()
-                        
-                  
+
+
                 }
-               
+
                 boundElement.DOMelement.value = (updateValue || "")
-             
-                
-                boundElement.DOMelement.addEventListener("input", (KeyboardEvent) => { 
+
+
+                boundElement.DOMelement.addEventListener("input", (KeyboardEvent) => {
                     let nodeValue = boundElement.DOMelement.value
                     if (bindMode == "date") {
                         tnodeValue = new Date(nodeValue)
@@ -350,307 +350,306 @@ function zk() {
                         nodeValue = boundElement.DOMelement.checked
                     }
                     target[property] = (nodeValue || "")
-            })
-        }
-
-        
-
-
-
-        // A 'for' binder repeats the syntax in the children elements for each item in the defined iterable
-        // This function must be able to control the items in the list (push/pop) and change their value if the
-        // model data changes.
-        function initializeForeach(boundElement) {
-
-            // parse syntax, note that 'objectPath' refers to the foreach syntax of the for element
-            // which follows foreach syntax (item of list)
-            
-            tempList  = boundElement.objectPath.split('of')
-            let iteratorKey = tempList[0].trim()
-            let iterableObjectPath = tempList[1].trim()
-            let iterable = returnTargetProperty(iterableObjectPath)
-            let oldChild = boundElement.DOMelement.removeChild(boundElement.DOMelement.children[0])
-            // The current bound element is the 'for' parent element containing the iterated objects
-            // this element needs to store all of its children, the html template for creating a new child, 
-            // and the iteratore key (eg 'item')
-            boundElement.objectPath = iterableObjectPath
-
-            oRefPath = utils.prepareObjectPath(boundElement.objectPath)
-            boundElement.target = iterable
-            boundElement.observableChildren = []
-            boundElement.templateNode = oldChild
-            boundElement.iteratorKey = iteratorKey
-
-            
-            // The application should enforce that the boundElement only has one root (the iterator template)
-            // Then, it should clone that item and append it iterable.length - 1 times 
-            // The parent object (curent boundElement) needs to be added to the bound elements array
-            // problem noted: when the ObservableObject instantiates, it copies the object parameter, meaning that scoped sub models
-            // Do not reflect changes to the object model they are descendent from
-            let index = 0;
-            for (let item of iterable) {
-                // Create clone of template node for each bound element
-                let clone = oldChild.cloneNode(true)
-                boundElement.DOMelement.appendChild(clone)
-
-                // a 'for' element creates its own autonomous model scope with the 'item' being a new observable object inserted into
-                // a sub model
-                let subModel = {}
-                let newObj = new ObservableObject(item,self)
-              
-                
-                
-                subModel[iteratorKey] = newObj
-                subModel.$parentModel = self.$model
-                newObj._observableObject.$model = subModel
-                ParseDOMforObservables(subModel, clone)
-
-                
-                subModelContext = {
-                    "subModel": subModel,
-                    "node" : clone
-
-                }
-                boundElement.observableChildren.push(subModelContext)
-
-                // replace array item with its observable version
-                iterable[index++] = newObj
-            }
-            
-            forEachComponents.push(boundElement)
-        }
-
-        function updateArrayOnDelete(targetArr, targetProperty) {
-            let boundElement;
-
-            if (Number.parseInt(targetProperty) == NaN) {throw new Error("Array index must be an integer value")}
-            
-            for (let item of forEachComponents) {
-                if (item.target._targetObject == targetArr){
-                    boundElement = item
-                    break
-                }
+                })
             }
 
-            // Presence of boundElement means that this array is bound to a DOM element
-            if(boundElement) {
 
-                // find the node in the for element to delete and delete it from DOM
-                let currentIndex = boundElement.DOMelement.children[targetProperty]
-                boundElement.DOMelement.removeChild(currentIndex)
 
-                // remove element from observable children to maintain parity between that list and the targetArr
-                delete boundElement.observableChildren[targetProperty]
-            }
-            
 
-            // Finally, delete element in targetArr
-            delete targetArr[targetProperty]
-            
-            
-        }
-        // this method is called by the handler 'set' function so that the DOM mirrors the array on state change
-        function updateArrayOnSet(targetArr, targetProperty, value) {
-            
-            // locate appropriate array of bound elements in forEachComponents (this should be a 'for' element)
-            // targetArr is an array part of the obj argument to observable object, this function is called when updating 
-            // its Proxy object.
-            let boundElement;
 
-            
-            
-            for (let item of forEachComponents) {
-                if (item.target._targetObject == targetArr){
-                    boundElement = item
-                    break
-                }
-            }
-            if ((targetProperty == "length")) {
-                targetArr[targetProperty] = value
-                if (boundElement) {
-                    boundElement.observableChildren.length = value
-                }
-                return
-                
-            }
-           // Presence of boundElement means that this array is bound to a DOM element
-            if (boundElement) {
-                let insertNode 
-                // If value being set is not an observable object
-                if (!(value._observableObject)) {
-                     // construct new child node
-                     insertNode = boundElement.templateNode.cloneNode(true)
+            // A 'for' binder repeats the syntax in the children elements for each item in the defined iterable
+            // This function must be able to control the items in the list (push/pop) and change their value if the
+            // model data changes.
+            function initializeForeach(boundElement) {
+                // parse syntax, note that 'objectPath' refers to the foreach syntax of the for element
+                // which follows foreach syntax (item of list)
 
-                    
+                tempList = boundElement.objectPath.split('of')
+                let iteratorKey = tempList[0].trim()
+                let iterableObjectPath = tempList[1].trim()
+                let iterable = returnTargetProperty(iterableObjectPath)
+                let oldChild = boundElement.DOMelement.removeChild(boundElement.DOMelement.children[0])
+                // The current bound element is the 'for' parent element containing the iterated objects
+                // this element needs to store all of its children, the html template for creating a new child, 
+                // and the iteratore key (eg 'item')
+                boundElement.objectPath = iterableObjectPath
 
-                    // creat subModel for child node observable scope and add the observable to the array
+                oRefPath = utils.prepareObjectPath(boundElement.objectPath)
+                boundElement.target = iterable
+                boundElement.observableChildren = []
+                boundElement.templateNode = oldChild
+                boundElement.iteratorKey = iteratorKey
+
+
+                // The application should enforce that the boundElement only has one root (the iterator template)
+                // Then, it should clone that item and append it iterable.length - 1 times 
+                // The parent object (curent boundElement) needs to be added to the bound elements array
+                // problem noted: when the ObservableObject instantiates, it copies the object parameter, meaning that scoped sub models
+                // Do not reflect changes to the object model they are descendent from
+                let index = 0
+                for (let item of iterable) {
+                    // Create clone of template node for each bound element
+                    let clone = oldChild.cloneNode(true)
+                    boundElement.DOMelement.appendChild(clone)
+
+                    // a 'for' element creates its own autonomous model scope with the 'item' being a new observable object inserted into
+                    // a sub model
                     let subModel = {}
-                    value = new ObservableObject(value)
-                    
-                    subModel[boundElement.iteratorKey] = value
-                    value._observableObject.$model = subModel
+                    let newObj = new ObservableObject(item, self)
+
+
+
+                    subModel[iteratorKey] = newObj
                     subModel.$parentModel = self.$model
-                    // Create submodel context that stores node-element pairing
+                    newObj._observableObject.$model = subModel
+                    ParseDOMforObservables(subModel, clone)
+
+
                     subModelContext = {
                         "subModel": subModel,
-                        "node" : insertNode
+                        "node": clone
                     }
+                    boundElement.observableChildren.push(subModelContext)
 
-                    boundElement.observableChildren[targetProperty] = subModelContext
-                    ParseDOMforObservables(subModel, insertNode)
+                    // replace array item with its observable version
+                    iterable[index++] = newObj
                 }
-                
-                // this makes assumption that if it is NOT an observable object, it is an existing item in the array.
-                else {
-                    // Locate the observable child of the bound 'for' element where
-                    // the observable object at observableChild.subModel[iteratorKey]
-                    // equals the value parameter of this function
-                    // Reminder: 'iteratorKey' is whatever the DOM element declares a <item> in the foreach bind
-                    let iteratorKey = boundElement.iteratorKey
-                    
-                    let observableChild = boundElement.observableChildren.find((item)=> {
-                        return item.subModel[iteratorKey] == value
-                    })
-                    // if the inserted object is an observable, but is not currently in the bound array
-                    if (!observableChild) {
+
+                forEachComponents.push(boundElement)
+            }
+
+            function updateArrayOnDelete(targetArr, targetProperty) {
+                let boundElement
+
+                if (Number.parseInt(targetProperty) == NaN) { throw new Error("Array index must be an integer value")} 
+
+                for (let item of forEachComponents) {
+                    if (item.target._targetObject == targetArr) {
+                        boundElement = item
+                        break
+                    }
+                }
+
+                // Presence of boundElement means that this array is bound to a DOM element
+                if (boundElement) {
+
+                    // find the node in the for element to delete and delete it from DOM
+                    let currentIndex = boundElement.DOMelement.children[targetProperty]
+                    boundElement.DOMelement.removeChild(currentIndex)
+
+                    // remove element from observable children to maintain parity between that list and the targetArr
+                    delete boundElement.observableChildren[targetProperty]
+                }
+
+
+                // Finally, delete element in targetArr
+                delete targetArr[targetProperty]
+
+
+            }
+            // this method is called by the handler 'set' function so that the DOM mirrors the array on state change
+            function updateArrayOnSet(targetArr, targetProperty, value) {
+
+                // locate appropriate array of bound elements in forEachComponents (this should be a 'for' element)
+                // targetArr is an array part of the obj argument to observable object, this function is called when updating 
+                // its Proxy object.
+                let boundElement
+
+
+
+                for (let item of forEachComponents) {
+                    if (item.target._targetObject == targetArr) {
+                        boundElement = item
+                        break
+                    }
+                }
+                if ((targetProperty == "length")) {
+                    targetArr[targetProperty] = value
+                    if (boundElement) {
+                        boundElement.observableChildren.length = value
+                    }
+                    return
+
+                }
+                // Presence of boundElement means that this array is bound to a DOM element
+                if (boundElement) {
+                    let insertNode
+                    // If value being set is not an observable object
+                    if (!(value._observableObject)) {
+                        // construct new child node
                         insertNode = boundElement.templateNode.cloneNode(true)
+
+
+
+                        // creat subModel for child node observable scope and add the observable to the array
                         let subModel = {}
+                        value = new ObservableObject(value)
+
                         subModel[boundElement.iteratorKey] = value
                         value._observableObject.$model = subModel
                         subModel.$parentModel = self.$model
                         // Create submodel context that stores node-element pairing
                         subModelContext = {
                             "subModel": subModel,
-                            "node" : insertNode
+                            "node": insertNode
                         }
-    
+
                         boundElement.observableChildren[targetProperty] = subModelContext
                         ParseDOMforObservables(subModel, insertNode)
-                        
-                    }
-                    else{
-                        boundElement.observableChildren[targetProperty]  = observableChild
-                        // Reminder: 'observableChild' refers to a subModelContext containing a submodel and a html node
-                        insertNode = observableChild.node
                     }
 
-                   
+
+                    // this makes assumption that if it is NOT an observable object, it is an existing item in the array.
+                    else {
+                        // Locate the observable child of the bound 'for' element where
+                        // the observable object at observableChild.subModel[iteratorKey]
+                        // equals the value parameter of this function
+                        // Reminder: 'iteratorKey' is whatever the DOM element declares a <item> in the foreach bind
+                        let iteratorKey = boundElement.iteratorKey
+
+                        let observableChild = boundElement.observableChildren.find((item) => {
+                            return item.subModel[iteratorKey] == value
+                        })
+                        // if the inserted object is an observable, but is not currently in the bound array
+                        if (!observableChild) {
+                            insertNode = boundElement.templateNode.cloneNode(true)
+                            let subModel = {}
+                            subModel[boundElement.iteratorKey] = value
+                            value._observableObject.$model = subModel
+                            subModel.$parentModel = self.$model
+                            // Create submodel context that stores node-element pairing
+                            subModelContext = {
+                                "subModel": subModel,
+                                "node": insertNode
+                            }
+
+                            boundElement.observableChildren[targetProperty] = subModelContext
+                            ParseDOMforObservables(subModel, insertNode)
+
+                        }
+                        else {
+                            boundElement.observableChildren[targetProperty] = observableChild
+                            // Reminder: 'observableChild' refers to a subModelContext containing a submodel and a html node
+                            insertNode = observableChild.node
+                        }
+
+
+
+                    }
+                    // Insert node in appropriate index position
+                    // Get current node at that position
+                    let currentIndex = boundElement.DOMelement.children[targetProperty]
+                    if (targetProperty == boundElement.DOMelement.length) {
+                        boundElement.appendChild(currentIndex)
+                    }
+                    else {
+                        boundElement.DOMelement.insertBefore(insertNode, currentIndex)
+                    }
+
 
                 }
-                // Insert node in appropriate index position
-                // Get current node at that position
-                
-                let currentIndex = boundElement.DOMelement.children[targetProperty]
-                if (targetProperty == boundElement.DOMelement.length) {
-                    boundElement.appendChild(currentIndex)
-                }
-                else {
-                    boundElement.DOMelement.insertBefore(insertNode,currentIndex)
-                }
-                
-               
+
+                // push the object to the the data object proxy array
+                targetArr[targetProperty] = value
+
+
+
             }
-            
-            // push the object to the the data object proxy array
-            targetArr[targetProperty] = value
 
 
 
-        }
-
-  
-        
 
 
 
-        // function to register an element, perform any intialization,a nd add to appropriate array
-        this.registerElement = function (bindMode, boundElement) {
+            // function to register an element, perform any intialization,a nd add to appropriate array
+            this.registerElement = function (bindMode, boundElement) {
 
-            switch (bindMode) {
-                case "text" :
-                case "checked":
-                case "radio":
-                case "date":
-                    transmitters.push(boundElement);
-                    oRefPath = utils.prepareObjectPath(boundElement.objectPath)
-                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, oRefPath, true)
-                    var splitPath = boundElement.objectPath.split(".")
-                    boundElement.property = splitPath[(splitPath.length-1)]
-                    initializeTransmitter(boundElement, bindMode);
-                    break
-                
-                case 'format':
-                    // format binds have syntax "format: objectPath|callbackFunction"
-                    [objectPath, callBackPath] = boundElement.objectPath.split('|')
-                    try {
-                        boundElement.updateCallback = utils.returnTargetProperty(dataObjectProxy,callBackPath)
-                    }
-                    catch (err) {
-                        console.error(err.message)
-                    }
-                    boundElement.objectPath = objectPath
-                case "value": 
-                    
-                    targetPath = utils.prepareObjectPath(boundElement.objectPath)
-                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
-                    splitPath = boundElement.objectPath.split(".")
-                    boundElement.property = splitPath[(splitPath.length-1)]
-                    receivers.push(boundElement);
-                    boundElement.update()
-                    break
-                
-                case "attr":
-                    // attr bindings follow syntax "attr: targetAttr|binding"
-                    [attr,binding, callBackPath] = boundElement.objectPath.split('|')
-                    if(callBackPath) {
+                switch (bindMode) {
+                    case "text":
+                    case "checked":
+                    case "radio":
+                    case "date":
+                        transmitters.push(boundElement)
+                        oRefPath = utils.prepareObjectPath(boundElement.objectPath)
+                        boundElement.target = utils.returnTargetProperty(dataObjectProxy, oRefPath, true)
+                        var splitPath = boundElement.objectPath.split(".")
+                        boundElement.property = splitPath[(splitPath.length - 1)]
+                        initializeTransmitter(boundElement, bindMode)
+                        break
+
+                    case 'format':
+                        // format binds have syntax "format: objectPath|callbackFunction"
+                        [objectPath, callBackPath] = boundElement.objectPath.split('|')
                         try {
-                            boundElement.updateCallback = utils.returnTargetProperty(dataObjectProxy,callBackPath)
+                            boundElement.updateCallback = utils.returnTargetProperty(dataObjectProxy, callBackPath)
                         }
                         catch (err) {
                             console.error(err.message)
                         }
-                    }
-                  
-                    boundElement.objectPath = binding
-                    splitPath = boundElement.objectPath.split(".")
-                    boundElement.property = splitPath[(splitPath.length-1)]
-                    targetPath = utils.prepareObjectPath(boundElement.objectPath)
-                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
-                    splitPath = boundElement.objectPath.split(".")
-                    receivers.push(boundElement);
-                    boundElement.attr = attr
-                    boundElement.update()
-                    break
-                case "for":
-                    initializeForeach(boundElement);
-                    break
-                case "hidden":
-                    targetPath = utils.prepareObjectPath(boundElement.objectPath)
-                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
-                    splitPath = boundElement.objectPath.split(".")
-                    boundElement.property = splitPath[(splitPath.length-1)]
-                    receivers.push(boundElement);
-                    boundElement.update = function() {
-                        boundElement.DOMelement.hidden = boundElement.target[boundElement.property]
-                    }
-                    boundElement.update()
-                    break
+                        boundElement.objectPath = objectPath
+                    case "value":
 
-                case "visible":
-                    targetPath = utils.prepareObjectPath(boundElement.objectPath)
-                    boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
-                    splitPath = boundElement.objectPath.split(".")
-                    boundElement.property = splitPath[(splitPath.length-1)]
-                    
-                    receivers.push(boundElement);
-                    boundElement.update = function() {
-                        boundElement.DOMelement.hidden = !boundElement.target[boundElement.property]
-                    }
-                    boundElement.update()
-                    break
+                        targetPath = utils.prepareObjectPath(boundElement.objectPath)
+                        boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
+                        splitPath = boundElement.objectPath.split(".")
+                        boundElement.property = splitPath[(splitPath.length - 1)]
+                        receivers.push(boundElement)
+                        boundElement.update()
+                        break
+
+                    case "attr":
+                        // attr bindings follow syntax "attr: targetAttr|binding"
+                        [attr, binding, callBackPath] = boundElement.objectPath.split('|')
+                        if (callBackPath) {
+                            try {
+                                boundElement.updateCallback = utils.returnTargetProperty(dataObjectProxy, callBackPath)
+                            }
+                            catch (err) {
+                                console.error(err.message)
+                            }
+                        }
+
+                        boundElement.objectPath = binding
+                        splitPath = boundElement.objectPath.split(".")
+                        boundElement.property = splitPath[(splitPath.length - 1)]
+                        targetPath = utils.prepareObjectPath(boundElement.objectPath)
+                        boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
+                        splitPath = boundElement.objectPath.split(".")
+                        receivers.push(boundElement)
+                        boundElement.attr = attr
+                        boundElement.update()
+                        break
+                    case "for":
+                        initializeForeach(boundElement)
+                        break
+                    case "hidden":
+                        targetPath = utils.prepareObjectPath(boundElement.objectPath)
+                        boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
+                        splitPath = boundElement.objectPath.split(".")
+                        boundElement.property = splitPath[(splitPath.length - 1)]
+                        receivers.push(boundElement)
+                        boundElement.update = function () {
+                            boundElement.DOMelement.hidden = boundElement.target[boundElement.property]
+                        }
+                        boundElement.update()
+                        break
+
+                    case "visible":
+                        targetPath = utils.prepareObjectPath(boundElement.objectPath)
+                        boundElement.target = utils.returnTargetProperty(dataObjectProxy, targetPath, true)
+                        splitPath = boundElement.objectPath.split(".")
+                        boundElement.property = splitPath[(splitPath.length - 1)]
+
+                        receivers.push(boundElement)
+                        boundElement.update = function () {
+                            boundElement.DOMelement.hidden = !boundElement.target[boundElement.property]
+                        }
+                        boundElement.update()
+                        break
+                }
             }
+            return dataObjectProxy
         }
-        return dataObjectProxy
     }
     zk_self.subscribe = function(eventTypes, target, property, callback) {
         this.eventTypes = eventTypes

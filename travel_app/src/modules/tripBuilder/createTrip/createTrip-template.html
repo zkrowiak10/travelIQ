@@ -1,0 +1,22 @@
+<form  method="post" style="display: none" id='createTrips' action="{{url_for('iq.create_trip')}}">
+    <h1 >New Trip</h1> 
+    <div class="form-group">
+      <label for="name">Trip Name</label>
+      <input class="form-control" required name="TName" aria-describedby="emailHelp" placeholder="eg. 'Trip to Italy'">
+
+    </div>
+    <div class="form-group">
+      <label for="StartDate">Trip Start Date</label>
+      <input type="date" required class="form-control" name="TStart">
+    </div>
+    <div class="form-group">
+            <label for="StartDate">Trip End Date</label>
+            <input type="date" required class="form-control" name="TEnd">
+    </div>
+    <div class="form-group">
+            <label for="Description">Description</label>
+            <textarea class="form-control" name="TDescription"></textarea>
+    </div>
+    <button type="submit" name="login" class="btn btn-primary">Create</button>
+    <button type="button" onclick="formToggle()" class="btn btn-primary">Cancel</button>
+</form>

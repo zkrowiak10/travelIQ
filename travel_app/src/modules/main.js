@@ -1,13 +1,13 @@
 
 
-import { api } from './modules/utils/api.js'
-import * as DestinationsController from './modules/tripBuilder/destinations/destinations.js';
+import { api } from './utils/api.js'
+import * as DestinationsController from './tripBuilder/destinations/destinations.js';
 // import { * } from './modules/tripBuilder/hotels/hotels.js';
-import { FlightsController} from './modules/tripBuilder/flights/flights.js'
-import { RentalsController } from './modules/tripBuilder/rentals/rentals.js';
-import {header} from './modules/header/header.js'
-import * as utils from './modules/utils/utilFunctions.js'
-import {TripsController} from './modules/trips/trips.js'
+import { FlightsController} from './tripBuilder/flights/flights.js'
+import { RentalsController } from './tripBuilder/rentals/rentals.js';
+import {header} from './header/header.js'
+import * as utils from './utils/utilFunctions.js'
+import {TripsController} from './trips/trips.js'
 
 
 

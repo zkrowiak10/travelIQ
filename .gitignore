@@ -11,6 +11,6 @@ migrations/versions/__pycache__/*
 migrations/versions/__pycache__/213c269d55a0_.cpython-37.pyc
 migrations/versions/__pycache__/213c269d55a0_.cpython-37.pyc
 
-postgres-data/*
+instance/*
 
 .env
