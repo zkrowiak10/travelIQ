@@ -1,9 +1,10 @@
 import logging
 
-from flask import Response, Request, abort, jsonify, g
+from flask import (
+    jsonify, abort, Response
+)
 
 from travel_app import models
-
 
 # Class to recieve API requests from the ajax module and handle operations on the data
 # Subsequent versions of this app will more strongly enforce this design architecture so that app routing
@@ -106,7 +107,7 @@ class API ():
                     abort(404)
                 models.db.session.delete(obj)
                 models.db.session.commit()
-                
+
                 return Response("Deleted", 200)
             except Exception as e:
                 logging.error(
