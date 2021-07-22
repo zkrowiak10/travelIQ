@@ -23,7 +23,7 @@ class Staging(Development):
     TESTING = False	 
     SECRET_KEY = os.getenv('SECRET_KEY')
 
-class Staging(Config):
+class Production(Config):
     @property
     def SQLALCHEMY_DATABASE_URI(self): 
         # Heroku requires postgresql as uri protocol (not postgres)

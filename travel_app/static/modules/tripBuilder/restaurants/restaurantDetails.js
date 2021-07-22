@@ -1,4 +1,4 @@
-var workdir =  "/static/modules/tripBuilder/restaurants"
+var workdir = "/static/modules/tripBuilder/restaurants"
 
 export class DetailsComponent {
 
@@ -11,7 +11,7 @@ export class DetailsComponent {
     constructor(controller, fields, title, target, targetElement, templateFile, update) {
 
         this.fields = new zk.ObservableObject(fields)
-        this.title =  title
+        this.title = title
         this.html
         this.target = (target) ? target : {}
         this.templateFile = templateFile
@@ -21,33 +21,33 @@ export class DetailsComponent {
     }
 
     async render() {
-            var template = await fetch(`${workdir}/${this.templateFile}`, { headers: { "Content-Type": "text/html" } })
-            var text = await template.text()
-            this.html = document.querySelector(this.targetElement)
-            this.html.innerHTML = text
+        var template = await fetch(`${workdir}/${this.templateFile}`, { headers: { "Content-Type": "text/html" } })
+        var text = await template.text()
+        this.html = document.querySelector(this.targetElement)
+        this.html.innerHTML = text
 
-            zk.initiateModel(this, this.html)
-        }
+        zk.initiateModel(this, this.html)
+    }
 
 
-    async delete () {
+    async delete() {
         if (target) {
             parent.deleteItem(target)
             this.close()
-                }
         }
+    }
 
     showCreate() {
         this.clear()
         this.show()
-     }
+    }
 
-     close() {
+    close() {
         this.html.remove()
     }
 
 
-     async save () {
+    async save() {
 
         for (let field of that.formModel.fields) {
             key = field.key
@@ -57,7 +57,7 @@ export class DetailsComponent {
             }
 
 
-            }
+        }
         if (update) {
             try {
                 target.update()
