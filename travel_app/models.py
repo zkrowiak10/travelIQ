@@ -20,7 +20,8 @@ class Base(db.Model):
         logging.debug('in update function \n dictionary is: ' + str(dictionary))
         # filter out any keys accidentally sent over, and filter out ID, which cannot change when updating.
         dictionary = {key: dictionary[key] for key in dictionary if key != "id" and key in self.__dict__}
-        self.__dict__.update(dictionary)
+        for key, value in dictionary.items():
+            setattr(self,key, value)
 
     # TODO create abstract method for __init__
         

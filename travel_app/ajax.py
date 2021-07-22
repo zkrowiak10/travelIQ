@@ -327,6 +327,7 @@ def changerRstaurant(trip_id, dest_id,restaurant_id):
         return abort(401)
     if request.method == "PATCH":
         restaurant.update(request.get_json())
+        models.db.session.add(restaurant)
         models.db.session.commit()
         return Response("updated",200)
         
