@@ -1,7 +1,7 @@
 import logging
 
 from flask import (
-    jsonify, abort, Response
+    jsonify, abort, Response, Request
 )
 
 from travel_app import models
@@ -30,7 +30,7 @@ class API ():
     def serializeItem(obj : dict):
         dict = {}
         logging.debug("Serializing object with dictionary:" + str(obj.__dict__))
-        dict = {key:obj.__dict__[key] for key in obj.__dict__ if obj.__dict__[key] != "_sa_instance_state"}
+        dict = {key:obj.__dict__[key] for key in obj.__dict__ if key != "_sa_instance_state"}
         return dict
 
     # Handle GET, POST, PATCH, and DELETE requests to database

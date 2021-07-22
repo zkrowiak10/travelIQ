@@ -1,6 +1,6 @@
 
 import os
-from travel_app import config, models, models, urls, ajax
+from travel_app import config, models, models, urls, ajax,auth
 from flask import Flask
 from flask_migrate import Migrate
 import logging
@@ -15,9 +15,13 @@ def create_app():
     if configEnv == "production":
         configParam = config.Production()
         logging.getLogger().setLevel(logging.INFO)
+    elif configEnv == "staging":
+        configParam = config.Staging()
+        logging.getLogger().setLevel(logging.INFO)
     elif configEnv == 'development':
         configParam = config.Development()
         logging.getLogger().setLevel(logging.DEBUG)
+    
     else:
         raise Exception("{configEnv}is not a valid configuration parameter".format(configEnv=configEnv))
     app = Flask(__name__)
@@ -28,8 +32,9 @@ def create_app():
     migrate = Migrate(app, models.db)   
 
     # Register routes
-    app.register_blueprint(urls.bp)
+    app.register_blueprint(urls.home)
     app.register_blueprint(urls.iq)
+    app.register_blueprint(auth.auth)
     app.register_blueprint(ajax.ajax)
 
     return app

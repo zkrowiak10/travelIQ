@@ -1,34 +1,32 @@
 #this substitutes for the .from_mapping config design for subsequent versions of this app
 import os
-import re
+
 class Config():
-    """Base config, uses staging database server."""
     DEBUG = False
     TESTING = False	 
+    SECRET_KEY = 'dev'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     @property
     def SQLALCHEMY_DATABASE_URI(self):
         return "postgresql://{}:{}@{}/".format(self.db_user, self.db_password, self.dbhost) + self.DATABASE
 
-class Debug(Config):
-    SECRET_KEY = 'dev'
-
-class Testing(Debug):
-    DEBUG = True
-    TESTING = True
-
-class Development(Testing):
+class Development(Config):
     db_user = "postgres"
     db_password = os.getenv('POSTGRES_ENV_POSTGRES_PASSWORD')
     DATABASE="postgres"
     dbhost = 'postgres:5432'
-    # SQLALCHEMY_ECHO = True
+    SECRET_KEY = 'dev'
+    DEBUG = True
 
-class Production():
+class Staging(Development):
+    DEBUG = False
+    TESTING = False	 
     SECRET_KEY = os.getenv('SECRET_KEY')
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+class Staging(Config):
     @property
     def SQLALCHEMY_DATABASE_URI(self): 
+        # Heroku requires postgresql as uri protocol (not postgres)
         uri = os.getenv("DATABASE_URL")  # or other relevant config var
         if uri != None:
             if uri.startswith("postgres://"):
