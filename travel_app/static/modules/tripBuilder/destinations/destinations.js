@@ -2,6 +2,7 @@ import { ItemController, Item} from "../itemController/itemController.js";
 import * as hotels from "../hotels/hotels.js";
 import * as utils from '../../utils/utilFunctions.js'
 import * as restaurants from "../restaurants/restaurant.js"
+
 export class Destination extends Item {
     fields = [
         { type: "text", key: "name", pretty: "Name" },
@@ -35,7 +36,7 @@ export class Destination extends Item {
         return links
     }
     async save() {
-        var data = this.stringify()
+        var data = JSON.stringify(this)
         // try {
         var response = await api.post(this.endPoint, data)
         this.id = response.id

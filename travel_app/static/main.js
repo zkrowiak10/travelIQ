@@ -2,35 +2,30 @@
 
 import { api } from './modules/utils/api.js'
 import * as DestinationsController from './modules/tripBuilder/destinations/destinations.js';
-// import { * } from './modules/tripBuilder/hotels/hotels.js';
-import { FlightsController} from './modules/tripBuilder/flights/flights.js'
-import { RentalsController } from './modules/tripBuilder/rentals/rentals.js';
 import {header} from './modules/header/header.js'
 import * as utils from './modules/utils/utilFunctions.js'
 import {TripsController} from './modules/trips/trips.js'
 
 
-
+// Initialize the header navbar
 header.init()
-zk.root_model.utils = utils
-function wipe(){
-    // document.querySelector("#left-sidebar").innerHTML=""
-    document.querySelector("#tabContent").innerHTML=""
 
+// zk binding library exposes a global root_model object so any element in the application
+// can access its functions/properties 
+zk.root_model.utils = utils
+
+// clear child views when rerouting 
+function wipe(){
+    document.querySelector("#tabContent").innerHTML=""
     document.querySelector("#hotelDetailView").innerHTML=""
 
 }
-$().ready(()=>{
-    
-    
-    
-    
+window.onload = ()=>{
     hashSwitcher.switch(location.hash) 
-})
+}
 
 window.addEventListener("hashchange", function(){
     wipe()
-   
     hashSwitcher.switch(location.hash)
 
 })
@@ -70,7 +65,7 @@ export class HashSwitcher {
 export var hashSwitcher = new HashSwitcher()
 
 
-console.log(header)
+
 
 
 

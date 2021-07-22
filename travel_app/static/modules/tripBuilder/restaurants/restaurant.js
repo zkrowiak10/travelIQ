@@ -51,9 +51,12 @@ export class RestaurantsController extends ItemController{
         let insertNode = "#tabContent"
         let templateFile = "restaurant-template.html"
         
+        // revise this constructor once I migrate to typescript as intellisense will be far 
+        // better.
         super(Restaurant,getEndpoint,fields,title,containerId,templateFile,workdir, insertNode)
         this.destination = destination
-      
+        
+        // Restaurants are displayed in hierarchy day > meal
         for (let i = 0; i < destination.days_there; i++) {
             let obj = {
                 dayNumber : (i + 1),

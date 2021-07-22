@@ -3,13 +3,17 @@
 /*
 Master list of binding syntax:
 
+add zk-bind attribute to HTML element with one of the following bindmodes. Multiple bindings are possible when 
+separated by semi-colon
+
 attr: <attr>|<valueObjet>|<formatCallback>
 for: key of <iterable>
 text: <object>
 format: <object>|<callback>
-
+on: event|callback
 
 */
+
 // parent function to store entire framework as singleton
 function zk() {
     
@@ -79,7 +83,7 @@ function zk() {
                 let parentObject = objectPath.split('.')[0]
 
                 // A little messy, but 'for' binders receive an argument of 'indexKey of iterable' where
-                // iterable is the typical objectpaty. 
+                // iterable is the typical objectpath (object.property.property... ). 
                 if (bindMode === 'for') {
                     parentObject = objectPath
                                     .split('of')[1]

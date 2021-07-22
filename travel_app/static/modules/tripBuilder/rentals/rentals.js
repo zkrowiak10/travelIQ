@@ -1,4 +1,5 @@
 
+// NOT IMPLEMENTED
 import { ItemController} from "../itemController/itemController.js";
 
 export class RentalsController extends ItemController {
