@@ -1,4 +1,6 @@
 # travelIQ
 
-Work In Progress: README to come.
+A vacation itinerary planner. 
+
+
 
