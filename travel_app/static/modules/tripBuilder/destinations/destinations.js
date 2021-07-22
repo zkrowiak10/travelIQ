@@ -2,6 +2,7 @@ import { ItemController, Item} from "../itemController/itemController.js";
 import * as hotels from "../hotels/hotels.js";
 import * as utils from '../../utils/utilFunctions.js'
 import * as restaurants from "../restaurants/restaurant.js"
+import {api} from "../../utils/api.js"
 
 export class Destination extends Item {
     fields = [
