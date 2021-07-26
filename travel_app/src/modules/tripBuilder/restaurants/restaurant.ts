@@ -1,13 +1,16 @@
 
 import {api} from "../../utils/api.js"
+import { Destination } from "../destinations/destinations.js"
 import { Item, ItemController } from "../itemController/itemController.js"
 import {DetailsComponent} from './restaurantDetails.js'
 import {RestaurantModal} from './restaurantModal.js'
+
+import {zk} from '../../../lib/zk.js'
 // constructor function for a restaurant object
 
 var workdir =  "/static/modules/tripBuilder/restaurants"
-var getEndpoint
 var putEndpoint
+var getEndpoint
 export class Restaurant extends Item {
     fields = [
         { type: "text", key: "name", pretty: "Name" },
@@ -21,37 +24,34 @@ export class Restaurant extends Item {
     reservation
     mealType
     day
-    
+    endPoint = putEndpoint
     constructor() {
         super()
-        this.endPoint = putEndpoint
-
     }
 }
 
 // collection handler for current restaurants
 export class RestaurantsController extends ItemController{
     detailsTargetElement = "#restaurantDetailView"
-    misFits = new zk.ObservableObject([])
+    misFits = zk.makeObservable([])
     itemClass = Restaurant
     modalClass = RestaurantModal
+    fields = [
+        { type: "text", key: "name", pretty: "Name" },
+        { type: "text", key: "link", pretty: "Link" },
+        { type: "dateTime", key: "reservation", pretty: "Reservation date and time" },
+        { type: "text", key: "mealType", pretty: "Breakfast, Lunch or Dinner?" },
+        { type: "number", key: "day", pretty: "Which day?"},
+    ]
+    title = "Create Restaurants"
+    containerId = '#restaurants'
+    insertNode = "#tabContent"
+    template = "restaurant-template.html"
+    destination: Destination
+    endPoint = getEndpoint
+    workdir = workdir
     constructor(destination) {
-
-        var fields = [
-            { type: "text", key: "name", pretty: "Name" },
-            { type: "text", key: "link", pretty: "Link" },
-            { type: "dateTime", key: "reservation", pretty: "Reservation date and time" },
-            { type: "text", key: "mealType", pretty: "Breakfast, Lunch or Dinner?" },
-            { type: "number", key: "day", pretty: "Which day?"},
-        ]
-        
-        
-        let title = "Create Restaurants"
-        let containerId = '#restaurants'
-        let insertNode = "#tabContent"
-        let templateFile = "restaurant-template.html"
-        
-        super(Restaurant,getEndpoint,fields,title,containerId,templateFile,workdir, insertNode)
+        super()
         this.destination = destination
       
         for (let i = 0; i < destination.days_there; i++) {
@@ -67,7 +67,6 @@ export class RestaurantsController extends ItemController{
             }
             this.itemList.push(obj)
             this.itemList.misFits = []
-            
         }
     
     }
@@ -85,10 +84,10 @@ export class RestaurantsController extends ItemController{
     }
     async get(){
         // get data through fetch
-        var data = await api.get(this.endPoint, "GET")
+        var data = await api.get(this.endPoint)
 
         for (let item of data) {
-            let itemObject = new this.itemClass(this.endPoint)
+            let itemObject = new this.itemClass()
             Object.assign(itemObject,item)  
             this.addItemToModel(itemObject) 
         }
@@ -109,7 +108,12 @@ export class RestaurantsController extends ItemController{
         let detail = new DetailsComponent(this,this.fields, detailTitle,Restaurant,this.detailsTargetElement,"restaurantDetails-template.html",false )
         detail.render()
     }
-    async updateItem (target, source) {
+    async updateItem(target) : Promise<void>
+    async updateItem(target,source?) : Promise<void>
+    async updateItem (target, source?) {
+        if (!source) {
+            throw new Error("This")
+        }
         let dayIndex = target.day-1
         let mealType = target.mealType
 
@@ -126,8 +130,8 @@ export class RestaurantsController extends ItemController{
         target.update()
         this.addItemToModel(target)
     }
-    appendItem = async function (item) {
-        let itemObject = new this.itemClass(this.fields, this.endPoint)
+    async appendItem (item) {
+        let itemObject = new this.itemClass()
         Object.assign(itemObject, item)
         
         try {
@@ -170,8 +174,9 @@ export class RestaurantsController extends ItemController{
 }
 
 export function route(hashArray, destination) {
-    getEndpoint = `${destination.endPoint}/${destination.id}/restaurants`
-    putEndpoint = `${destination.endPoint}/${destination.id}/restaurant`
+    var endpointPrefix = `${destination.endPoint}/${destination.id}`
+    putEndpoint = endpointPrefix + "/restaurant"
+    getEndpoint = endpointPrefix + "/restaurants"
     let controller = new RestaurantsController(destination)
     controller.init()
     

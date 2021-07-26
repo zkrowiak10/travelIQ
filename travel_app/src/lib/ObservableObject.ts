@@ -1,20 +1,23 @@
-class ObservableObject {
+import {BoundElement, proxyObservable, utils, zk, ParseDOMforObservables} from './zk.js'
+import type {SubModel} from './zk'
+
+export class ObservableObject {
     receivers: BoundElement[] = [];
     transmitters: BoundElement[] = [];
     forEachComponents: BoundElement[] = [];
     subscribers: BoundElement[] = [];
-    parent: ObservableObject;
+    parent?: ObservableObject;
     dataObject: any;
     dataObjectProxy: proxyObservable;
     $model: any;
     $parentModel?: any;
     handler = {
-        get: (target: any, property: string, receiver: any) => {
+        get: (target: any, property: keyof typeof target, receiver: any) => {
 
             if (typeof target[property] == "function") {
-
                 if (target instanceof Date) {
-                    return target[property].bind(target);
+                    // @ts-ignore
+                    return target[property].bind(target); 
                 }
 
             }
@@ -36,7 +39,7 @@ class ObservableObject {
                 return true;
             }
 
-            if (property == "$model") { self[property] = value; }
+            if (property == "$model") { this[property] = value; }
             target[property] = value;
             this.updateOnStateChangeByOref(target, property);
 
@@ -44,9 +47,9 @@ class ObservableObject {
             return true;
         },
 
-        deleteProperty(target: { [x: string]: any; }, property: any) {
+        deleteProperty: (target: { [x: string]: any; }, property: any) =>{
             if (Array.isArray(target)) {
-                updateArrayOnDelete(target, property);
+                this.updateArrayOnDelete(target, property);
                 return true;
             }
             delete target[property];
@@ -80,7 +83,7 @@ class ObservableObject {
     returnTargetProperty(pathToObject: string, getParent = false) {
         let targetChild = this.dataObjectProxy;
         let splitPath = pathToObject.split('.');
-        if (splitPath[0] == "root") { targetChild = zk_self.root_model; }
+        if (splitPath[0] == "root") { targetChild = zk.root_model; }
         if (splitPath[0] == "$parentModel") {
             targetChild = this.$parentModel;
             let i = 1;
@@ -104,28 +107,11 @@ class ObservableObject {
 
         // A transmitter should always be an input element in HTML. Currently, the supported elemetns
         // Are text, date, datetime, checked
-        if (!(boundElement instanceof BoundElement)) { throw new Error('Invalid argument to initialize transmitter'); }
-
-        if (!(boundElement.DOMelement instanceof HTMLInputElement)) {
-            throw new Error(`Invalid html element binding: "${bindMode}" must be bound to an input element`);
-        }
         let target = boundElement.target;
         let property = boundElement.property;
         let updateValue = target[property];
-
-        if (boundElement.DOMelement.type == "date") {
-            if (updateValue) {
-                updateValue = new Date(updateValue);
-                try {
-                    updateValue = updateValue.toISOString().split('T')[0];
-                }
-
-                catch (err) {
-                    console.error("error converting date object", updateValue, err.message);
-                }
-            }
-
-        }
+        
+        if (!(boundElement instanceof BoundElement)) { throw new Error('Invalid argument to initialize transmitter'); }
         if (bindMode == "radio") {
             let options = boundElement.DOMelement.querySelectorAll('input');
             for (let option of options) {
@@ -141,6 +127,25 @@ class ObservableObject {
             }
             return;
         }
+        if (!(boundElement.DOMelement instanceof HTMLInputElement)) {
+            throw new Error(`Invalid html element binding: "${bindMode}" must be bound to an input element`);
+        }
+       
+
+        if (boundElement.DOMelement.type == "date") {
+            if (updateValue) {
+                updateValue = new Date(updateValue);
+                try {
+                    updateValue = updateValue.toISOString().split('T')[0];
+                }
+
+                catch (err) {
+                    console.error("error converting date object", updateValue, err.message);
+                }
+            }
+
+        }
+
 
 
         if (bindMode == "datetime-local") {
@@ -168,15 +173,16 @@ class ObservableObject {
 
         });
     }
-    updateArrayOnSet(targetArr: any[], targetProperty: string, value: any) {
+    updateArrayOnSet(targetArr: any[], targetProperty: string | number, value: any) {
 
         // locate appropriate array of bound elements in forEachComponents (this should be a 'for' element)
         // targetArr is an array part of the obj argument to observable object, this function is called when updating 
         // its Proxy object.
-        let boundElement : BoundElement
+        var boundElement : BoundElement 
 
-
-
+        // Find the correct BoundElement in the list of 'forEachComponents',
+        // which represent all arrays inside of the ObservableObject
+        // that have been bound to a for binding in the DOM.
         for (let item of this.forEachComponents) {
             if (item.target._targetObject == targetArr) {
                 boundElement = item
@@ -191,7 +197,10 @@ class ObservableObject {
             return
 
         }
-
+        if (typeof targetProperty == "string") {
+            targetProperty = Number.parseInt(targetProperty)
+        }
+        
         
         // Presence of boundElement means that this array is bound to a DOM element
         if (boundElement) {
@@ -209,10 +218,10 @@ class ObservableObject {
         
                 // creat subModel for child node observable scope and add the observable to the array
                 
-                value = new ObservableObject(value)
+                value = new ObservableObject(value).dataObjectProxy
 
                 subModel[boundElement.iteratorKey] = value
-                value.$model = subModel
+                value._observableObject.$model = subModel
                 subModel.$parentModel = this.$model
                 // Create submodel context that stores node-element pairing
                 let subModelContext = {
@@ -220,6 +229,7 @@ class ObservableObject {
                     "node": insertNode
                 }
 
+                
                 boundElement.observableChildren[targetProperty] = subModelContext
                 ParseDOMforObservables(subModel, insertNode)
             }
@@ -233,7 +243,7 @@ class ObservableObject {
                 let iteratorKey = boundElement.iteratorKey
 
                 let observableChild = boundElement.observableChildren.find((item) => {
-                    return item.subModel[iteratorKey] == value
+                    return item.subModel[iteratorKey] == value.dataObjectProxy
                 })
                 // if the inserted object is an observable, but is not currently in the bound array
                 if (!observableChild) {
@@ -256,15 +266,12 @@ class ObservableObject {
                     // Reminder: 'observableChild' refers to a subModelContext containing a submodel and a html node
                     insertNode = observableChild.node
                 }
-
-
-
             }
             // Insert node in appropriate index position
             // Get current node at that position
             let currentIndex = boundElement.DOMelement.children[targetProperty]
             if (Number(targetProperty) == boundElement.DOMelement.children.length) {
-                boundElement.appendChild(currentIndex)
+                boundElement.DOMelement.appendChild(insertNode)
             }
             else {
                 boundElement.DOMelement.insertBefore(insertNode, currentIndex)
@@ -280,11 +287,6 @@ class ObservableObject {
 
     }
 
-
-
-
-
-
     // A 'for' binder repeats the syntax in the children elements for each item in the defined iterable
     // This function must be able to control the items in the list (push/pop) and change their value if the
     // model data changes.
@@ -296,13 +298,14 @@ class ObservableObject {
         let iterableObjectPath = tempList[1].trim();
         let iterable = this.returnTargetProperty(iterableObjectPath);
         if (boundElement.DOMelement.children.length > 1) {
-            throw new Error(`'For element must have only one child at ${boundElement.DOMelement}`);
+            console.error(`For element must have only one child at`, boundElement.DOMelement)
+            return
             
         }
         let templateNode = boundElement.DOMelement.removeChild(boundElement.DOMelement.children[0]);
 
         if (!(templateNode instanceof HTMLElement)) {
-            throw new Error("Template node must be instance of HTMLElement"));
+            throw new Error("Template node must be instance of HTMLElement");
             
         }
         // The current bound element is the 'for' parent element containing the iterated objects
@@ -338,7 +341,7 @@ class ObservableObject {
 
 
 
-            subModel[iteratorKey] = newObj;
+            subModel[iteratorKey] = newObj.dataObjectProxy;
             subModel.$parentModel = this.$model;
             newObj.$model = subModel;
 
@@ -357,15 +360,17 @@ class ObservableObject {
             boundElement.observableChildren.push(subModelContext);
 
             // replace array item with its observable version
-            iterable[index++] = newObj.getProxy();
+            iterable[index++] = newObj.dataObjectProxy;
         }
 
         this.forEachComponents.push(boundElement);
     }
-    updateArrayOnDelete(targetArr: { [x: string]: any; }, targetProperty: string) {
+    updateArrayOnDelete(targetArr: { [x: string]: any; }, targetProperty: string | number) {
         let boundElement : BoundElement
 
-        if (Number.parseInt(targetProperty) == NaN) { throw new Error("Array index must be an integer value")} 
+        if (typeof targetProperty == "string"){
+            if (Number.parseInt(targetProperty) == NaN) { throw new Error("Array index must be an integer value")} 
+        }
         
         for (let item of this.forEachComponents) {
             if (item.target._targetObject == targetArr) {
@@ -373,6 +378,10 @@ class ObservableObject {
                 break
             }
         }
+        if (typeof targetProperty == "string") {
+            targetProperty = Number.parseInt(targetProperty)
+        }
+        
 
         // Presence of boundElement means that this array is bound to a DOM element
         if (boundElement) {
@@ -390,10 +399,126 @@ class ObservableObject {
 
 
     }
+    // function to register an element, perform any intialization,a nd add to appropriate array
+    registerElement (bindMode: string, boundElement: BoundElement) {
+        let objectPath : string
+        var callBackPath : string
+        var attr : string
+        var binding : string
+        var targetPath :string
+        switch (bindMode) {
+            case "text":
+            case "checked":
+            case "radio":
+            case "date":
+                this.transmitters.push(boundElement)
+                let oRefPath = utils.prepareObjectPath(boundElement.objectPath)
+                boundElement.target = utils.returnTargetProperty(this.dataObjectProxy, oRefPath, true)
+                var splitPath = boundElement.objectPath.split(".")
+                boundElement.property = splitPath[(splitPath.length - 1)]
+                this.initializeTransmitter(boundElement, bindMode)
+                break
+
+            case 'format':
+                // format binds have syntax "format: objectPath|callbackFunction"
+                [objectPath, callBackPath] = boundElement.objectPath.split('|')
+                try {
+                    boundElement.updateCallback = utils.returnTargetProperty(this.dataObjectProxy, callBackPath)
+                }
+                catch (err) {
+                    console.error(err.message)
+                }
+                boundElement.objectPath = objectPath
+            case "value":
+
+                targetPath = utils.prepareObjectPath(boundElement.objectPath)
+                boundElement.target = utils.returnTargetProperty(this.dataObjectProxy, targetPath, true)
+                splitPath = boundElement.objectPath.split(".")
+                boundElement.property = splitPath[(splitPath.length - 1)]
+                this.receivers.push(boundElement)
+                boundElement.update()
+                break
+
+            case "attr":
+                // attr bindings follow syntax "attr: targetAttr|binding"
+                [attr, binding, callBackPath] = boundElement.objectPath.split('|')
+                if (callBackPath) {
+                    try {
+                        boundElement.updateCallback = utils.returnTargetProperty(this.dataObjectProxy, callBackPath)
+                    }
+                    catch (err) {
+                        console.error(err.message)
+                    }
+                }
+
+                boundElement.objectPath = binding
+                splitPath = boundElement.objectPath.split(".")
+                boundElement.property = splitPath[(splitPath.length - 1)]
+                targetPath = utils.prepareObjectPath(boundElement.objectPath)
+                boundElement.target = utils.returnTargetProperty(this.dataObjectProxy, targetPath, true)
+                splitPath = boundElement.objectPath.split(".")
+                this.receivers.push(boundElement)
+                boundElement.attr = attr
+                boundElement.update()
+                break
+            case "for":
+                this.initializeForeach(boundElement)
+                break
+            case "hidden":
+                targetPath = utils.prepareObjectPath(boundElement.objectPath)
+                boundElement.target = utils.returnTargetProperty(this.dataObjectProxy, targetPath, true)
+                splitPath = boundElement.objectPath.split(".")
+                boundElement.property = splitPath[(splitPath.length - 1)]
+                this.receivers.push(boundElement)
+                boundElement.update = function () {
+                    boundElement.DOMelement.hidden = boundElement.target[boundElement.property]
+                }
+                boundElement.update()
+                break
+
+            case "visible":
+                targetPath = utils.prepareObjectPath(boundElement.objectPath)
+                boundElement.target = utils.returnTargetProperty(this.dataObjectProxy, targetPath, true)
+                splitPath = boundElement.objectPath.split(".")
+                boundElement.property = splitPath[(splitPath.length - 1)]
+
+                this.receivers.push(boundElement)
+                boundElement.update = function () {
+                    boundElement.DOMelement.hidden = !boundElement.target[boundElement.property]
+                }
+                boundElement.update()
+                break
+        }
+    }
+    //  subscribe(eventTypes, target, property, callback) {
+    // this.eventTypes = eventTypes
+    // this.target = target
+    // this.property = property
+    // this.callback = callback
+
+    // if (!(target instanceof zk.ObservableObject)) {
+    //     throw new Error("Invalid subscription target. Subscribe must be called on an ObservableObject")
+    // }
+
+    // if (!target._subscribers) {
+    //     target._subscribers = []
+    // }
+    // target._subscribers.push(this)
+    // this.applyCallbacks(eventType) = function() {
+    //     if (!callback){return}
+
+    //     if (eventTypes.includes(eventTypes)) {
+    //         callback(eventType, target)
+    //     }
+            
+    // }
+
 }
 
-function makeObservable(obj:any , parent? : proxyObservable ) {
+
+export function makeObservable(obj:any , parent? : proxyObservable ) {
     
     var observable = new ObservableObject(obj)
     return observable.getProxy()
 }
+

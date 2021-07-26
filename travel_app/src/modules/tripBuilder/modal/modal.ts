@@ -1,36 +1,41 @@
 var workdir =  "/static/modules/tripBuilder/modal"
-export class Modal {
-    fields
-    title
-    html
-    target
-    parent
-    templateFile = "modal-template.html"
-    constructor(parent, fields, title, target, update) {
-        
+import type {fieldsArray, } from '../itemController/itemController.js'
+import {ItemController, Item} from '../itemController/itemController.js'
+import {zk} from '../../../lib/zk.js'
 
-        this.target = target ? target : {}
-        for (let field of fields) {
+interface Iparent extends ItemController{}
+
+export class Modal {
+    html: HTMLDivElement
+    templateFile = "modal-template.html"
+    workdir = "/static/modules/tripBuilder/modal"
+    target? : Item 
+    constructor(
+        public parent: ItemController,
+        public fields: fieldsArray,
+        public title: string, 
+        public update: boolean, 
+        target? : Item 
+    ){
+        this.target = target ? target : new parent.itemClass()
+        for (let field of this.fields) {
             // undefined, or value of target
             if (target) {
                 if (field.key in target) {
                     field.value = target[field.key]
                 }
             }
-            
-            else {
+            if (!update) {
                 field.value = undefined
             }
             field.id = `modal-${field.key}`
         }
-        this.fields = new zk.ObservableObject(fields)
-        this.title = title
-        this.parent = parent
-        this.update = update
-        this.workdir = workdir
+        
+        this.fields = zk.makeObservable(fields)
+  
     }
 
-    async render(obj) {
+    async render() {
         var template = await fetch(`${this.workdir}/${this.templateFile}`, { headers: { "Content-Type": "text/html" } })
         var text = await template.text()
         this.html = document.createElement('div')
@@ -43,42 +48,21 @@ export class Modal {
         zk.initiateModel(this, this.html)
     }
 
-
     async delete () {
         if (this.target) {
             this.parent.deleteItem(this.target)
             this.close()
-
-
         }
-    }
-
-    showCreate() {
-        this.clear()
-        this.show()
     }
 
     close () {
         this.html.remove()
     }
 
-
     async save () {
 
         for (let field of this.fields) {
-            let key = field.key
-
-            // this enables one level of object nesting for generic form use. For deeper nesting,
-            // I would prefer to use sub-components.
-            if (field.parent) {
-                if(!this.target[field.parent]){
-                    this.target[field.parent] = {}
-                }
-                
-                this.target[field.parent][key] = field.value
-                
-                continue
-            }
+            let key = field.key  
             this.target[key] = field.value
             if (field.type == "date") {
                 try {

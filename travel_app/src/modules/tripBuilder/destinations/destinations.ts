@@ -2,6 +2,8 @@ import { ItemController, Item} from "../itemController/itemController.js";
 import * as hotels from "../hotels/hotels.js";
 import * as utils from '../../utils/utilFunctions.js'
 import * as restaurants from "../restaurants/restaurant.js"
+import {api} from "../../utils/api.js"
+
 export class Destination extends Item {
     fields = [
         { type: "text", key: "name", pretty: "Name" },
@@ -11,18 +13,17 @@ export class Destination extends Item {
         
     ]
     focused = false
-    
-    constructor(trip_id){
+    trip_id : number = utils.g.trip.id
+    name : string
+    days_there : number
+    notes : string
+    trip_order :number
+    id : number 
+    endPoint = `/ajax/trip/${this.trip_id}/destination`
+    constructor(){
         super()
-        this.trip_id = trip_id
-        
-        this.endPoint = `/ajax/trip/${utils.g.trip.id}/destination`
-        var linkPaths = `#trip/${utils.g.trip.id}/destination/${this.id}`
-
-    
-        
     }
-    toggleFocus(item) {
+    toggleFocus(item : this) {
         item.focused = !item.focused
     }
     get links() {
@@ -35,11 +36,10 @@ export class Destination extends Item {
         return links
     }
     async save() {
-        var data = this.stringify()
+        var data = JSON.stringify(this)
         // try {
         var response = await api.post(this.endPoint, data)
         this.id = response.id
-        this.makeLinks()
         return response
     }
    
@@ -51,16 +51,15 @@ export class DestinationsController extends ItemController {
         { type: "textarea", key: "notes", pretty: "Notes" },
         { type: "number", key: "trip_order", pretty: "Order in Trip"}
     ]
+    endPoint = "/ajax/trip/" + utils.g.trip.id  + "/destinations"
+    containerId = '#destinations'
+    title = "Destinations"
+    template = "destinations-template.html"
+    workdir = "/static/modules/tripBuilder/destinations"
+    insertNode = "#left-sidebar"
+    itemClass= Destination
     constructor(){
-        super()
-        this.endPoint = "/ajax/trip/" + utils.g.trip.id  + "/destinations"
-        this.containerId = '#destinations'
-        this.title = "Destinations"
-        this.template = "destinations-template.html"
-        this.workdir = "/static/modules/tripBuilder/destinations"
-        this.insertNode = "#left-sidebar"
-        this.itemClass= Destination
-        
+        super()    
     }
     findDestinationByID(destID) {
         return this.itemList.find(dest => dest.id == destID)
@@ -88,7 +87,7 @@ export async function route(hashArray) {
         next = hashArray.shift()
     }
     else {
-        alert("page not found: ", next)
+        
         console.log(next)
     }
     let destination = destinationsController.findDestinationByID(next)

@@ -24,7 +24,7 @@ var api = {
                 "body":  body 
             })
             if (!response.ok) {
-                throw new Error("Something went wrong: ", response.status, response.message)
+                throw new Error("Something went wrong: " + response.status + response.statusText)
             }
             var json = await response.json()        
             return json

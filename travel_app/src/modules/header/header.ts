@@ -1,6 +1,6 @@
 import {api} from '../utils/api.js'
 import * as utils from '../utils/utilFunctions.js'
-
+import {zk} from '../../lib/zk.js'
 
 export class Header {
     trips
@@ -13,27 +13,40 @@ export class Header {
     currentTrip 
     g
     constructor(){
-        this.trips = new zk.ObservableObject([])
-        this.messages = new zk.ObservableObject([])
+        this.trips = zk.makeObservable([])
+        this.messages = zk.makeObservable([])
         this.g = utils.g
     }
    async get() {
 
         //get data through fetch
-        var data = await api.get(this.endPoint, "GET")
+        var data = await api.get(this.endPoint)
         while (this.trips.length > 0) {
             this.trips.pop()
         }
         if (location.hash != "#trips") {
             if (data.length == 0) {
-                document.querySelector('#noTrips').hidden = false
+                var element = document.querySelector('#noTrips')
+                if (element instanceof HTMLElement) {
+                    element.hidden = false
+                }
+                
             }
             else  if (!this.g.trip.isDefined) {
-                document.querySelector('#selectTrip').hidden = false
+             element = document.querySelector('#selectTrip')
+             if (element instanceof HTMLElement) {
+                element.hidden = false
+            }
             } 
             else {
-                document.querySelector('#noTrips').hidden = true
-                document.querySelector('#selectTrip').hidden = true
+                element = document.querySelector('#noTrips')
+                if (element instanceof HTMLElement) {
+                    element.hidden = true
+                }
+                element = document.querySelector('#selectTrip')
+                if (element instanceof HTMLElement) {
+                    element.hidden = true
+                }
             }
         }
         

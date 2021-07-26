@@ -1,18 +1,22 @@
 import { Modal } from "../modal/modal.js";
 import {RestaurantsController,Restaurant} from "./restaurant.js"
-
+import {zk} from '../../../lib/zk.js'
+import { ItemController, fieldsArray, Item } from "../itemController/itemController.js";
 export class RestaurantModal extends Modal {
     workdir = "/static/modules/tripBuilder/restaurants"
     templateFile = "restaurantModal-template.html"
-    tempObj
     destination
-    constructor(parent, fields, title, target, update) {
-        super(parent, fields, title, target, update)
-        this.tempObj = {}
+    parent
+    tempObj = {}
+    constructor(parent: ItemController, fields: fieldsArray, title: string, update: boolean, target: Item) {
+        super(parent, fields, title, update, target)
+        if (!(parent instanceof RestaurantsController)) {
+            throw new Error('Cannot create restaurante modal with non-Restaurant controller')
+        }
         for (let field of fields){
             this.tempObj[field.key] = (target)? target[field.key] : undefined
         }
-        this.tempObj = new zk.ObservableObject(this.tempObj)
+        this.tempObj = zk.makeObservable(this.tempObj)
         if (target) {
             Object.assign(this.tempObj, target)
         }
@@ -24,7 +28,7 @@ export class RestaurantModal extends Modal {
 
         
         for (let field of this.fields) {
-            
+            var key = field.key
             if (field.type == "date") {
                 try {
                     this.tempObj[key] = new Date(this.tempObj[key])

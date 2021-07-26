@@ -1,4 +1,5 @@
-var workdir =  "/static/modules/tripBuilder/hotels"
+import {zk} from '../../../lib/zk.js'
+var workdir =  "/static/modules/tripBuilder/restaurants"
 
 export class DetailsComponent {
 
@@ -8,14 +9,16 @@ export class DetailsComponent {
     target
     templateFile
     update
+    targetElement
+    controller
     constructor(controller, fields, title, target, targetElement, templateFile, update) {
 
-        this.fields = new zk.ObservableObject(fields)
+        this.fields = zk.makeObservable(fields)
         this.title =  title
         this.html
         this.target = (target) ? target : {}
         this.templateFile = templateFile
-        this.update = new zk.ObservableObject(update)
+        this.update = zk.makeObservable(update)
         this.targetElement = targetElement
         this.controller = controller
     }
@@ -31,17 +34,11 @@ export class DetailsComponent {
 
 
     async delete () {
-        if (target) {
-            parent.deleteItem(target)
+        if (this.target) {
+            this.controller.deleteItem(this.target)
             this.close()
                 }
         }
-
-    showCreate() {
-        this.clear()
-        this.show()
-     }
-
      close() {
         this.html.remove()
     }
@@ -49,18 +46,18 @@ export class DetailsComponent {
 
      async save () {
 
-        for (let field of that.formModel.fields) {
-            key = field.key
-            target[key] = that.formModel.tempObj[key]
+        for (let field of this.fields) {
+            var key = field.key
+            
             if (field.type == "date") {
-                target[key] = new Date(that.formModel.tempObj[key])
+                this.target[key] = new Date(this.target[key])
             }
 
 
             }
-        if (update) {
+        if (this.update) {
             try {
-                target.update()
+                this.target.update()
             }
             catch (err) {
                 console.error("error: ", err.message)

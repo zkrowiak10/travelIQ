@@ -1,5 +1,5 @@
 export {logging, formatDate}
-
+import {zk} from '../../lib/zk.js'
 function logging(...args) {
     console.log(...args)
 }
@@ -41,7 +41,7 @@ export function formatPrice(price) {
     let str = "$" + price.toFixed(2)
     return str
 }
-export const g = new zk.ObservableObject({
+export const g = zk.makeObservable({
     trip: {
         name : "",
         isDefined: false,

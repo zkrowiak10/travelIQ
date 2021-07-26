@@ -1,5 +1,6 @@
 
 import {api} from "../../utils/api.js"
+import { Destination } from "../destinations/destinations.js"
 import { Item, ItemController } from "../itemController/itemController.js"
 import {DetailsComponent} from './hotelDetails.js'
 // constructor function for a Hotel object
@@ -34,37 +35,37 @@ export class Hotel extends Item {
     constructor() {
         super()
         this.endPoint = putEndpoint
-
     }
 }
 
 // collection handler for current hotels
 class HotelsController extends ItemController{
     detailsTargetElement = "#hotelDetailView"
+    fields = [
+        { type: "text", key: "name", pretty: "Name" },
+        { type: "text", key: "link", pretty: "Link" },
+        { type: "date", key: "check_in", pretty: "Check In Date" },
+        { type: "date", key: "check_out", pretty: "Check Out Date" },
+        { type: "checkbox", key: "refundable", pretty: "Refundable Reservation?" },
+        { type: "date", key: "cancellation_date", pretty: "Last Day to Cancel" },
+        { type: "number", key: "rate", pretty: "Nightly Rate" },
+        { type: "checkbox", key: "breakfast_included", pretty: "Breakfast Included?" },
+        { type: "text", key: "address", pretty: "Address"},
+        { type: "text", key: "city", pretty: "City"},
+        { type: "tel", key: "phone", pretty: "Phone"},
+    ]
+    title = "Create Hotel"
+    containerId = '#hotels'
+    insertNode = "#tabContent"
+    template = "hotels-template.html"
+    workdir = workdir
+    destination : Destination
+    endPoint = getEndpoint
+    itemClass = Hotel
     constructor(destination) {
-
-        var fields = [
-            { type: "text", key: "name", pretty: "Name" },
-            { type: "text", key: "link", pretty: "Link" },
-            { type: "date", key: "check_in", pretty: "Check In Date" },
-            { type: "date", key: "check_out", pretty: "Check Out Date" },
-            { type: "checkbox", key: "refundable", pretty: "Refundable Reservation?" },
-            { type: "date", key: "cancellation_date", pretty: "Last Day to Cancel" },
-            { type: "number", key: "rate", pretty: "Nightly Rate" },
-            { type: "checkbox", key: "breakfast_included", pretty: "Breakfast Included?" },
-            { type: "text", key: "address", pretty: "Address"},
-            { type: "text", key: "city", pretty: "City"},
-            { type: "tel", key: "phone", pretty: "Phone"},
-        ]
-        
-        
-        let title = "Create Hotel"
-        let containerId = '#hotels'
-        let insertNode = "#tabContent"
-        let templateFile = "hotels-template.html"
-        
-        super(Hotel,getEndpoint,fields,title,containerId,templateFile,workdir, insertNode)
+        super()
         this.destination = destination
+        
     
     }
     showDetails(hotel){
