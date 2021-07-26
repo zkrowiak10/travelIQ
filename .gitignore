@@ -10,7 +10,12 @@ migrations/__pycache__
 migrations/versions/__pycache__/* 
 migrations/versions/__pycache__/213c269d55a0_.cpython-37.pyc
 migrations/versions/__pycache__/213c269d55a0_.cpython-37.pyc
+<<<<<<< HEAD
 
 instance/*
 
+=======
+instance/*
+postgres-data/*
+>>>>>>> master
 .env

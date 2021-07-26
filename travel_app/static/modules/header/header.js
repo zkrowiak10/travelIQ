@@ -4,17 +4,15 @@ import * as utils from '../utils/utilFunctions.js'
 
 export class Header {
     trips
-    messages
     endPoint = "/ajax/trips"
     insertNode = "#header"
     workdir = "/static/modules/header"
     template = "navBar-template.html"
     html
     currentTrip 
-    g
+    g // attach reference to utils.g to instance for easy access.
     constructor(){
         this.trips = new zk.ObservableObject([])
-        this.messages = new zk.ObservableObject([])
         this.g = utils.g
     }
    async get() {

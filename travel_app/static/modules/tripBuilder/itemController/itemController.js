@@ -1,64 +1,63 @@
 import {api} from "../../utils/api.js"
 import {Modal} from "../modal/modal.js"
 
-// constructor function for a item object
+// Item and ItemController are abstract classes to store and manage collections of data
+// They also will dynamically render collections using a template file.
 
 var workdir =  "/static/modules/tripBuilder/destinations"
 export class Item {
+    endPoint
     constructor( endPoint) {
-
-        var that = this
-        
         this.endPoint = endPoint
-        this.update = async function () {
-            var data = JSON.stringify(this)
-            endPoint = `${this.endPoint}/${this.id}`
-            var response = await api.patch(endPoint, data)
-            // will need to process potential erros down the road
-            if (response.status != 200) {
-                alert('something went wrong')
-            }
-
-        },
-
-            //creates new item on server and returns json of created resource
-            // with id attribute
-        this.save = async function () {
-            var data = JSON.stringify(this)
-            // try {
-            var response = await api.post(this.endPoint, data)
-            this.id = response.id
-            return response
+    }
+    async update () {
+        var data = JSON.stringify(this)
+        var endPoint = `${this.endPoint}/${this.id}`
+        var response = await api.patch(endPoint, data)
+        // will need to process potential erros down the road
+        if (response.status != 200) {
+            alert('something went wrong')
         }
 
-        // this.stringify = function () {
-        //     let obj = {}
-        //     console.log(this)
-        //     for (let field of this.fields) {
-        //         obj[field.key] = this[field.key]
-        //     }
-        //     obj.id = (null || this.id)
-        //     return JSON.stringify(obj)
-        // }
-        this.delete = async function () {
-            var body = JSON.stringify(this)
-            endPoint = `${this.endPoint}/${this.id}`
-            var response = await api.delete(endPoint, body)
-            if (response.status != 200) {
-                throw Error("Resource not deleted")
-            }
-            return response
+    }
+
+    //creates new item on server and returns json of created resource
+    // with id attribute
+    async save () {
+        var data = JSON.stringify(this)
+        // try {
+        var response = await api.post(this.endPoint, data)
+        this.id = response.id
+        return response
+    }
+
+    async delete () {
+        var body = JSON.stringify(this)
+        endPoint = `${this.endPoint}/${this.id}`
+        var response = await api.delete(endPoint, body)
+        if (response.status != 200) {
+            throw Error("Resource not deleted")
         }
+        return response
     }
 }
 
-// collection handler for item collection
+// Abstract handlerfor item collection
 export class ItemController {
-    modalClass = Modal
-    
+    // Item creation/editing is defaulted to use a modal. This can be overridden in 
+    // descendents
+    itemList
+    endPoint
+    fields
+    title
+    containerId
+    html
+    template
+    workdir
+    insertNode
+    modalClass = Modal 
     constructor(itemClass, endPoint, fields, title, containerId, templateFile, workdir, insertNode)
     {
-        var that = this
         this.itemClass = (itemClass)? itemClass : Item
         this.itemList = new zk.ObservableObject([])
         this.endPoint = endPoint
@@ -67,7 +66,7 @@ export class ItemController {
         this.containerId = containerId
         this.html
         this.template =templateFile
-        this.workdir = workdir
+        this.workdir = workdir // path to current directory for fetching the template file
         this.insertNode = insertNode
         
     }
@@ -122,9 +121,9 @@ export class ItemController {
             this.itemList.push(itemObject)
             this.onListChange()
         }
-    // abstract method
+    // abstract optional callback  
     onListChange() {
-        return true
+        return 
     }
     async updateItem (item) {
         await item.update()
@@ -144,10 +143,6 @@ export class ItemController {
         catch (err){
             console.error("error", err.message)
         }
-     
-            
-            
-        
     }
 }
 

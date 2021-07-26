@@ -1,4 +1,6 @@
-var workdir =  "/static/modules/tripBuilder/modal"
+var workdir = "/static/modules/tripBuilder/modal"
+
+// Creates a popup to add/edit data
 export class Modal {
     fields
     title
@@ -7,8 +9,6 @@ export class Modal {
     parent
     templateFile = "modal-template.html"
     constructor(parent, fields, title, target, update) {
-        
-
         this.target = target ? target : {}
         for (let field of fields) {
             // undefined, or value of target
@@ -17,7 +17,7 @@ export class Modal {
                     field.value = target[field.key]
                 }
             }
-            
+
             else {
                 field.value = undefined
             }
@@ -44,12 +44,10 @@ export class Modal {
     }
 
 
-    async delete () {
+    async delete() {
         if (this.target) {
             this.parent.deleteItem(this.target)
             this.close()
-
-
         }
     }
 
@@ -58,25 +56,23 @@ export class Modal {
         this.show()
     }
 
-    close () {
+    close() {
         this.html.remove()
     }
 
-
-    async save () {
-
+    async save() {
         for (let field of this.fields) {
             let key = field.key
 
             // this enables one level of object nesting for generic form use. For deeper nesting,
             // I would prefer to use sub-components.
             if (field.parent) {
-                if(!this.target[field.parent]){
+                if (!this.target[field.parent]) {
                     this.target[field.parent] = {}
                 }
-                
+
                 this.target[field.parent][key] = field.value
-                
+
                 continue
             }
             this.target[key] = field.value
@@ -108,7 +104,6 @@ export class Modal {
         }
 
         this.parent.appendItem(this.target)
-
         this.close()
-    }  
+    }
 }

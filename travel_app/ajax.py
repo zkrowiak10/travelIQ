@@ -1,43 +1,43 @@
-from operator import mod
-import re
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app, jsonify, abort, Response
 )
 import logging
-import functools
-
-from travel_app import models, urls, utils
+from travel_app import models, urls, utils, auth
 import logging
 
-login_required = urls.login_required
+login_required = auth.login_required
 
+# API Routes.
 ajax = Blueprint('ajax', __name__, url_prefix='/ajax')
 
+# TODO: Lots of repeated procedures. Create generalized utility methods using the API class before
+# adding additionaly routes
 
 @ajax.route('/trip/<trip_id>', methods=('PATCH','DELETE'))
 @login_required
 def change_trips(trip_id):
     data = request.get_json()
     trip = models.Trip.query.filter_by(id=trip_id).first()
+    if not trip:
+        abort(404)
     if request.method == 'PATCH':
         try:            
             trip.update(data)
             models.db.session.add(trip)
             models.db.session.commit()
+            return Response('updated', 200) 
         except Exception as e:
             logging.error("Exception in editing trip: {}".format(e))
-            flash('something went wrong: {}'.format(e))
-        return Response('updated', 200) 
+            abort(400)
+        
     if request.method == 'DELETE':
-        data = request.get_json()
         try:
-            models.db.session.delete(trip)
+            models.db.session.delete(trip) #TODO: Cascade delete implementation
             models.db.session.commit()
+            return Response('deleted', 200)
         except Exception as e:
             logging.error("Exception in deleting trip: {}".format(e))
-            flash('something went wrong: {}'.format(e))
-        return Response('deleted', 200)
-
+        
 @ajax.route('/trips',methods=('GET',))
 @login_required
 def trips():
@@ -46,13 +46,12 @@ def trips():
         data = utils.API.serializeList(trips)
         return jsonify(data)
 
-    
-    
-
 @ajax.route('/trip', methods=('POST',))
 @login_required
 def add_trip():
     data = request.get_json()
+
+    # TODO: Line below is repeated often: sanitize data before instantiating ORM record
     data = {key: data[key] for key in data if key in models.Trip.__dict__ }
     trip = models.Trip(**data)
     try:
@@ -90,6 +89,8 @@ def destinations(trip_id):
 def destination(trip_id):
             
     currentTrip = models.Trip.query.filter_by(id=trip_id).first()
+    #TODO: Validate user is authorized for this operation.
+
     #if POST add new destination
     if request.method == "POST":
         try:
@@ -97,24 +98,19 @@ def destination(trip_id):
             data = {key:data[key] for key in data if key in models.Destination.__dict__}
             logging.debug("request data: " + str(data))
             logging.debug('setting trip_id: ' + str(trip_id))
-            # if data['trip_id'] is not None:
-            #     trip_id = data['trip_id']
-            #     logging.debug('resetting trip_id: ' + str(trip_id))
             
             # need to improve constructor to take all fields
             dest = models.Destination(**data)
             currentTrip.destinations.append(dest)
             models.db.session.commit()
             data = {"id": dest.id}
-            logging.info('created trip: ' + str(dest.name)+ "with id: " + str(data['id']))
+            logging.debug('created trip: ' + str(dest.name)+ "with id: " + str(data['id']))
+            return jsonify(data), 201
+
         except Exception as e:
             logging.error("There was an error in loading json POST request: " + str(e))
-            
-            return abort(400)
-        return jsonify(data), 201
+            return abort(500) #TODO: improve status codes by using better except blocks
         
-        
-
     #if PATCH update resource
     if request.method == "PATCH":
         try:
@@ -122,7 +118,7 @@ def destination(trip_id):
             
             logging.debug("patching data from dict: " + str(data))
             if not data['id']:
-                raise Exception("No trip id")
+                abort(400)
             
             dest = models.Destination.query.filter_by(id = data['id']).first()
 
@@ -131,21 +127,15 @@ def destination(trip_id):
                 return abort(401)
             
             dest.update(data)
-            logging.debug("this is the edited notes" + str(dest.notes))
-            
-            # dest.name = data['name']
-            # dest.notes = data['notes']
-            # dest.trip_order = data['trip_order']
-            
+
             models.db.session.add(dest)
             models.db.session.commit()
+
             return Response("updated",200)
         except Exception as e:
             logging.error("There was an error in loading json PATCH: " + str(e))
             return abort(400)
         
-
-    #if DELETE delete resource
     if request.method == "DELETE":
         # check auth
         try:
@@ -171,17 +161,18 @@ def destination(trip_id):
 @login_required
 def destinationUpdates(trip_id, dest_id):
 
-    trips = models.UserTripPair.getTripsByUser(g.user)
-            
     currentTrip = models.Trip.query.filter_by(id=trip_id).first()
     
     data = request.get_json()
             
     logging.debug("patching data from dict: " + str(data))
     if not data['id']:
-        raise Exception("No trip id")
+        abort(400)
     
     dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
+    if not dest:
+        abort(404)
+
     if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
         # if not OAUTH():
         return abort(401)
@@ -189,14 +180,7 @@ def destinationUpdates(trip_id, dest_id):
     #if PATCH update resource
     if request.method == "PATCH":
         try:
-            
             dest.update(data)
-            logging.debug("this is the edited notes" + str(dest.notes))
-            
-            # dest.name = data['name']
-            # dest.notes = data['notes']
-            # dest.trip_order = data['trip_order']
-            
             models.db.session.add(dest)
             models.db.session.commit()
             return Response("updated",200)
@@ -207,28 +191,32 @@ def destinationUpdates(trip_id, dest_id):
 
     #if DELETE delete resource
     if request.method == "DELETE":
-        # check auth
         try:            
             models.db.session.delete(dest)
             models.db.session.commit()
+            return Response("Deleted", 200)
         except Exception as e:
             logging.error("There was an error in loading json DELETE request: " + str(e))
             return abort(400)
         
-        return Response("Deleted", 200)
+        
 
 @ajax.route('/trip/<trip_id>/destination/<dest_id>/hotels', methods=('GET',))
 @login_required
 def getHotels(trip_id,dest_id):
 
-    trips = models.UserTripPair.getTripsByUser(g.user)
+    #TODO: add try/except blocks
     currentTrip = models.Trip.query.filter_by(id=trip_id).first()
     dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
+    if not dest:
+        abort(404)
 
-    logging.debug(models.UserTripPair.getUsersByTrip(currentTrip)[0])
     if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
         # if not OAUTH():
         return abort(401)
+    if dest not in currentTrip.destinations:
+        return abort(401)
+
     data = dest.hotels
     serial = utils.API.serializeList(data)
 
@@ -237,32 +225,44 @@ def getHotels(trip_id,dest_id):
 @ajax.route('/trip/<trip_id>/destination/<dest_id>/hotel', methods=('POST',))
 @login_required
 def addHotel(trip_id,dest_id):
-    trips = models.UserTripPair.getTripsByUser(g.user)
     currentTrip = models.Trip.query.filter_by(id=trip_id).first()
     dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
+    if not dest:
+        abort(404)
+
     if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
         # if not OAUTH():
         return abort(401)
+    if dest not in currentTrip.destinations:
+        return abort(401)
+    
     data = request.get_json()
-    logging.debug(data)
     data = {key: data[key] for key in data if key in  models.Hotel_Reservation.__dict__}
     hotel = models.Hotel_Reservation(**data)
     dest.hotels.append(hotel)
     models.db.session.commit()
     data = {"id": hotel.id}
-    logging.debug("response" + str(data))
     return  jsonify(data), 201
 
 @ajax.route('/trip/<trip_id>/destination/<dest_id>/hotel/<hotel_id>', methods=( 'PATCH', 'DELETE'))
 @login_required
 def changeHotel(trip_id, dest_id,hotel_id ):
-    trips = models.UserTripPair.getTripsByUser(g.user)
     currentTrip = models.Trip.query.filter_by(id=trip_id).first()
     dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
+    if not dest:
+        abort(404)
     hotel = [hotel for hotel in dest.hotels if hotel.id == int(hotel_id)][0]
+    if not hotel:
+        abort(404)
+    if not dest:
+        abort(404)
+
     if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
         # if not OAUTH():
         return abort(401)
+    if dest not in currentTrip.destinations:
+        return abort(401)
+
     if request.method == "PATCH":
         hotel.update(request.get_json())
         models.db.session.commit()
@@ -273,7 +273,70 @@ def changeHotel(trip_id, dest_id,hotel_id ):
         models.db.session.commit()
     return Response("Deleted", 200)
 
+@ajax.route('/trip/<trip_id>/destination/<dest_id>/restaurants', methods=('GET',))
+@login_required
+def getRestaurants(trip_id,dest_id):
 
+    currentTrip = models.Trip.query.filter_by(id=trip_id).first()
+    dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
+    if not dest:
+        abort(404)
+
+    if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
+        # if not OAUTH():
+        return abort(401)
+    data = dest.restaurants
+    serial = utils.API.serializeList(data)
+
+    return jsonify(serial)
+
+@ajax.route('/trip/<trip_id>/destination/<dest_id>/restaurant', methods=('POST',))
+@login_required
+def addRestaurant(trip_id,dest_id):
+    currentTrip = models.Trip.query.filter_by(id=trip_id).first()
+    dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
+    if not dest:
+        abort(404)
+
+    if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
+        # if not OAUTH():
+        return abort(401)
+
+    data = request.get_json()
+    data = {key: data[key] for key in data if key in  models.Restaurant.__dict__}
+
+    restaurant = models.Restaurant(**data)
+    dest.restaurants.append(restaurant)
+    models.db.session.commit()
+    data = {"id": restaurant.id}
+    return  jsonify(data), 201
+
+@ajax.route('/trip/<trip_id>/destination/<dest_id>/restaurant/<restaurant_id>', methods=( 'PATCH', 'DELETE'))
+@login_required
+def changerRstaurant(trip_id, dest_id,restaurant_id):
+    currentTrip = models.Trip.query.filter_by(id=trip_id).first()
+    dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
+    if not dest:
+        abort(404)
+    restaurant = [restaurant for restaurant in dest.restaurants if restaurant.id == int(restaurant_id)][0]
+    if not restaurant:
+        abort(404)
+
+    if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
+        # if not OAUTH():
+        return abort(401)
+    if request.method == "PATCH":
+        restaurant.update(request.get_json())
+        models.db.session.add(restaurant)
+        models.db.session.commit()
+        return Response("updated",200)
+        
+    if request.method =="DELETE":
+        models.db.session.delete(restaurant)
+        models.db.session.commit()
+    return Response("Deleted", 200)
+
+# The following routes are not currently in use and will need to be updated.
 @ajax.route('/flights', methods=('GET', 'POST', 'PATCH', 'DELETE'))
 @login_required
 def flights():
@@ -286,59 +349,3 @@ def rentals():
     api = utils.API(models.Car_Rental)
     return api.api_driver(request)
 
-@ajax.route('/trip/<trip_id>/destination/<dest_id>/restaurants', methods=('GET',))
-@login_required
-def getRestaurants(trip_id,dest_id):
-
-    trips = models.UserTripPair.getTripsByUser(g.user)
-    currentTrip = models.Trip.query.filter_by(id=trip_id).first()
-    dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
-
-    logging.debug(models.UserTripPair.getUsersByTrip(currentTrip)[0])
-    if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
-        # if not OAUTH():
-        return abort(401)
-    data = dest.restaurants
-    serial = utils.API.serializeList(data)
-
-    return jsonify(serial)
-
-@ajax.route('/trip/<trip_id>/destination/<dest_id>/restaurant', methods=('POST',))
-@login_required
-def addRestaurant(trip_id,dest_id):
-    trips = models.UserTripPair.getTripsByUser(g.user)
-    currentTrip = models.Trip.query.filter_by(id=trip_id).first()
-    dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
-    if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
-        # if not OAUTH():
-        return abort(401)
-    data = request.get_json()
-    data = {key: data[key] for key in data if key in  models.Restaurant.__dict__}
-
-    logging.debug(data)
-    restaurant = models.Restaurant(**data)
-    dest.restaurants.append(restaurant)
-    models.db.session.commit()
-    data = {"id": restaurant.id}
-    logging.debug("response" + str(data))
-    return  jsonify(data), 201
-
-@ajax.route('/trip/<trip_id>/destination/<dest_id>/restaurant/<restaurant_id>', methods=( 'PATCH', 'DELETE'))
-@login_required
-def changerRstaurant(trip_id, dest_id,restaurant_id):
-    trips = models.UserTripPair.getTripsByUser(g.user)
-    currentTrip = models.Trip.query.filter_by(id=trip_id).first()
-    dest = [dest for dest in currentTrip.destinations if dest.id == int(dest_id)][0]
-    restaurant = [restaurant for restaurant in dest.restaurants if restaurant.id == int(restaurant_id)][0]
-    if g.user not in models.UserTripPair.getUsersByTrip(currentTrip):
-        # if not OAUTH():
-        return abort(401)
-    if request.method == "PATCH":
-        restaurant.update(request.get_json())
-        models.db.session.commit()
-        return Response("updated",200)
-        
-    if request.method =="DELETE":
-        models.db.session.delete(restaurant)
-        models.db.session.commit()
-    return Response("Deleted", 200)

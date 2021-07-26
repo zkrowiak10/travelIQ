@@ -5,7 +5,7 @@
     </div>
     <div class="sideBar-container" zk-bind="for: item of itemList">
         <div class="destinationCard">
-            <div class="destinationTop" zk-bind="on: click|item.toggleFocus(item)" >
+            <div class="destinationTop"  >
                 <span zk-bind="hidden: item.focused">
                     <i zk-bind="on: click|item.toggleFocus(item)" class="fas fa-caret-right"></i>
                 </span>
