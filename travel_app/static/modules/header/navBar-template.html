@@ -7,10 +7,12 @@
               
                       <p zk-bind="hidden: g.trip.isDefined">Select Trip </p>
                       <p style="font-weight: bold" zk-bind="visible: g.trip.isDefined"><span zk-bind="value:g.trip.name"></span></p>
-                      <div class="dropdown-menu" zk-bind="for: trip of trips" aria-labelledby="navbarDropdown">
-                      
+                      <div class="dropdown-menu"  aria-labelledby="navbarDropdown">
+                      <div zk-bind="for: trip of trips">
                         <a style="display:block"class="dropdown-item" zk-bind="attr: href|trip.href"><span zk-bind="value:trip.name"></span></a>
-                       
+                      </div>
+                        
+                      
                       <div class="dropdown-divider"></div>
                       <a style="display:block" class="dropdown-item" href="/app/createTrip">Create A New Trip</a>
                       <a style="display:block" class="dropdown-item" href="#trips">Manage Trips</a>

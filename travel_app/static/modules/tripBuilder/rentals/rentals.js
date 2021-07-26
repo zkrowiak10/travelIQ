@@ -1,27 +1,22 @@
-
-// NOT IMPLEMENTED
-import { ItemController} from "../itemController/itemController.js";
-
+import { ItemController } from "../itemController/itemController.js";
 export class RentalsController extends ItemController {
-    constructor(){
-        super()
-        this.endPoint = rentalsEndpoint
-        this.containerId = '#rentals'
-        this.title = "Create Rentals"
-        this.template = "rentals-template.html"
-        this.workdir = "/static/modules/tripBuilder/rentals"
+    constructor() {
+        super();
+        this.endPoint = "TODO";
+        this.containerId = '#rentals';
+        this.title = "Create Rentals";
+        this.template = "rentals-template.html";
+        this.workdir = "/static/modules/tripBuilder/rentals";
         this.fields = [
             {
-                key:"pickup",
+                key: "pickup",
                 pretty: "Pickup Location",
                 type: "text",
-            
             },
             {
                 key: "dropoff",
                 pretty: "Drop Off Location",
                 type: "text",
-                
             },
             {
                 key: "company",
@@ -36,12 +31,8 @@ export class RentalsController extends ItemController {
             {
                 key: 'dropoff_day',
                 pretty: "Dropoff Day",
-                type:"date"
+                type: "date"
             }
-        
-            ]
-        
+        ];
     }
-    
 }
-

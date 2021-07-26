@@ -1,6 +1,6 @@
-"use strict";
 // import { Modal } from "../modal/modal";
 // import {Hotel} from "./hotels.js"
+
 // class HotelModal extends Modal {
 //     workdir = "static/modules/tripBuilder/hotels"
 //     templateFile = "hotelModal-template.html"
@@ -11,8 +11,11 @@
 //         if (target) {
 //             Object.assign(this.tempObj, target)
 //         }
+
 //     }
+    
 //     async save () {
+
 //         for (let field of this.fields) {
 //             var key = field.key
 //             this.target[key] = field.value
@@ -26,6 +29,8 @@
 //                     this.close()
 //                 }
 //             }
+
+
 //         }
 //         if (this.update) {
 //             try {
@@ -38,8 +43,13 @@
 //                 this.close()
 //                 return
 //             }
+
 //         }
+
 //         this.parent.appendItem(this.target)
+
 //         this.close()
 //     }
+    
+    
 // }
