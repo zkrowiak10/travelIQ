@@ -3,7 +3,7 @@
         Edit
       </button>
     <button type="btn" class="close btn corner-buttons" zk-bind="on: click|close()"><span aria-hidden="true">&times;</span></button>
-    <h2 zk-bind="value: title"></h2>
+    <h2 >Details for <span zk-bind="value: target.name"></span></h2>
     <h3 class="textGroupLabel">Contact Info</h3>
     <p class="textGroupProperty">
         <span zk-bind="visible: target.phone;value: target.phone"></span><br  zk-bind="visible: target.phone" >

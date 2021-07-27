@@ -40,7 +40,7 @@ export class DetailsComponent {
                 }
         }
      close() {
-        this.html.remove()
+        this.html.innerHTML = ""
     }
 
 

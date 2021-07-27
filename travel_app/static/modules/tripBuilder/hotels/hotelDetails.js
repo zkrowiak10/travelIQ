@@ -25,7 +25,7 @@ export class DetailsComponent {
         }
     }
     close() {
-        this.html.remove();
+        this.html.innerHTML = "";
     }
     async save() {
         for (let field of this.fields) {
