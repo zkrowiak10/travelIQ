@@ -1,10 +1,19 @@
 <div class="contentArea" id="hotels">
-  <button type="button" role="button" class="btn createButton" zk-bind="on: click|createItem()"><i class="fas fa-plus" ></i></button>
+  <button
+    type="button"
+    role="button"
+    class="btn createButton"
+    zk-bind="on: click|createItem()"
+    ><i class="fas fa-plus"></i
+  ></button>
   <h1>Hotels</h1>
 
-  <p>Keep track of the hotels you are interested in here. Once you book, you'll see that one first.</p>
-  
-  <br>
+  <p
+    >Keep track of the hotels you are interested in here. Once you book, you'll
+    see that one first.</p
+  >
+
+  <br />
   <ul class="hotelList" zk-bind="for: hotel of itemList">
     <li>
       <div class="hotelBox">
@@ -12,10 +21,11 @@
           <h2 zk-bind="value: hotel.name"></h2>
         </a>
         <p zk-bind="format: hotel.check_in|root.utils.formatDatePretty"> </p>
-        
-        <button class="btn" zk-bind="on: click|$parentModel.showDetails(hotel)"><i class="far fa-list-alt"></i></button>
+
+        <button class="btn" zk-bind="on: click|$parentModel.showDetails(hotel)"
+          ><i class="far fa-list-alt"></i
+        ></button>
       </div>
     </li>
   </ul>
-
-</div> 
+</div>

@@ -4,8 +4,8 @@ var api = {
         var response = await fetch(endpoint, {
             method: "GET",
             headers: {
-                "Content-Type": "application/json"
-            }
+                "Content-Type": "application/json",
+            },
         });
         var data = await response.json();
         return data;
@@ -14,9 +14,9 @@ var api = {
         var response = await fetch(endpoint, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             },
-            "body": body
+            body: body,
         });
         if (!response.ok) {
             throw new Error("Something went wrong: " + response.status + response.statusText);
@@ -28,9 +28,9 @@ var api = {
         var response = await fetch(endpoint, {
             method: "PATCH",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             },
-            "body": body
+            body: body,
         });
         return response;
     },
@@ -38,10 +38,10 @@ var api = {
         var response = await fetch(endpoint, {
             method: "DELETE",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             },
-            "body": body
+            body: body,
         });
         return response;
-    }
+    },
 };

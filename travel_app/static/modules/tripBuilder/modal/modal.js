@@ -1,5 +1,5 @@
 var workdir = "/static/modules/tripBuilder/modal";
-import { zk } from '../../../lib/zk.js';
+import { zk } from "../../../lib/zk.js";
 export class Modal {
     constructor(parent, fields, title, update, target) {
         this.parent = parent;
@@ -24,13 +24,15 @@ export class Modal {
         this.fields = zk.makeObservable(fields);
     }
     async render() {
-        var template = await fetch(`${this.workdir}/${this.templateFile}`, { headers: { "Content-Type": "text/html" } });
+        var template = await fetch(`${this.workdir}/${this.templateFile}`, {
+            headers: { "Content-Type": "text/html" },
+        });
         var text = await template.text();
-        this.html = document.createElement('div');
+        this.html = document.createElement("div");
         this.html.innerHTML = text;
         document.querySelector(this.parent.containerId).append(this.html);
         if (!this.update) {
-            document.querySelector('#deleteItem').remove();
+            document.querySelector("#deleteItem").remove();
         }
         zk.initiateModel(this, this.html);
     }
@@ -53,7 +55,7 @@ export class Modal {
                 }
                 catch (err) {
                     console.error(err.message);
-                    alert('Error, item not saved');
+                    alert("Error, item not saved");
                     this.close();
                 }
             }

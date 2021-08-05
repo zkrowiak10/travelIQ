@@ -1,43 +1,43 @@
-<!doctype html style="heigh:100%">
+<!DOCTYPE html style="heigh:100%">
 <head>
-        <link rel="icon" href="{{url_for('static', filename='Assets/icon.png')}}">
-        <script> 
-                var loggedIn = false;
-                {% if g.user %}
-                    loggedIn=true;
-                {% endif %}
-        </script>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src= 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js'></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
-    <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet">
-    
-    <link href="https://fonts.googleapis.com/css?family=Acme&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
- 
+  <link rel="icon" href="{{url_for('static', filename='Assets/icon.png')}}" />
+  <script>
+    var loggedIn = false;
+    {% if g.user %}
+        loggedIn=true;
+    {% endif %}
+  </script>
 
+  <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet" />
+
+  <link
+    href="https://fonts.googleapis.com/css?family=Acme&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+    integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
+    crossorigin="anonymous"
+  />
 </head>
 <header>
-        
-    <nav id="nav-bar" class="navbar nav-empty navbar-expand-sm"> 
-            <a  href='{{url_for("iq.iqPage")}}'><img src="{{url_for('static', filename='Assets/Logo_Text_200.png')}}" style="width: 150px"/></a>
-            
-            {%block nav %} {% endblock %}
-           
+  <nav id="nav-bar" class="navbar nav-empty navbar-expand-sm">
+    <a href='{{url_for("iq.iqPage")}}'
+      ><img
+        src="{{url_for('static', filename='Assets/Logo_Text_200.png')}}"
+        style="width: 150px"
+    /></a>
 
-    </nav>
-            {% for message in get_flashed_messages() %}
-                <div class="flash alert alert-primary" data-dismiss="alert" role="alert">{{ message }}</div>
-            {% endfor %}
+    {%block nav %} {% endblock %}
+  </nav>
+  {% for message in get_flashed_messages() %}
+  <div class="flash alert alert-primary" data-dismiss="alert" role="alert"
+    >{{ message }}</div
+  >
+  {% endfor %}
 </header>
 <title> {% block title %} {% endblock %}</title>
 <body class="h-100" style="height: 100%">
-        {% block content %}{% endblock %}
+  {% block content %}{% endblock %}
 </body>
-
-                    
-                    

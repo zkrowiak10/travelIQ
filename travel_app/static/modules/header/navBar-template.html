@@ -1,37 +1,45 @@
-<nav> 
-    <ul class="nav-bar">
-      <li id="iconlink">
-              <a  href='/app'><img src="/static/Assets/Logo_Text_200.png" style="width: 150px"/></a>
-      </li>
-      <li class="dropdown-toggle"  aria-haspopup="true" aria-expanded="false">
-              
-                      <p zk-bind="hidden: g.trip.isDefined">Select Trip </p>
-                      <p style="font-weight: bold" zk-bind="visible: g.trip.isDefined"><span zk-bind="value:g.trip.name"></span></p>
-                      <div class="dropdown-menu"  aria-labelledby="navbarDropdown">
-                      <div zk-bind="for: trip of trips">
-                        <a style="display:block"class="dropdown-item" zk-bind="attr: href|trip.href"><span zk-bind="value:trip.name"></span></a>
-                      </div>
-                        
-                      
-                      <div class="dropdown-divider"></div>
-                      <a style="display:block" class="dropdown-item" href="/app/createTrip">Create A New Trip</a>
-                      <a style="display:block" class="dropdown-item" href="#trips">Manage Trips</a>
-                   </div>
-               
-      </li>
-      <li>
-              <!-- <a class=""  href="#">Plan</a> -->
-      </li>              
-      <li>
-              <!-- <a href="#">Budget</a> -->
-      </li>
-      <li class="nav-right" style="float:right">
-              <a  href="/auth/logout">Logout</a>  
-      </li>
-                  
-    </ul>
+<nav>
+  <ul class="nav-bar">
+    <li id="iconlink">
+      <a href="/app"
+        ><img src="/static/Assets/Logo_Text_200.png" style="width: 150px"
+      /></a>
+    </li>
+    <li class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+      <p zk-bind="hidden: g.trip.isDefined">Select Trip </p>
+      <p style="font-weight: bold" zk-bind="visible: g.trip.isDefined"
+        ><span zk-bind="value:g.trip.name"></span
+      ></p>
+      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <div zk-bind="for: trip of trips">
+          <a
+            style="display: block"
+            class="dropdown-item"
+            zk-bind="attr: href|trip.href"
+            ><span zk-bind="value:trip.name"></span
+          ></a>
+        </div>
+
+        <div class="dropdown-divider"></div>
+        <a style="display: block" class="dropdown-item" href="/app/createTrip"
+          >Create A New Trip</a
+        >
+        <a style="display: block" class="dropdown-item" href="#trips"
+          >Manage Trips</a
+        >
+      </div>
+    </li>
+    <li>
+      <!-- <a class=""  href="#">Plan</a> -->
+    </li>
+    <li>
+      <!-- <a href="#">Budget</a> -->
+    </li>
+    <li class="nav-right" style="float: right">
+      <a href="/auth/logout">Logout</a>
+    </li>
+  </ul>
 </nav>
 <!-- <div dat-bind="for: message of messages">
     <div class="flash alert alert-primary" data-dismiss="alert" role="alert">{{ message }}</div>
 </div> -->
-

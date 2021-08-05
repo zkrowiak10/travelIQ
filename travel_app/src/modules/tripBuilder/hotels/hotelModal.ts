@@ -13,7 +13,7 @@
 //         }
 
 //     }
-    
+
 //     async save () {
 
 //         for (let field of this.fields) {
@@ -29,7 +29,6 @@
 //                     this.close()
 //                 }
 //             }
-
 
 //         }
 //         if (this.update) {
@@ -50,6 +49,5 @@
 
 //         this.close()
 //     }
-    
-    
+
 // }

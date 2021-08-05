@@ -1,6 +1,6 @@
-import { ItemController, Item } from "../tripBuilder/itemController/itemController.js";
-import { header } from '../header/header.js';
-import * as utils from '../utils/utilFunctions.js';
+import { ItemController, Item, } from "../tripBuilder/itemController/itemController.js";
+import { header } from "../header/header.js";
+import * as utils from "../utils/utilFunctions.js";
 export class Trip extends Item {
     constructor() {
         super();
@@ -11,10 +11,10 @@ export class TripsController extends ItemController {
     constructor() {
         super();
         this.endPoint = "/ajax/trips";
-        this.containerId = '#tabContent';
+        this.containerId = "#tabContent";
         this.title = "Create Trips";
         this.itemClass = Trip;
-        this.insertNode = '#tabContent';
+        this.insertNode = "#tabContent";
         this.template = "trips-template.html";
         this.workdir = "/static/modules/trips";
         this.fields = [

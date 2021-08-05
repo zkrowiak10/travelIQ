@@ -1,4 +1,4 @@
-import { BoundElement, utils, zk, ParseDOMforObservables } from './zk.js';
+import { BoundElement, utils, zk, ParseDOMforObservables, } from "./zk.js";
 export class ObservableObject {
     constructor(obj, parent) {
         this.receivers = [];
@@ -13,7 +13,7 @@ export class ObservableObject {
                         return target[property].bind(target);
                     }
                 }
-                // for certain operations, it is necessary to verify that the target object is the same spot in memory as 
+                // for certain operations, it is necessary to verify that the target object is the same spot in memory as
                 // some other reference to it.
                 if (property == "_targetObject") {
                     return target;
@@ -48,7 +48,7 @@ export class ObservableObject {
                 }
                 delete target[property];
                 return true;
-            }
+            },
         };
         this.dataObject = obj;
         this.parent = parent;
@@ -61,7 +61,8 @@ export class ObservableObject {
     // Function receives the object which contains the updated property, and the property key
     updateOnStateChangeByOref(oRefParent, property) {
         for (let element of this.receivers) {
-            if ((element.target._targetObject === oRefParent) && (property == element.property)) {
+            if (element.target._targetObject === oRefParent &&
+                property == element.property) {
                 element.update();
             }
         }
@@ -69,7 +70,7 @@ export class ObservableObject {
     // Parse property path of binding and return object at that location
     returnTargetProperty(pathToObject, getParent = false) {
         let targetChild = this.dataObjectProxy;
-        let splitPath = pathToObject.split('.');
+        let splitPath = pathToObject.split(".");
         if (splitPath[0] == "root") {
             targetChild = zk.root_model;
         }
@@ -81,7 +82,7 @@ export class ObservableObject {
             }
         }
         for (let i = 1; i < splitPath.length; i++) {
-            if (getParent && (i == (splitPath.length - 1))) {
+            if (getParent && i == splitPath.length - 1) {
                 return targetChild;
             }
             targetChild = targetChild[splitPath[i]];
@@ -99,15 +100,15 @@ export class ObservableObject {
         let property = boundElement.property;
         let updateValue = target[property];
         if (!(boundElement instanceof BoundElement)) {
-            throw new Error('Invalid argument to initialize transmitter');
+            throw new Error("Invalid argument to initialize transmitter");
         }
         if (bindMode == "radio") {
-            let options = boundElement.DOMelement.querySelectorAll('input');
+            let options = boundElement.DOMelement.querySelectorAll("input");
             for (let option of options) {
                 if (option.value == updateValue) {
                     option.checked = true;
                 }
-                option.addEventListener('input', function () {
+                option.addEventListener("input", function () {
                     if (option.checked) {
                         target[property] = option.value;
                     }
@@ -122,7 +123,7 @@ export class ObservableObject {
             if (updateValue) {
                 updateValue = new Date(updateValue);
                 try {
-                    updateValue = updateValue.toISOString().split('T')[0];
+                    updateValue = updateValue.toISOString().split("T")[0];
                 }
                 catch (err) {
                     console.error("error converting date object", updateValue, err.message);
@@ -133,7 +134,7 @@ export class ObservableObject {
             updateValue = new Date(updateValue);
             updateValue = updateValue._targetObject.toISOString();
         }
-        boundElement.DOMelement.value = (updateValue || "");
+        boundElement.DOMelement.value = updateValue || "";
         boundElement.DOMelement.addEventListener("input", () => {
             if (boundElement.DOMelement instanceof HTMLInputElement) {
                 let nodeValue = boundElement.DOMelement.value;
@@ -144,13 +145,13 @@ export class ObservableObject {
                 if (boundElement.DOMelement.type == "checkbox") {
                     nodeValue = boundElement.DOMelement.checked;
                 }
-                target[property] = (nodeValue || "");
+                target[property] = nodeValue || "";
             }
         });
     }
     updateArrayOnSet(targetArr, targetProperty, value) {
         // locate appropriate array of bound elements in forEachComponents (this should be a 'for' element)
-        // targetArr is an array part of the obj argument to observable object, this function is called when updating 
+        // targetArr is an array part of the obj argument to observable object, this function is called when updating
         // its Proxy object.
         var boundElement;
         // Find the correct BoundElement in the list of 'forEachComponents',
@@ -162,7 +163,7 @@ export class ObservableObject {
                 break;
             }
         }
-        if ((targetProperty == "length")) {
+        if (targetProperty == "length") {
             targetArr[targetProperty] = value;
             if (boundElement) {
                 boundElement.observableChildren.length = value;
@@ -182,7 +183,7 @@ export class ObservableObject {
             }
             let subModel = {};
             // If value being set is not an observable object
-            if (!(value._observableObject)) {
+            if (!value._observableObject) {
                 // creat subModel for child node observable scope and add the observable to the array
                 value = new ObservableObject(value).dataObjectProxy;
                 subModel[boundElement.iteratorKey] = value;
@@ -190,8 +191,8 @@ export class ObservableObject {
                 subModel.$parentModel = this.$model;
                 // Create submodel context that stores node-element pairing
                 let subModelContext = {
-                    "subModel": subModel,
-                    "node": insertNode
+                    subModel: subModel,
+                    node: insertNode,
                 };
                 boundElement.observableChildren[targetProperty] = subModelContext;
                 ParseDOMforObservables(subModel, insertNode);
@@ -213,8 +214,8 @@ export class ObservableObject {
                     subModel.$parentModel = this.$model;
                     // Create submodel context that stores node-element pairing
                     let subModelContext = {
-                        "subModel": subModel,
-                        "node": insertNode
+                        subModel: subModel,
+                        node: insertNode,
                     };
                     boundElement.observableChildren[targetProperty] = subModelContext;
                     ParseDOMforObservables(subModel, insertNode);
@@ -244,7 +245,7 @@ export class ObservableObject {
     initializeForeach(boundElement) {
         // parse syntax, note that 'objectPath' refers to the foreach syntax of the for element
         // which follows foreach syntax (item of list)
-        let tempList = boundElement.objectPath.split('of');
+        let tempList = boundElement.objectPath.split("of");
         let iteratorKey = tempList[0].trim();
         let iterableObjectPath = tempList[1].trim();
         let iterable = this.returnTargetProperty(iterableObjectPath);
@@ -257,7 +258,7 @@ export class ObservableObject {
             throw new Error("Template node must be instance of HTMLElement");
         }
         // The current bound element is the 'for' parent element containing the iterated objects
-        // this element needs to store all of its children, the html template for creating a new child, 
+        // this element needs to store all of its children, the html template for creating a new child,
         // and the iteratore key (eg 'item')
         boundElement.objectPath = iterableObjectPath;
         let oRefPath = utils.prepareObjectPath(boundElement.objectPath);
@@ -266,12 +267,12 @@ export class ObservableObject {
         boundElement.templateNode = templateNode;
         boundElement.iteratorKey = iteratorKey;
         // The application should enforce that the boundElement only has one root (the iterator template)
-        // Then, it should clone that item and append it iterable.length - 1 times 
+        // Then, it should clone that item and append it iterable.length - 1 times
         // The parent object (curent boundElement) needs to be added to the bound elements array
         // problem noted: when the ObservableObject instantiates, it copies the object parameter, meaning that scoped sub models
         // Do not reflect changes to the object model they are descendent from
         let index = 0;
-        if (!(Array.isArray(iterable))) {
+        if (!Array.isArray(iterable)) {
             throw new Error(`'For' element much bind to an iterable at ${boundElement.DOMelement}`);
         }
         for (let item of iterable) {
@@ -290,8 +291,8 @@ export class ObservableObject {
             }
             ParseDOMforObservables(subModel, clone);
             var subModelContext = {
-                "subModel": subModel,
-                "node": clone
+                subModel: subModel,
+                node: clone,
             };
             boundElement.observableChildren.push(subModelContext);
             // replace array item with its observable version
@@ -342,12 +343,12 @@ export class ObservableObject {
                 let oRefPath = utils.prepareObjectPath(boundElement.objectPath);
                 boundElement.target = utils.returnTargetProperty(this.dataObjectProxy, oRefPath, true);
                 var splitPath = boundElement.objectPath.split(".");
-                boundElement.property = splitPath[(splitPath.length - 1)];
+                boundElement.property = splitPath[splitPath.length - 1];
                 this.initializeTransmitter(boundElement, bindMode);
                 break;
-            case 'format':
+            case "format":
                 // format binds have syntax "format: objectPath|callbackFunction"
-                [objectPath, callBackPath] = boundElement.objectPath.split('|');
+                [objectPath, callBackPath] = boundElement.objectPath.split("|");
                 try {
                     boundElement.updateCallback = utils.returnTargetProperty(this.dataObjectProxy, callBackPath);
                 }
@@ -359,13 +360,13 @@ export class ObservableObject {
                 targetPath = utils.prepareObjectPath(boundElement.objectPath);
                 boundElement.target = utils.returnTargetProperty(this.dataObjectProxy, targetPath, true);
                 splitPath = boundElement.objectPath.split(".");
-                boundElement.property = splitPath[(splitPath.length - 1)];
+                boundElement.property = splitPath[splitPath.length - 1];
                 this.receivers.push(boundElement);
                 boundElement.update();
                 break;
             case "attr":
                 // attr bindings follow syntax "attr: targetAttr|binding"
-                [attr, binding, callBackPath] = boundElement.objectPath.split('|');
+                [attr, binding, callBackPath] = boundElement.objectPath.split("|");
                 if (callBackPath) {
                     try {
                         boundElement.updateCallback = utils.returnTargetProperty(this.dataObjectProxy, callBackPath);
@@ -376,7 +377,7 @@ export class ObservableObject {
                 }
                 boundElement.objectPath = binding;
                 splitPath = boundElement.objectPath.split(".");
-                boundElement.property = splitPath[(splitPath.length - 1)];
+                boundElement.property = splitPath[splitPath.length - 1];
                 targetPath = utils.prepareObjectPath(boundElement.objectPath);
                 boundElement.target = utils.returnTargetProperty(this.dataObjectProxy, targetPath, true);
                 splitPath = boundElement.objectPath.split(".");
@@ -391,10 +392,11 @@ export class ObservableObject {
                 targetPath = utils.prepareObjectPath(boundElement.objectPath);
                 boundElement.target = utils.returnTargetProperty(this.dataObjectProxy, targetPath, true);
                 splitPath = boundElement.objectPath.split(".");
-                boundElement.property = splitPath[(splitPath.length - 1)];
+                boundElement.property = splitPath[splitPath.length - 1];
                 this.receivers.push(boundElement);
                 boundElement.update = function () {
-                    boundElement.DOMelement.hidden = boundElement.target[boundElement.property];
+                    boundElement.DOMelement.hidden =
+                        boundElement.target[boundElement.property];
                 };
                 boundElement.update();
                 break;
@@ -402,10 +404,11 @@ export class ObservableObject {
                 targetPath = utils.prepareObjectPath(boundElement.objectPath);
                 boundElement.target = utils.returnTargetProperty(this.dataObjectProxy, targetPath, true);
                 splitPath = boundElement.objectPath.split(".");
-                boundElement.property = splitPath[(splitPath.length - 1)];
+                boundElement.property = splitPath[splitPath.length - 1];
                 this.receivers.push(boundElement);
                 boundElement.update = function () {
-                    boundElement.DOMelement.hidden = !boundElement.target[boundElement.property];
+                    boundElement.DOMelement.hidden =
+                        !boundElement.target[boundElement.property];
                 };
                 boundElement.update();
                 break;

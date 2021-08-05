@@ -1,5 +1,5 @@
 import { Item, ItemController } from "../itemController/itemController.js";
-import { DetailsComponent } from './hotelDetails.js';
+import { DetailsComponent } from "./hotelDetails.js";
 // constructor function for a Hotel object
 var workdir = "/static/modules/tripBuilder/hotels";
 var getEndpoint;
@@ -15,7 +15,11 @@ export class Hotel extends Item {
             { type: "checkbox", key: "refundable", pretty: "Refundable Reservation?" },
             { type: "date", key: "cancellation_date", pretty: "Last Day to Cancel" },
             { type: "number", key: "rate", pretty: "Nightly Rate" },
-            { type: "checkbox", key: "breakfast_included", pretty: "Breakfast Included?" },
+            {
+                type: "checkbox",
+                key: "breakfast_included",
+                pretty: "Breakfast Included?",
+            },
             { type: "text", key: "address", pretty: "Address" },
             { type: "text", key: "city", pretty: "City" },
             { type: "tel", key: "phone", pretty: "Phone" },
@@ -36,13 +40,17 @@ class HotelsController extends ItemController {
             { type: "checkbox", key: "refundable", pretty: "Refundable Reservation?" },
             { type: "date", key: "cancellation_date", pretty: "Last Day to Cancel" },
             { type: "number", key: "rate", pretty: "Nightly Rate" },
-            { type: "checkbox", key: "breakfast_included", pretty: "Breakfast Included?" },
+            {
+                type: "checkbox",
+                key: "breakfast_included",
+                pretty: "Breakfast Included?",
+            },
             { type: "text", key: "address", pretty: "Address" },
             { type: "text", key: "city", pretty: "City" },
             { type: "tel", key: "phone", pretty: "Phone" },
         ];
         this.title = "Create Hotel";
-        this.containerId = '#hotels';
+        this.containerId = "#hotels";
         this.insertNode = "#tabContent";
         this.template = "hotels-template.html";
         this.workdir = workdir;

@@ -1,6 +1,6 @@
 import { api } from "../../utils/api.js";
 import { Modal } from "../modal/modal.js";
-import { zk } from '../../../lib/zk.js';
+import { zk } from "../../../lib/zk.js";
 var workdir = "/static/modules/tripBuilder/destinations";
 export class Item {
     constructor() { }
@@ -10,7 +10,7 @@ export class Item {
         var response = await api.patch(endPoint, data);
         // will need to process potential erros down the road
         if (response.status != 200) {
-            alert('something went wrong');
+            alert("something went wrong");
         }
     }
     //creates new item on server and returns json of created resource
@@ -35,13 +35,15 @@ export class Item {
 // Abstract handlerfor item collection
 export class ItemController {
     constructor() {
-        // Item creation/editing is defaulted to use a modal. This can be overridden in 
+        // Item creation/editing is defaulted to use a modal. This can be overridden in
         // descendents
         this.itemList = zk.makeObservable([]);
         this.modalClass = Modal;
     }
     async init() {
-        var template = await fetch(`${this.workdir}/${this.template}`, { headers: { "Content-Type": "text/html" } });
+        var template = await fetch(`${this.workdir}/${this.template}`, {
+            headers: { "Content-Type": "text/html" },
+        });
         var text = await template.text();
         document.querySelector(this.insertNode).innerHTML = text;
         this.html = document.querySelector(this.containerId);
@@ -66,7 +68,7 @@ export class ItemController {
     }
     createItem() {
         var modal = new this.modalClass(this, this.fields, this.title, false);
-        console.log('source fields', this.fields);
+        console.log("source fields", this.fields);
         modal.render();
     }
     editItem(item) {
@@ -82,11 +84,10 @@ export class ItemController {
         catch (err) {
             console.error(err.message);
         }
-        ;
         this.itemList.push(itemObject);
         this.onListChange();
     }
-    // abstract optional callback  
+    // abstract optional callback
     onListChange() {
         return;
     }
@@ -95,7 +96,7 @@ export class ItemController {
         this.onListChange();
     }
     async deleteItem(target) {
-        let index = this.itemList.findIndex(x => x.id == target.id);
+        let index = this.itemList.findIndex((x) => x.id == target.id);
         try {
             let status = await target.delete();
             if (status.ok) {

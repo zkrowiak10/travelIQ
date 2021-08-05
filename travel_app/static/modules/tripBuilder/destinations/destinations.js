@@ -1,6 +1,6 @@
 import { ItemController, Item } from "../itemController/itemController.js";
 import * as hotels from "../hotels/hotels.js";
-import * as utils from '../../utils/utilFunctions.js';
+import * as utils from "../../utils/utilFunctions.js";
 import * as restaurants from "../restaurants/restaurant.js";
 import { api } from "../../utils/api.js";
 export class Destination extends Item {
@@ -24,7 +24,7 @@ export class Destination extends Item {
         var links = {
             hotels: `${linkPaths}/hotels`,
             restaurants: `${linkPaths}/restaurants`,
-            activities: `${linkPaths}/activities`
+            activities: `${linkPaths}/activities`,
         };
         return links;
     }
@@ -43,10 +43,10 @@ export class DestinationsController extends ItemController {
             { type: "text", key: "name", pretty: "Name" },
             { type: "number", key: "days_there", pretty: "Days There" },
             { type: "textarea", key: "notes", pretty: "Notes" },
-            { type: "number", key: "trip_order", pretty: "Order in Trip" }
+            { type: "number", key: "trip_order", pretty: "Order in Trip" },
         ];
         this.endPoint = "/ajax/trip/" + utils.g.trip.id + "/destinations";
-        this.containerId = '#destinations';
+        this.containerId = "#destinations";
         this.title = "Destinations";
         this.template = "destinations-template.html";
         this.workdir = "/static/modules/tripBuilder/destinations";
@@ -54,19 +54,19 @@ export class DestinationsController extends ItemController {
         this.itemClass = Destination;
     }
     findDestinationByID(destID) {
-        return this.itemList.find(dest => dest.id == destID);
+        return this.itemList.find((dest) => dest.id == destID);
     }
 }
 // receives /destinations or /destination/<id>/etc...
 export async function route(hashArray) {
     let next = hashArray.shift();
     if (!next) {
-        location.hash = location.hash + '/destinations';
+        location.hash = location.hash + "/destinations";
         return;
     }
     var destinationsController = new DestinationsController();
     await destinationsController.init();
-    if ((next == "destinations")) {
+    if (next == "destinations") {
         return 200;
     }
     if (next == "destination") {
@@ -77,7 +77,7 @@ export async function route(hashArray) {
     }
     let destination = destinationsController.findDestinationByID(next);
     if (!destination) {
-        console.log('no destination at current hash');
+        console.log("no destination at current hash");
     }
     destination.focused = true;
     next = hashArray.shift();

@@ -1,8 +1,8 @@
 import { api } from "../../utils/api.js";
 import { Item, ItemController } from "../itemController/itemController.js";
-import { DetailsComponent } from './restaurantDetails.js';
-import { RestaurantModal } from './restaurantModal.js';
-import { zk } from '../../../lib/zk.js';
+import { DetailsComponent } from "./restaurantDetails.js";
+import { RestaurantModal } from "./restaurantModal.js";
+import { zk } from "../../../lib/zk.js";
 // constructor function for a restaurant object
 var workdir = "/static/modules/tripBuilder/restaurants";
 var putEndpoint;
@@ -13,7 +13,11 @@ export class Restaurant extends Item {
         this.fields = [
             { type: "text", key: "name", pretty: "Name" },
             { type: "text", key: "link", pretty: "Link" },
-            { type: "dateTime", key: "reservation", pretty: "Reservation date and time" },
+            {
+                type: "dateTime",
+                key: "reservation",
+                pretty: "Reservation date and time",
+            },
             { type: "text", key: "mealType", pretty: "Breakfast, Lunch or Dinner?" },
             { type: "number", key: "day", pretty: "Which day?" },
         ];
@@ -31,12 +35,16 @@ export class RestaurantsController extends ItemController {
         this.fields = [
             { type: "text", key: "name", pretty: "Name" },
             { type: "text", key: "link", pretty: "Link" },
-            { type: "dateTime", key: "reservation", pretty: "Reservation date and time" },
+            {
+                type: "dateTime",
+                key: "reservation",
+                pretty: "Reservation date and time",
+            },
             { type: "text", key: "mealType", pretty: "Breakfast, Lunch or Dinner?" },
             { type: "number", key: "day", pretty: "Which day?" },
         ];
         this.title = "Create Restaurants";
-        this.containerId = '#restaurants';
+        this.containerId = "#restaurants";
         this.insertNode = "#tabContent";
         this.template = "restaurant-template.html";
         this.endPoint = getEndpoint;
@@ -44,7 +52,7 @@ export class RestaurantsController extends ItemController {
         this.destination = destination;
         for (let i = 0; i < destination.days_there; i++) {
             let obj = {
-                dayNumber: (i + 1),
+                dayNumber: i + 1,
                 breakfast: [],
                 lunch: [],
                 dinner: [],
@@ -79,7 +87,7 @@ export class RestaurantsController extends ItemController {
         }
     }
     addItemToModel(itemObject) {
-        if ((typeof itemObject.day != "undefined") && (itemObject.mealType)) {
+        if (typeof itemObject.day != "undefined" && itemObject.mealType) {
             let day = itemObject.day - 1;
             this.itemList[day][itemObject.mealType].push(itemObject);
         }
@@ -99,12 +107,12 @@ export class RestaurantsController extends ItemController {
         let dayIndex = target.day - 1;
         let mealType = target.mealType;
         // find current location of object being updated and remove it
-        if ((typeof dayIndex != 'undefined') && (mealType)) {
-            let index = this.itemList[dayIndex][mealType].findIndex(x => x.id == target.id);
+        if (typeof dayIndex != "undefined" && mealType) {
+            let index = this.itemList[dayIndex][mealType].findIndex((x) => x.id == target.id);
             this.itemList[dayIndex][mealType].splice(index, 1);
         }
         else {
-            let index = this.misFits.findIndex(x => x.id == target.id);
+            let index = this.misFits.findIndex((x) => x.id == target.id);
             this.misFits.splice(index, 1);
         }
         Object.assign(target, source);
@@ -120,25 +128,24 @@ export class RestaurantsController extends ItemController {
         catch (err) {
             console.error(err.message);
         }
-        ;
         this.addItemToModel(itemObject);
     }
     async deleteItem(target) {
         let dayIndex = target.day - 1;
-        if ((typeof dayIndex != 'undefined') && (target.mealType)) {
-            let index = this.itemList[dayIndex][target.mealType].findIndex(x => x.id == target.id);
+        if (typeof dayIndex != "undefined" && target.mealType) {
+            let index = this.itemList[dayIndex][target.mealType].findIndex((x) => x.id == target.id);
         }
         else {
         }
         try {
             let status = await target.delete();
             if (status.ok) {
-                if ((typeof dayIndex != 'undefined') && (target.mealType)) {
-                    let index = this.itemList[dayIndex][target.mealType].findIndex(x => x.id == target.id);
+                if (typeof dayIndex != "undefined" && target.mealType) {
+                    let index = this.itemList[dayIndex][target.mealType].findIndex((x) => x.id == target.id);
                     this.itemList[dayIndex][target.mealType].splice(index, 1);
                 }
                 else {
-                    let index = this.misFits.findIndex(x => x.id == target.id);
+                    let index = this.misFits.findIndex((x) => x.id == target.id);
                     this.misFits.splice(index, 1);
                 }
             }

@@ -1,6 +1,6 @@
 import { Modal } from "../modal/modal.js";
 import { RestaurantsController } from "./restaurant.js";
-import { zk } from '../../../lib/zk.js';
+import { zk } from "../../../lib/zk.js";
 export class RestaurantModal extends Modal {
     constructor(parent, fields, title, update, target) {
         super(parent, fields, title, update, target);
@@ -8,10 +8,10 @@ export class RestaurantModal extends Modal {
         this.templateFile = "restaurantModal-template.html";
         this.tempObj = {};
         if (!(parent instanceof RestaurantsController)) {
-            throw new Error('Cannot create restaurante modal with non-Restaurant controller');
+            throw new Error("Cannot create restaurante modal with non-Restaurant controller");
         }
         for (let field of fields) {
-            this.tempObj[field.key] = (target) ? target[field.key] : undefined;
+            this.tempObj[field.key] = target ? target[field.key] : undefined;
         }
         this.tempObj = zk.makeObservable(this.tempObj);
         if (target) {
@@ -28,7 +28,7 @@ export class RestaurantModal extends Modal {
                 }
                 catch (err) {
                     console.error(err.message);
-                    alert('Error, item not saved');
+                    alert("Error, item not saved");
                     this.close();
                 }
             }
