@@ -24,7 +24,7 @@ export class Header {
       this.trips.pop();
     }
     if (location.hash != "#trips") {
-      if (data.length == 0) {
+      if (data.length === 0) {
         var element = document.querySelector("#noTrips");
         if (element instanceof HTMLElement) {
           element.hidden = false;
@@ -47,7 +47,7 @@ export class Header {
     }
 
     for (let item of data) {
-      if (item.id == utils.g.trip.id) {
+      if (item.id === utils.g.trip.id) {
         utils.g.trip.name = item.name;
       }
       item.href = "#trip/" + item.id;
@@ -67,7 +67,7 @@ export class Header {
   }
   async updateTripName() {
     await this.get();
-    let trip = this.trips.find((trip) => trip.id == utils.g.trip.id);
+    let trip = this.trips.find((trip) => trip.id === utils.g.trip.id);
     utils.g.trip.name = trip.name;
   }
 }

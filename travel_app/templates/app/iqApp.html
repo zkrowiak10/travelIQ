@@ -1,71 +1,65 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-        <link rel="icon" href="{{url_for('static', filename='Assets/icon.png')}}">
-     
+  <head>
+    <link rel="icon" href="{{url_for('static', filename='Assets/icon.png')}}" />
+
     <!-- <script src="{{url_for('static', filename='utils/tabContent.js')}}"></script> -->
     <script>
-            const TravelIQGlobal = {}
+      const TravelIQGlobal = {};
     </script>
-    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src= 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js'></script>
-    <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet">
+
+    <link
+      href="{{url_for('static', filename='styles.css')}}"
+      rel="stylesheet"
+    />
     <script type="module" src="/static/main.js"></script>
-    <link href="https://fonts.googleapis.com/css?family=Acme&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
- 
+    <link
+      href="https://fonts.googleapis.com/css?family=Acme&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+      integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
+      crossorigin="anonymous"
+    />
+  </head>
 
-</head>
+  <title> TravelIQ</title>
 
-<title> TravelIQ</title>
+  <body>
+    <header id="header"> </header>
 
-<body>
-  <header id="header">
-    
- </header>
+    <main class="mainArea">
+      <section class="sideBar" id="left-sidebar"> </section>
 
-<main class="mainArea">
-        
-        <section class="sideBar" id="left-sidebar">
-                
-        </section>
-        
-        <section class="contentArea" id="tabContent">
-        </section>
-        <p id="selectTrip" hidden>Please select a trip above to get started</p>
-        <div id="noTrips" hidden>
-                <div class="row">
-                    <div class="col"></div>
-                    <div class="col-6 centered">
-                        <div id ="noTrips">
-                            <div class="headline">
-                                    <h1 class='centered-text'> You Have Not Created Any Trips Yet</h1>
-                                    <a type="button" href='/app/createTrip' class="btn">
-                                        Create Your First One Today
-                                </a>
-                                    <br>
-                                    
-                            </div>
-                            
-                            
-                                <img src="{{url_for('static', filename='Assets/travel_search.png')}}" style="width: 400px;margin-top: 30px">
-                                
-                            
-                        </div>           
-                    </div >
-                    <div class="col"></div>
-                </div>
+      <section class="contentArea" id="tabContent"> </section>
+      <p id="selectTrip" hidden>Please select a trip above to get started</p>
+      <div id="noTrips" hidden>
+        <div class="row">
+          <div class="col"></div>
+          <div class="col-6 centered">
+            <div id="noTrips">
+              <div class="headline">
+                <h1 class="centered-text">
+                  You Have Not Created Any Trips Yet</h1
+                >
+                <a type="button" href="/app/createTrip" class="btn">
+                  Create Your First One Today
+                </a>
+                <br />
+              </div>
+
+              <img
+                src="{{url_for('static', filename='Assets/travel_search.png')}}"
+                style="width: 400px; margin-top: 30px"
+              />
             </div>
-        <aside id="hotelDetailView"></aside>
-</main>        
-        
-        
-</body>
-
-
-                    
-                    
+          </div>
+          <div class="col"></div>
+        </div>
+      </div>
+      <aside id="hotelDetailView"></aside>
+    </main>
+  </body>
 </html>

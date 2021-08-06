@@ -38,7 +38,7 @@ export class RestaurantModal extends Modal {
   async save() {
     for (let field of this.fields) {
       var key = field.key;
-      if (field.type == "date") {
+      if (field.type === "date") {
         try {
           this.tempObj[key] = new Date(this.tempObj[key]);
         } catch (err) {

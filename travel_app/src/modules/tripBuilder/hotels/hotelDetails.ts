@@ -53,7 +53,7 @@ export class DetailsComponent {
   async save() {
     for (let field of this.fields) {
       let key = field.key;
-      if (field.type == "date") {
+      if (field.type === "date") {
         this.target[key] = new Date(this.target[key]);
       }
     }

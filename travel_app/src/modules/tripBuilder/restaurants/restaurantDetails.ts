@@ -54,7 +54,7 @@ export class DetailsComponent {
     for (let field of this.fields) {
       var key = field.key;
 
-      if (field.type == "date") {
+      if (field.type === "date") {
         this.target[key] = new Date(this.target[key]);
       }
     }

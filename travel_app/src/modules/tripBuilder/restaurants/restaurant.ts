@@ -131,11 +131,11 @@ export class RestaurantsController extends ItemController {
     // find current location of object being updated and remove it
     if (typeof dayIndex != "undefined" && mealType) {
       let index = this.itemList[dayIndex][mealType].findIndex(
-        (x) => x.id == target.id
+        (x) => x.id === target.id
       );
       this.itemList[dayIndex][mealType].splice(index, 1);
     } else {
-      let index = this.misFits.findIndex((x) => x.id == target.id);
+      let index = this.misFits.findIndex((x) => x.id === target.id);
       this.misFits.splice(index, 1);
     }
     Object.assign(target, source);
@@ -159,7 +159,7 @@ export class RestaurantsController extends ItemController {
 
     if (typeof dayIndex != "undefined" && target.mealType) {
       let index = this.itemList[dayIndex][target.mealType].findIndex(
-        (x) => x.id == target.id
+        (x) => x.id === target.id
       );
     } else {
     }
@@ -169,11 +169,11 @@ export class RestaurantsController extends ItemController {
       if (status.ok) {
         if (typeof dayIndex != "undefined" && target.mealType) {
           let index = this.itemList[dayIndex][target.mealType].findIndex(
-            (x) => x.id == target.id
+            (x) => x.id === target.id
           );
           this.itemList[dayIndex][target.mealType].splice(index, 1);
         } else {
-          let index = this.misFits.findIndex((x) => x.id == target.id);
+          let index = this.misFits.findIndex((x) => x.id === target.id);
           this.misFits.splice(index, 1);
         }
       }

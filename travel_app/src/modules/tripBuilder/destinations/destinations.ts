@@ -60,7 +60,7 @@ export class DestinationsController extends ItemController {
     super();
   }
   findDestinationByID(destID) {
-    return this.itemList.find((dest) => dest.id == destID);
+    return this.itemList.find((dest) => dest.id === destID);
   }
 }
 
@@ -75,10 +75,10 @@ export async function route(hashArray) {
   var destinationsController = new DestinationsController();
   await destinationsController.init();
 
-  if (next == "destinations") {
+  if (next === "destinations") {
     return 200;
   }
-  if (next == "destination") {
+  if (next === "destination") {
     next = hashArray.shift();
   } else {
     console.log(next);

@@ -103,7 +103,7 @@ export function ParseDOMforObservables(model: any, root: HTMLElement) {
 
       // A little messy, but 'for' binders receive an argument of 'indexKey of iterable' where
       // iterable is the typical objectpaty.
-      if (bindMode === "for") {
+      if (bindMode ==== "for") {
         parentObject = objectPath.split("of")[1].trim().split(".")[0];
       }
 
@@ -112,22 +112,22 @@ export function ParseDOMforObservables(model: any, root: HTMLElement) {
       // TODO: make register element pass parsing to bound element rather than do it on the object itself.
       let boundElement = new BoundElement(root, objectPath, bindMode, "");
 
-      if (bindMode == "on") {
+      if (bindMode === "on") {
         registerListener(boundElement, model);
         continue;
       }
-      if (bindMode == "attr") {
+      if (bindMode === "attr") {
         parentObject = objectPath.split("|")[1].split(".")[0];
       }
 
-      if (typeof parent == "undefined") {
+      if (typeof parent === "undefined") {
         console.error("Invald object path at ", binder, "with model: ", model);
         continue;
       }
 
       // populate non-observable fields just once
       if (!model[parentObject]._observableObject) {
-        if (bindMode == "value") {
+        if (bindMode === "value") {
           root.innerText = utils.returnTargetProperty(model, objectPath);
           continue;
         }
@@ -139,7 +139,7 @@ export function ParseDOMforObservables(model: any, root: HTMLElement) {
           `attempting to bind on non-observable object at`,
           boundElement.DOMelement
         );
-        if (bindMode == "value") {
+        if (bindMode === "value") {
           root.innerText = utils.returnTargetProperty(model, objectPath, false);
         }
         continue;
@@ -267,7 +267,7 @@ let utils = {
     handler: ProxyHandler<any>
   ): proxyObservable {
     // do not remake observable objects
-    if (typeof object == "function") {
+    if (typeof object === "function") {
       return new Proxy(object, handler);
     }
     if (Array.isArray(object)) {
@@ -278,12 +278,12 @@ let utils = {
       return object;
     }
     for (let item in object) {
-      if (typeof object[item] == "object") {
+      if (typeof object[item] === "object") {
         object[item] = deepProxy(object[item], handler);
       }
     }
 
-    if (typeof object == "object" && object) {
+    if (typeof object === "object" && object) {
       return new Proxy(object, handler);
     }
     return object;
@@ -306,13 +306,13 @@ let utils = {
     let splitPath = pathToObject.split(".");
 
     let i = 0;
-    if (splitPath[0] == "root") {
+    if (splitPath[0] === "root") {
       targetChild = zk.root_model;
       i++;
     }
 
     while (i < splitPath.length) {
-      if (getParent && i == splitPath.length - 1) {
+      if (getParent && i === splitPath.length - 1) {
         return targetChild;
       }
       targetChild = targetChild[splitPath[i]];

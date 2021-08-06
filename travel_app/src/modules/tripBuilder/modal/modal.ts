@@ -64,7 +64,7 @@ export class Modal {
     for (let field of this.fields) {
       let key = field.key;
       this.target[key] = field.value;
-      if (field.type == "date") {
+      if (field.type === "date") {
         try {
           this.target[key] = new Date(field.value);
         } catch (err) {

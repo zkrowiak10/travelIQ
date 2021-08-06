@@ -19,7 +19,7 @@ export class ObservableObject {
   $parentModel?: any;
   handler = {
     get: (target: any, property: keyof typeof target, receiver: any) => {
-      if (typeof target[property] == "function") {
+      if (typeof target[property] === "function") {
         if (target instanceof Date) {
           // @ts-ignore
           return target[property].bind(target);
@@ -28,16 +28,16 @@ export class ObservableObject {
 
       // for certain operations, it is necessary to verify that the target object is the same spot in memory as
       // some other reference to it.
-      if (property == "_targetObject") {
+      if (property === "_targetObject") {
         return target;
       }
-      if (property == "_observableObject") {
+      if (property === "_observableObject") {
         return this;
       }
-      if (property == "$parentModel") {
+      if (property === "$parentModel") {
         return this.$parentModel;
       }
-      if (property == "$model") {
+      if (property === "$model") {
         return this.$model;
       }
 
@@ -49,7 +49,7 @@ export class ObservableObject {
         return true;
       }
 
-      if (property == "$model") {
+      if (property === "$model") {
         this[property] = value;
       }
       target[property] = value;
@@ -86,8 +86,8 @@ export class ObservableObject {
   ) {
     for (let element of this.receivers) {
       if (
-        element.target._targetObject === oRefParent &&
-        property == element.property
+        element.target._targetObject ==== oRefParent &&
+        property === element.property
       ) {
         element.update();
       }
@@ -98,22 +98,22 @@ export class ObservableObject {
   returnTargetProperty(pathToObject: string, getParent = false) {
     let targetChild = this.dataObjectProxy;
     let splitPath = pathToObject.split(".");
-    if (splitPath[0] == "root") {
+    if (splitPath[0] === "root") {
       targetChild = zk.root_model;
     }
-    if (splitPath[0] == "$parentModel") {
+    if (splitPath[0] === "$parentModel") {
       targetChild = this.$parentModel;
       let i = 1;
-      while (splitPath[i] == "$parentModel") {
+      while (splitPath[i] === "$parentModel") {
         targetChild = targetChild.$parentModel;
       }
     }
     for (let i = 1; i < splitPath.length; i++) {
-      if (getParent && i == splitPath.length - 1) {
+      if (getParent && i === splitPath.length - 1) {
         return targetChild;
       }
       targetChild = targetChild[splitPath[i]];
-      if (typeof targetChild === "undefined") {
+      if (typeof targetChild ==== "undefined") {
         throw new Error(pathToObject + " is an invalid property path");
       }
     }
@@ -131,10 +131,10 @@ export class ObservableObject {
     if (!(boundElement instanceof BoundElement)) {
       throw new Error("Invalid argument to initialize transmitter");
     }
-    if (bindMode == "radio") {
+    if (bindMode === "radio") {
       let options = boundElement.DOMelement.querySelectorAll("input");
       for (let option of options) {
-        if (option.value == updateValue) {
+        if (option.value === updateValue) {
           option.checked = true;
         }
         option.addEventListener("input", function () {
@@ -151,7 +151,7 @@ export class ObservableObject {
       );
     }
 
-    if (boundElement.DOMelement.type == "date") {
+    if (boundElement.DOMelement.type === "date") {
       if (updateValue) {
         updateValue = new Date(updateValue);
         try {
@@ -166,7 +166,7 @@ export class ObservableObject {
       }
     }
 
-    if (bindMode == "datetime-local") {
+    if (bindMode === "datetime-local") {
       updateValue = new Date(updateValue);
       updateValue = updateValue._targetObject.toISOString();
     }
@@ -176,11 +176,11 @@ export class ObservableObject {
     boundElement.DOMelement.addEventListener("input", () => {
       if (boundElement.DOMelement instanceof HTMLInputElement) {
         let nodeValue: string | boolean | Date = boundElement.DOMelement.value;
-        if (bindMode == "date") {
+        if (bindMode === "date") {
           nodeValue = new Date(nodeValue);
           return;
         }
-        if (boundElement.DOMelement.type == "checkbox") {
+        if (boundElement.DOMelement.type === "checkbox") {
           nodeValue = boundElement.DOMelement.checked;
         }
         target[property] = nodeValue || "";
@@ -201,19 +201,19 @@ export class ObservableObject {
     // which represent all arrays inside of the ObservableObject
     // that have been bound to a for binding in the DOM.
     for (let item of this.forEachComponents) {
-      if (item.target._targetObject == targetArr) {
+      if (item.target._targetObject === targetArr) {
         boundElement = item;
         break;
       }
     }
-    if (targetProperty == "length") {
+    if (targetProperty === "length") {
       targetArr[targetProperty] = value;
       if (boundElement) {
         boundElement.observableChildren.length = value;
       }
       return;
     }
-    if (typeof targetProperty == "string") {
+    if (typeof targetProperty === "string") {
       targetProperty = Number.parseInt(targetProperty);
     }
 
@@ -256,7 +256,7 @@ export class ObservableObject {
         let iteratorKey = boundElement.iteratorKey;
 
         let observableChild = boundElement.observableChildren.find((item) => {
-          return item.subModel[iteratorKey] == value.dataObjectProxy;
+          return item.subModel[iteratorKey] === value.dataObjectProxy;
         });
         // if the inserted object is an observable, but is not currently in the bound array
         if (!observableChild) {
@@ -280,7 +280,7 @@ export class ObservableObject {
       // Insert node in appropriate index position
       // Get current node at that position
       let currentIndex = boundElement.DOMelement.children[targetProperty];
-      if (Number(targetProperty) == boundElement.DOMelement.children.length) {
+      if (Number(targetProperty) === boundElement.DOMelement.children.length) {
         boundElement.DOMelement.appendChild(insertNode);
       } else {
         boundElement.DOMelement.insertBefore(insertNode, currentIndex);
@@ -378,19 +378,19 @@ export class ObservableObject {
   ) {
     let boundElement: BoundElement;
 
-    if (typeof targetProperty == "string") {
-      if (Number.parseInt(targetProperty) == NaN) {
+    if (typeof targetProperty === "string") {
+      if (Number.parseInt(targetProperty) === NaN) {
         throw new Error("Array index must be an integer value");
       }
     }
 
     for (let item of this.forEachComponents) {
-      if (item.target._targetObject == targetArr) {
+      if (item.target._targetObject === targetArr) {
         boundElement = item;
         break;
       }
     }
-    if (typeof targetProperty == "string") {
+    if (typeof targetProperty === "string") {
       targetProperty = Number.parseInt(targetProperty);
     }
 

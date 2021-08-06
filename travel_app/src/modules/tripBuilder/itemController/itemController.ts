@@ -122,7 +122,7 @@ export abstract class ItemController {
     this.onListChange();
   }
   async deleteItem(target) {
-    let index = this.itemList.findIndex((x) => x.id == target.id);
+    let index = this.itemList.findIndex((x) => x.id === target.id);
     try {
       let status = await target.delete();
 
