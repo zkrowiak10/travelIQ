@@ -8,12 +8,12 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
-
 auth = Blueprint('auth', __name__, url_prefix='/auth')
+
 
 @auth.route('/register', methods=('POST',))
 def register():
-   
+
     username = request.form['username']
     email = request.form['email']
     password = request.form['password']
@@ -21,19 +21,20 @@ def register():
     if password != request.form.get('confirmPassword'):
         flash('Make sure passwords match')
         return redirect(url_for('home.welcome'))
-    
+
     try:
-        status = models.User.register(username,email,password)
+        status = models.User.register(username, email, password)
         if not status:
             flash('Username {} created'.format(username))
         return redirect(url_for('home.welcome'))
-        
+
     except Exception as e:
         flash('something went wrong', str(e))
         logging.error("Exception in creating new user", e)
         return redirect(url_for('home.welcome'))
 
-@auth.route('/login', methods=('POST','GET'))
+
+@auth.route('/login', methods=('POST', 'GET'))
 def login():
     try:
         username = request.form['Lusername']
@@ -45,16 +46,16 @@ def login():
 
     except Exception as e:
         logging.debug("there was an exception: " + str(e))
-        
-        flash("Invalid Username or password") 
-        return redirect(url_for('home.welcome'))
 
+        flash("Invalid Username or password")
+        return redirect(url_for('home.welcome'))
 
 
 @auth.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('home.welcome'))
+
 
 def login_required(view):
     @functools.wraps(view)
