@@ -1,0 +1,3 @@
+export FLASK_APP=travel_app
+export FLASK_ENV=development
+export POSTGRES_ENV_POSTGRES_PASSWORD=docker

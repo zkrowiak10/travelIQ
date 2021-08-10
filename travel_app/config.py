@@ -16,8 +16,8 @@ class Config():
 class Development(Config):
     db_user = "postgres"
     db_password = os.getenv('POSTGRES_ENV_POSTGRES_PASSWORD')
-    DATABASE = "postgres"
-    dbhost = 'postgres:5432'
+    DATABASE = "dev_db"
+    dbhost = 'localhost:5432'
     SECRET_KEY = 'dev'
     DEBUG = True
 

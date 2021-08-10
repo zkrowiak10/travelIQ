@@ -1,430 +1,396 @@
-h1, h3, h4, p, a {
-    font-family: 'Anton', sans-serif;
-    
+h1,
+h3,
+h4,
+p,
+a {
+  font-family: "Anton", sans-serif;
 }
 
 a {
-    color: black;
-    text-decoration: none;
+  color: black;
+  text-decoration: none;
 }
 
 body {
-    display: flex;
-    flex-direction: column;
-}
-.main {
-
+  display: flex;
+  flex-direction: column;
 }
 
 .slideOut {
-    display: flex;
-    flex-direction: column;
-    margin-top: 5px;
-    background-color: F2F2F2;
-    align-items: center;
-
+  display: flex;
+  flex-direction: column;
+  margin-top: 5px;
+  background-color: #f2f2f2;
+  align-items: center;
 }
-.slideOut > a > button{
-    flex: 3;
-    margin-bottom: 2px;
-    background-color: F2F2F2;
-    font-size: medium;
-    font-weight: bolder;
-    width:200px;
+.slideOut > a > button {
+  flex: 3;
+  margin-bottom: 2px;
+  background-color: #f2f2f2;
+  font-size: medium;
+  font-weight: bolder;
+  width: 200px;
 }
 .destinationTop {
-    display:flex;
-    justify-content: flex-start;
-    align-items: center;
-    height:35px
-  }
-  
-  .destinationTop > h1 {
-    flex:3;
-    padding:0px;
-  
-  }
-  .destinationTop > p {
-    margin-right:5%;
-  }
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 35px;
+}
+
+.destinationTop > h1 {
+  flex: 3;
+  padding: 0px;
+}
+.destinationTop > p {
+  margin-right: 5%;
+}
 .slideOut > a {
-    flex: 3;
-    margin-bottom: 2px;
-  
+  flex: 3;
+  margin-bottom: 2px;
 }
 .flex-header {
-    flex: 1
+  flex: 1;
 }
 .nav-link {
-    
- 
 }
 .nav-bar {
-    list-style-type: none;
-    margin-bottom: 0px;
-    padding: 0;
-    overflow: hidden;
-    width: 100vw;
-    margin-top: 0px;
-    border-bottom: 2px solid lightgray;
-    
+  list-style-type: none;
+  margin-bottom: 0px;
+  padding: 0;
+  overflow: hidden;
+  width: 100vw;
+  margin-top: 0px;
+  border-bottom: 2px solid lightgray;
 }
 #iconlink {
-    margin: 0px 0px 0px 0px;
-
+  margin: 0px 0px 0px 0px;
 }
 .dropdown-divider {
-    height: 0;
-    margin: .5rem 0;
-    overflow: hidden;
-    border-top: 1px solid #e9ecef;
+  height: 0;
+  margin: 0.5rem 0;
+  overflow: hidden;
+  border-top: 1px solid #e9ecef;
 }
-.nav-bar li:not(.nav-right){
-    display: inline;
-    float: left;
-    text-align:center;
-    margin: 20px 10px 0px 10px;
-    font-size: larger;
-    
+.nav-bar li:not(.nav-right) {
+  display: inline;
+  float: left;
+  text-align: center;
+  margin: 20px 10px 0px 10px;
+  font-size: larger;
 }
 .sideBar-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding:0px;
-    margin: 0px
-    
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 0px;
+  margin: 0px;
 }
 
 .destinationCard {
-    display: flex;
-    box-shadow: 3px 3px 3px grey;
-    margin: 5px 5px 5px 5px;
-    background-color: #DAD8D8;
-    padding: 10px;
-    border-style: solid;
-    border-width: 1px;
-    flex-direction: column;
+  display: flex;
+  box-shadow: 3px 3px 3px grey;
+  margin: 5px 5px 5px 5px;
+  background-color: #dad8d8;
+  padding: 10px;
+  border-style: solid;
+  border-width: 1px;
+  flex-direction: column;
 }
 
-.nav-bar li:hover:not(.active){
-    background-color: #ddd;
+.nav-bar li:hover:not(.active) {
+  background-color: #ddd;
 }
 .dropdown-menu {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    padding: 12px 16px;
-    z-index: -1;
-    text-align: start;
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  padding: 12px 16px;
+  z-index: -1;
+  text-align: start;
 }
 .dropdown-menu a {
-    margin: 3px 0 3px
+  margin: 3px 0 3px;
 }
-.dropdown-menu a:hover:not(.active){
-    background-color: #ddd;
+.dropdown-menu a:hover:not(.active) {
+  background-color: #ddd;
 }
-
 
 .dropdown-toggle:hover .dropdown-menu {
-    display: block;
-    z-index: 1; 
+  display: block;
+  z-index: 1;
 }
 .dropdown-item {
-    margin-top: 3px;
-    margin-bottom: 3px;
-    padding: 2px;
-    border:blue
+  margin-top: 3px;
+  margin-bottom: 3px;
+  padding: 2px;
+  border: blue;
 }
 .dropdown-toggle > p {
-    margin:auto
-  }
+  margin: auto;
+}
 
-
-.sideBar-header{
-    border-style: solid;
-    border-width: 2px;
-    font-size: xx-large;
-    padding: 0px 0px 0px 10px;
-    background-color: #B4C6E7;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    margin: 0px
-    
-    
-    
+.sideBar-header {
+  border-style: solid;
+  border-width: 2px;
+  font-size: xx-large;
+  padding: 0px 0px 0px 10px;
+  background-color: #b4c6e7;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  margin: 0px;
 }
 .mainArea {
-    display:flex
+  display: flex;
 }
 .tooltip {
-    position: relative;
-    
-    
-  }
+  position: relative;
+}
 .tooltip .tooltiptext {
-    visibility: hidden;
-    width: 220px;
-    background-color: black;
-    color: #fff;
-    text-align: center;
-    padding: 5px 0;
-    border-radius: 6px;
-    font-size: medium;
-    font-style: normal;
-    font-weight: lighter;
-    top:100%;
-    /* Position the tooltip text - see examples below! */
-    position: absolute;
-    z-index: 1;
-  }
-  
-  /* Show the tooltip text when you mouse over the tooltip container */
-  .tooltip:hover .tooltiptext {
-    visibility: visible;
-  }
+  visibility: hidden;
+  width: 220px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  font-size: medium;
+  font-style: normal;
+  font-weight: lighter;
+  top: 100%;
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
 /* right now reffering to logout link */
-.nav-right{
-    margin-left: auto;
-    display: inline;
-    margin: 20px 10px 0px 10px;
-    float: right;
-    margin-right: 30px;
-    color: black;
-    font-size: larger;
+.nav-right {
+  margin-left: auto;
+  display: inline;
+  margin: 20px 10px 0px 10px;
+  float: right;
+  margin-right: 30px;
+  color: black;
+  font-size: larger;
 }
 
 .nav-left {
-    display: inline
+  display: inline;
 }
 
 #tabContent {
-    padding: 30px
+  padding: 30px;
 }
 .form {
-    margin: 20% ;
-    padding: 10%;
+  margin: 20%;
+  padding: 10%;
 
-    border-color: #0675bf;
-    box-shadow: 2px 2px 20px #c6c6c6;
-    background-color: #ebf7ff
+  border-color: #0675bf;
+  box-shadow: 2px 2px 20px #c6c6c6;
+  background-color: #ebf7ff;
 }
 .welcome-story {
-    margin: 10% 3% 0% 10%;
-    
+  margin: 10% 3% 0% 10%;
 }
 
 .welcome-picture {
-    width: 110%;
-
+  width: 110%;
 }
 
 .centered-text {
-    text-align: center;
-   
-} 
+  text-align: center;
+}
 
 .headline {
-    margin-top: 30px
+  margin-top: 30px;
 }
 
 .sideBar {
-    background-color: #e8f8ff;
-    height: 100vh;
-    float: left;
-    width: 20%;
-    margin-left: 0;
-    border-color: darkgray;
-    padding-right: 5px;
-    border-right: 3px solid lightgray
-    
-
-
+  background-color: #e8f8ff;
+  height: 100vh;
+  float: left;
+  width: 20%;
+  margin-left: 0;
+  border-color: darkgray;
+  padding-right: 5px;
+  border-right: 3px solid lightgray;
 }
 .contentArea {
-    float:left
+  float: left;
 }
 .popup {
-    display: flex;
-    position: fixed;
-    /* Stay in place */
-    z-index: 1;
-    /* Sit on top */
-    /* Location of the box */
-    left: 0;
-    top: 0;
-    width: 100%;
-    /* Full width */
-    height: 100%;
-    /* Full height */
-    overflow: auto;
-    /* Enable scroll if needed */
-    background-color: rgb(0,0,0);
-    /* Fallback color */
-    background-color: rgba(0,0,0,0.4);
-    align-items: center;
-    justify-content: space-around;
-    align-content: center;
+  display: flex;
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Sit on top */
+  /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0);
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4);
+  align-items: center;
+  justify-content: space-around;
+  align-content: center;
 }
 .modal-content {
-    display: flex;
-    flex-direction: column;
-    align-content: space-between;
-  }
-  .modal-dialog {
-      background-color: white;
-      max-width: 40%;
-      padding: 15px;
-      border: solid 2px black;
-      border-radius: 5px;
-      
-  }
-  .modal-header {
-    display: flex;
-    flex-direction: row;
-    align-content: center;
-    justify-content: center;
-    align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  align-content: space-between;
+}
+.modal-dialog {
+  background-color: white;
+  max-width: 40%;
+  padding: 15px;
+  border: solid 2px black;
+  border-radius: 5px;
+}
+.modal-header {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  justify-content: center;
+  align-items: flex-start;
+}
 
-  }
-  
-  .modal-body {
-    display:flex;
-    flex:2;
-    flex-direction: column;
-    flex-wrap: wrap;
-    align-content: space-between;
-    align-items: stretch;
-  }
-  .modal-body > .inputGroup {
-    margin:5px 5px 5px 5px;
-    flex:1
-  }
-  .modal-body > .inputGroup >  input {
-    float:right;
-    margin-left:10px;
-    margin-top:5px
-  }
- 
-  .modal-footer {
-    display:flex;
-    flex:1;
-    align-content: space-around;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: baseline;
-    margin-top:15px
-    
-  }
-  .modal-footer > button {
-    margin: 0px 5px 0px 5px
-  }
-  .btn {
-    background-color: white;
-    border-style: solid;
-    border-width:  1px;
-    border-color: #46A133;
-    border-radius:4px;
-    padding:5px;
-  }
-  .btn:hover {
-    background-color:#EEEEEE;
-    
-  }
-  .btn:click {
-    border:inset 2px;
-    
-  }
-  .hotelBox {
-    border:2px solid  green;
-    width:100%;
-    flex-direction: row;
-    justify-content: flex-start;
-    margin-bottom: 5px;
-    display: flex;
-    align-items: center;
+.modal-body {
+  display: flex;
+  flex: 2;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: space-between;
+  align-items: stretch;
+}
+.modal-body > .inputGroup {
+  margin: 5px 5px 5px 5px;
+  flex: 1;
+}
+.modal-body > .inputGroup > input {
+  float: right;
+  margin-left: 10px;
+  margin-top: 5px;
+}
 
-  }
-  .hotelBox > button {
-    margin-left: auto;
-    margin-right: 1%;
-  }
-  .hotelBox > * {
-      display: inline;
-      margin-left: 10px;
-  }
-  .hotelList {
-      list-style-type: none;
-
-  }
-  .createButton {
-      float: right;
-    
-  }
-  .detailsBox {
-    margin-top:5%;
-    background-color: #E6E9EB;
-    border: 2px solid black;
-    border-radius: 4px;
-    width:85%;
-    height:85%;
-    padding-left:3%
-
-  }
-  #hotelDetailView {
-    flex:2;
-  }
-  .corner-buttons {
-    float: right;
-    margin: 1% 1% 1% 1%;
-  }
-  .textGroupLabel {
-      margin-bottom: 1%;
-  }
-  .textGroupProperty {
-      margin-top: 1%;
-  }
-  .restaurantBox > p {
-      display: inline;
-      
-  }
-  .restaurantBox {
-    width: 60%;
-    border: solid 1px #0F6EFD;
-    border-radius: 5px;
-    align-content: center;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 5px;
-    margin-left: 10%;
-    margin-bottom: 5px;
-    padding:10px;
+.modal-footer {
+  display: flex;
+  flex: 1;
+  align-content: space-around;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin-top: 15px;
+}
+.modal-footer > button {
+  margin: 0px 5px 0px 5px;
+}
+.btn {
+  background-color: white;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #46a133;
+  border-radius: 4px;
+  padding: 5px;
+}
+.btn:hover {
+  background-color: #eeeeee;
+}
+.btn:click {
+  border: inset 2px;
+}
+.hotelBox {
+  border: 2px solid green;
+  width: 100%;
+  flex-direction: row;
+  justify-content: flex-start;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+.hotelBox > button {
+  margin-left: auto;
+  margin-right: 1%;
+}
+.hotelBox > * {
+  display: inline;
+  margin-left: 10px;
+}
+.hotelList {
+  list-style-type: none;
+}
+.createButton {
+  float: right;
+}
+.detailsBox {
+  margin-top: 5%;
+  background-color: #e6e9eb;
+  border: 2px solid black;
+  border-radius: 4px;
+  width: 85%;
+  height: 85%;
+  padding-left: 3%;
+}
+#hotelDetailView {
+  flex: 2;
+}
+.corner-buttons {
+  float: right;
+  margin: 1% 1% 1% 1%;
+}
+.textGroupLabel {
+  margin-bottom: 1%;
+}
+.textGroupProperty {
+  margin-top: 1%;
+}
+.restaurantBox > p {
+  display: inline;
+}
+.restaurantBox {
+  width: 60%;
+  border: solid 1px #0f6efd;
+  border-radius: 5px;
+  align-content: center;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 5px;
+  margin-left: 10%;
+  margin-bottom: 5px;
+  padding: 10px;
 }
 .restaurantBox > button {
-    float: right;
+  float: right;
 }
 .restaurantList > li {
-    list-style-type: none;
-   
-    
+  list-style-type: none;
 }
 
 .headerDiv > h4 {
-    display: inline;   
+  display: inline;
 }
 .headerDiv {
-    border-bottom: solid 3px #4B77C5;
-    width: 100%;
-    margin-top:1%;
-    margin-bottom:3%;
+  border-bottom: solid 3px #4b77c5;
+  width: 100%;
+  margin-top: 1%;
+  margin-bottom: 3%;
 }
 .mealTypeDiv {
-    border-bottom: solid 1px #4B77C5;
-    margin-left: 5%;
-    margin-bottom:4%;
-    margin-top: 3%;
+  border-bottom: solid 1px #4b77c5;
+  margin-left: 5%;
+  margin-bottom: 4%;
+  margin-top: 3%;
 }
 .mealTypeDiv > h5 {
-    display: inline;
+  display: inline;
 }

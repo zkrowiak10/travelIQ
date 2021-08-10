@@ -1,10 +1,11 @@
 <!DOCTYPE html style="heigh:100%">
+
 <head>
   <link rel="icon" href="{{url_for('static', filename='Assets/icon.png')}}" />
   <script>
     var loggedIn = false;
     {% if g.user %}
-        loggedIn=true;
+    loggedIn = true;
     {% endif %}
   </script>
 
@@ -24,9 +25,7 @@
 <header>
   <nav id="nav-bar" class="navbar nav-empty navbar-expand-sm">
     <a href='{{url_for("iq.iqPage")}}'
-      ><img
-        src="{{url_for('static', filename='Assets/Logo_Text_200.png')}}"
-        style="width: 150px"
+      ><img src="{{url_for('static', filename='Assets/Logo_Text_200.png')}}"
     /></a>
 
     {%block nav %} {% endblock %}
@@ -38,6 +37,7 @@
   {% endfor %}
 </header>
 <title> {% block title %} {% endblock %}</title>
+
 <body class="h-100" style="height: 100%">
   {% block content %}{% endblock %}
 </body>
