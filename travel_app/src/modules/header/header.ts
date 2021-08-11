@@ -1,14 +1,14 @@
-import { api } from "../utils/api.js";
-import * as utils from "../utils/utilFunctions.js";
-import { zk } from "../../lib/zk.js";
+import { api } from "../utils/api";
+import * as utils from "../utils/utilFunctions";
+import { zk } from "../../lib/zk";
+import template from "./navBar-template.html";
+import { Trip } from "../trips/trips";
 
 export class Header {
   trips;
   messages;
   endPoint = "/ajax/trips";
   insertNode = "#header";
-  workdir = "/static/modules/header";
-  template = "navBar-template.html";
   html;
   currentTrip;
   g;
@@ -55,11 +55,7 @@ export class Header {
     }
   }
   async init() {
-    var template = await fetch(`${this.workdir}/${this.template}`, {
-      headers: { "Content-Type": "text/html" },
-    });
-    var text = await template.text();
-    document.querySelector(this.insertNode).innerHTML = text;
+    document.querySelector(this.insertNode).innerHTML = template;
     this.html = document.querySelector(this.insertNode);
     zk.initiateModel(this, this.html);
 
@@ -67,8 +63,13 @@ export class Header {
   }
   async updateTripName() {
     await this.get();
-    let trip = this.trips.find((trip) => trip.id === utils.g.trip.id);
-    utils.g.trip.name = trip.name;
+    let trip: Trip = this.trips.find(
+      // must use non-strict equivalence
+      (trip: Trip) => trip.id == utils.g.trip.id
+    );
+    if (typeof trip != "undefined") {
+      utils.g.trip.name = trip.name;
+    }
   }
 }
 

@@ -1,41 +1,37 @@
-import { zk } from "../../../lib/zk.js";
-var workdir = "/static/modules/tripBuilder/restaurants";
+import { zk } from "../../../lib/zk";
+import { fieldsArray, ItemController } from "../itemController/itemController";
+import { Restaurant } from "./restaurant";
+import template from "./restaurantDetails-template.html";
 
 export class DetailsComponent {
-  html;
-  fields;
-  title;
-  target;
-  templateFile;
-  update;
-  targetElement;
-  controller;
+  html: HTMLElement;
+  fields: fieldsArray;
+  title: string;
+  target: Restaurant | {};
+  template: string = template;
+  update: boolean;
+  targetElement: string;
+  controller: ItemController;
   constructor(
-    controller,
-    fields,
-    title,
-    target,
-    targetElement,
-    templateFile,
-    update
+    controller: ItemController,
+    fields: { type: string; key: string; pretty: string }[],
+    title: string,
+    target: Restaurant,
+    targetElement: string,
+    update: boolean
   ) {
     this.fields = zk.makeObservable(fields);
     this.title = title;
     this.html;
     this.target = target ? target : {};
-    this.templateFile = templateFile;
     this.update = zk.makeObservable(update);
     this.targetElement = targetElement;
     this.controller = controller;
   }
 
   async render() {
-    var template = await fetch(`${workdir}/${this.templateFile}`, {
-      headers: { "Content-Type": "text/html" },
-    });
-    var text = await template.text();
     this.html = document.querySelector(this.targetElement);
-    this.html.innerHTML = text;
+    this.html.innerHTML = this.template;
 
     zk.initiateModel(this, this.html);
   }
@@ -58,7 +54,7 @@ export class DetailsComponent {
         this.target[key] = new Date(this.target[key]);
       }
     }
-    if (this.update) {
+    if (this.update && this.target instanceof Restaurant) {
       try {
         this.target.update();
       } catch (err) {

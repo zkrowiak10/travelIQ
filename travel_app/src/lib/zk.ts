@@ -1,6 +1,6 @@
 export { BoundElement, utils, zk };
 export type { proxyObservable, SubModel };
-import { ObservableObject, makeObservable } from "./ObservableObject.js";
+import { ObservableObject, makeObservable } from "./ObservableObject";
 /*
 Master list of binding syntax:
 
@@ -103,7 +103,7 @@ export function ParseDOMforObservables(model: any, root: HTMLElement) {
 
       // A little messy, but 'for' binders receive an argument of 'indexKey of iterable' where
       // iterable is the typical objectpaty.
-      if (bindMode ==== "for") {
+      if (bindMode === "for") {
         parentObject = objectPath.split("of")[1].trim().split(".")[0];
       }
 

@@ -1,19 +1,10 @@
-version: "3.9"  # optional since v1.27.0
+version: "3.9" # optional since v1.27.0
 services:
-  web:
-    build: .
-    ports:
-      - "5000:5000"
-    volumes:
-      - .:/code
-    environment: 
-      - POSTGRES_ENV_POSTGRES_PASSWORD=docker
   postgres:
     image: postgres
-    volumes: 
+    volumes:
       - ./instance/postgres-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     environment:
       - POSTGRES_PASSWORD=docker
-      

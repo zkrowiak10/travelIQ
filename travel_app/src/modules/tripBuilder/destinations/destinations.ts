@@ -1,8 +1,10 @@
-import { ItemController, Item } from "../itemController/itemController.js";
-import * as hotels from "../hotels/hotels.js";
-import * as utils from "../../utils/utilFunctions.js";
-import * as restaurants from "../restaurants/restaurant.js";
-import { api } from "../../utils/api.js";
+import { ItemController, Item } from "../itemController/itemController";
+import * as hotels from "../hotels/hotels";
+import * as utils from "../../utils/utilFunctions";
+import * as restaurants from "../restaurants/restaurant";
+import { api } from "../../utils/api";
+import template from "./destinations-template.html";
+import styles from "./destination.module.css";
 
 export class Destination extends Item {
   fields = [
@@ -52,7 +54,7 @@ export class DestinationsController extends ItemController {
   endPoint = "/ajax/trip/" + utils.g.trip.id + "/destinations";
   containerId = "#destinations";
   title = "Destinations";
-  template = "destinations-template.html";
+  template = template;
   workdir = "/static/modules/tripBuilder/destinations";
   insertNode = "#left-sidebar";
   itemClass = Destination;
@@ -60,7 +62,7 @@ export class DestinationsController extends ItemController {
     super();
   }
   findDestinationByID(destID) {
-    return this.itemList.find((dest) => dest.id === destID);
+    return this.itemList.find((dest) => dest.id == destID);
   }
 }
 

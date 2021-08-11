@@ -4,7 +4,7 @@ import {
   utils,
   zk,
   ParseDOMforObservables,
-} from "./zk.js";
+} from "./zk";
 import type { SubModel } from "./zk";
 
 export class ObservableObject {
@@ -86,7 +86,7 @@ export class ObservableObject {
   ) {
     for (let element of this.receivers) {
       if (
-        element.target._targetObject ==== oRefParent &&
+        element.target._targetObject === oRefParent &&
         property === element.property
       ) {
         element.update();
@@ -113,7 +113,7 @@ export class ObservableObject {
         return targetChild;
       }
       targetChild = targetChild[splitPath[i]];
-      if (typeof targetChild ==== "undefined") {
+      if (typeof targetChild === "undefined") {
         throw new Error(pathToObject + " is an invalid property path");
       }
     }

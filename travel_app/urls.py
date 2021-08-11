@@ -1,8 +1,11 @@
+import os
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, send_from_directory
 )
 import logging
 import functools
+
+from werkzeug.utils import send_file
 from travel_app import models, auth
 import logging
 
@@ -20,12 +23,12 @@ def welcome():
 iq = Blueprint('iq', __name__, url_prefix='/app')
 
 
-@iq.route('/', methods=('GET', 'POST'))
+@iq.route('/', methods=('GET',))
 @auth.login_required
 def iqPage():
     if request.method == 'GET':
 
-        return render_template('app/iqApp.html')
+        return send_from_directory('./dist', 'app.html')
 
 
 @iq.route('/createTrip', methods=('POST', 'GET'))

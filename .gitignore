@@ -14,3 +14,6 @@ instance/*
 postgres-data/*
 .env
 tests/__pycache__
+node_modules
+travel_app/src/node_modules
+travel_app/dist

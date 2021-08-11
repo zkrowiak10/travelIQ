@@ -1,42 +1,38 @@
-import { zk } from "../../../lib/zk.js";
+import { zk } from "../../../lib/zk";
+import { fieldsArray, ItemController } from "../itemController/itemController";
+import template from "./hotelDetails-template.html";
+import { Hotel } from "./hotels";
 var workdir = "/static/modules/tripBuilder/hotels";
 
 export class DetailsComponent {
-  html;
-  fields;
-  title;
-  target?;
-  templateFile;
-  update;
-  targetElement;
-  controller;
+  html: HTMLElement;
+  fields: fieldsArray;
+  title: string;
+  target?: Hotel | {};
+  template: string = template;
+  update: boolean;
+  targetElement: string;
+  controller: { deleteItem: (arg0: any) => void };
   constructor(
-    controller,
-    fields,
-    title,
-    target,
-    targetElement,
-    templateFile,
-    update
+    controller: ItemController,
+    fields: { type: string; key: string; pretty: string }[],
+    title: string,
+    target: any,
+    targetElement: string,
+    update: boolean
   ) {
     this.fields = zk.makeObservable(fields);
     this.title = title;
     this.html;
     this.target = target ? target : {};
-    this.templateFile = templateFile;
     this.update = zk.makeObservable(update);
     this.targetElement = targetElement;
     this.controller = controller;
   }
 
   async render() {
-    var template = await fetch(`${workdir}/${this.templateFile}`, {
-      headers: { "Content-Type": "text/html" },
-    });
-    var text = await template.text();
     this.html = document.querySelector(this.targetElement);
-    this.html.innerHTML = text;
-
+    this.html.innerHTML = this.template;
     zk.initiateModel(this, this.html);
   }
 
@@ -57,7 +53,7 @@ export class DetailsComponent {
         this.target[key] = new Date(this.target[key]);
       }
     }
-    if (this.update) {
+    if (this.update && this.target instanceof Hotel) {
       try {
         this.target.update();
       } catch (err) {

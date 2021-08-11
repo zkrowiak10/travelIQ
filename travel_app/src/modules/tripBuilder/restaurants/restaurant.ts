@@ -1,10 +1,10 @@
-import { api } from "../../utils/api.js";
-import { Destination } from "../destinations/destinations.js";
-import { Item, ItemController } from "../itemController/itemController.js";
-import { DetailsComponent } from "./restaurantDetails.js";
-import { RestaurantModal } from "./restaurantModal.js";
-
-import { zk } from "../../../lib/zk.js";
+import { api } from "../../utils/api";
+import { Destination } from "../destinations/destinations";
+import { Item, ItemController } from "../itemController/itemController";
+import { DetailsComponent } from "./restaurantDetails";
+import { RestaurantModal } from "./restaurantModal";
+import { zk } from "../../../lib/zk";
+import template from "./restaurant-template.html";
 // constructor function for a restaurant object
 
 var workdir = "/static/modules/tripBuilder/restaurants";
@@ -53,7 +53,7 @@ export class RestaurantsController extends ItemController {
   title = "Create Restaurants";
   containerId = "#restaurants";
   insertNode = "#tabContent";
-  template = "restaurant-template.html";
+  template = template;
   destination: Destination;
   endPoint = getEndpoint;
   workdir = workdir;
@@ -114,7 +114,6 @@ export class RestaurantsController extends ItemController {
       detailTitle,
       Restaurant,
       this.detailsTargetElement,
-      "restaurantDetails-template.html",
       false
     );
     detail.render();

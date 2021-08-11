@@ -1,8 +1,10 @@
-import * as DestinationsController from "./modules/tripBuilder/destinations/destinations.js";
-import { header } from "./modules/header/header.js";
-import * as utils from "./modules/utils/utilFunctions.js";
-import { TripsController } from "./modules/trips/trips.js";
-import { zk } from "./lib/zk.js";
+import * as DestinationsController from "./modules/tripBuilder/destinations/destinations";
+import { header } from "./modules/header/header";
+import * as utils from "./modules/utils/utilFunctions";
+import { Trip, TripsController } from "./modules/trips/trips";
+import { zk } from "./lib/zk";
+import "./styles.css";
+import { ItemController } from "./modules/tripBuilder/itemController/itemController";
 
 header.init();
 // @ts-ignore
@@ -24,8 +26,8 @@ window.addEventListener("hashchange", function () {
 });
 
 export class HashSwitcher {
-  controller;
-  trip;
+  controller: ItemController;
+  trip: Trip;
 
   switch(hashValue) {
     header.get();

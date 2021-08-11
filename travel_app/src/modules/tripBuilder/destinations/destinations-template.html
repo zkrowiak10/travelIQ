@@ -1,0 +1,32 @@
+<nav id="destinations">
+  <div class="sideBar-header tooltip">
+    Destinations
+    <span class="tooltiptext">All other activities (hotels, restaurants, etc...) are linked to a
+      destination so you can organize your trip easily</span>
+    <i style="float: right; margin-right: 5px" class="fas fa-plus" zk-bind="on:click|createItem()"></i>
+  </div>
+  <div class="sideBar-container" zk-bind="for: item of itemList">
+    <div class="destinationCard">
+      <div class="destinationTop">
+        <span zk-bind="hidden: item.focused">
+          <i zk-bind="on: click|item.toggleFocus(item)" class="fas fa-caret-right"></i>
+        </span>
+        <span zk-bind="visible: item.focused">
+          <i zk-bind="on: click|item.toggleFocus(item)" class="fas fa-caret-down"></i>
+        </span>
+        <h1 class="inline" zk-bind="value: item.name"></h1>
+        <p><span zk-bind="value: item.days_there"></span> Days</p>
+        <button type="button" class="btn btn-primary" zk-bind="on: click|$parentModel.editItem(item)">Edit</button>
+      </div>
+
+      <div zk-bind="visible: item.focused">
+        <div class="slideOut">
+          <a zk-bind="attr: href|item.links.hotels"><button>Hotels</button></a>
+
+          <a zk-bind="attr: href|item.links.restaurants"><button>Restaurants</button></a>
+          <!-- <a zk-bind="attr: href|item.links.activities"><button>Activities</button></a> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

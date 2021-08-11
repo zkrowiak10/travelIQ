@@ -1,12 +1,15 @@
 import {
   ItemController,
   Item,
-} from "../tripBuilder/itemController/itemController.js";
-import { header } from "../header/header.js";
-import * as utils from "../utils/utilFunctions.js";
-
+} from "../tripBuilder/itemController/itemController";
+import { header } from "../header/header";
+import * as utils from "../utils/utilFunctions";
+import template from "./trips-template.html";
 export class Trip extends Item {
   endPoint = "/ajax/trip";
+  name: string;
+  start_date: Date;
+  end_date: Date;
   constructor() {
     super();
   }
@@ -18,7 +21,7 @@ export class TripsController extends ItemController {
   title = "Create Trips";
   itemClass = Trip;
   insertNode = "#tabContent";
-  template = "trips-template.html";
+  template = template;
   workdir = "/static/modules/trips";
   fields = [
     { type: "text", key: "name", pretty: "Name of Trip" }, //go back to fix date issue

@@ -1,6 +1,6 @@
-import { api } from "../../utils/api.js";
-import { Modal } from "../modal/modal.js";
-import { zk } from "../../../lib/zk.js";
+import { api } from "../../utils/api";
+import { Modal } from "../modal/modal";
+import { zk } from "../../../lib/zk";
 
 // Item and ItemController are abstract classes to store and manage collections of data
 // They also will dynamically render collections using a template file.
@@ -65,11 +65,7 @@ export abstract class ItemController {
   modalClass: typeof Modal = Modal;
   constructor() {}
   async init() {
-    var template = await fetch(`${this.workdir}/${this.template}`, {
-      headers: { "Content-Type": "text/html" },
-    });
-    var text = await template.text();
-    document.querySelector(this.insertNode).innerHTML = text;
+    document.querySelector(this.insertNode).innerHTML = this.template;
     this.html = document.querySelector(this.containerId);
     zk.initiateModel(this, this.html);
     await this.get();

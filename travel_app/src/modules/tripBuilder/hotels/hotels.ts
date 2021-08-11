@@ -1,7 +1,8 @@
-import { api } from "../../utils/api.js";
-import { Destination } from "../destinations/destinations.js";
-import { Item, ItemController } from "../itemController/itemController.js";
-import { DetailsComponent } from "./hotelDetails.js";
+import { api } from "../../utils/api";
+import { Destination } from "../destinations/destinations";
+import { Item, ItemController } from "../itemController/itemController";
+import { DetailsComponent } from "./hotelDetails";
+import template from "./hotels-template.html";
 // constructor function for a Hotel object
 
 var workdir = "/static/modules/tripBuilder/hotels";
@@ -64,7 +65,7 @@ class HotelsController extends ItemController {
   title = "Create Hotel";
   containerId = "#hotels";
   insertNode = "#tabContent";
-  template = "hotels-template.html";
+  template = template;
   workdir = workdir;
   destination: Destination;
   endPoint = getEndpoint;
@@ -81,7 +82,6 @@ class HotelsController extends ItemController {
       detailTitle,
       hotel,
       this.detailsTargetElement,
-      "hotelDetails-template.html",
       false
     );
     detail.render();

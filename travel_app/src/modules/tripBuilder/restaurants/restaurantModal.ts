@@ -1,11 +1,11 @@
-import { Modal } from "../modal/modal.js";
-import { RestaurantsController, Restaurant } from "./restaurant.js";
-import { zk } from "../../../lib/zk.js";
+import { Modal } from "../modal/modal";
+import { RestaurantsController, Restaurant } from "./restaurant";
+import { zk } from "../../../lib/zk";
 import {
   ItemController,
   fieldsArray,
   Item,
-} from "../itemController/itemController.js";
+} from "../itemController/itemController";
 export class RestaurantModal extends Modal {
   workdir = "/static/modules/tripBuilder/restaurants";
   templateFile = "restaurantModal-template.html";

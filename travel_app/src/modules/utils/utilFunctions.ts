@@ -1,5 +1,5 @@
 export { logging, formatDate };
-import { zk } from "../../lib/zk.js";
+import { zk } from "../../lib/zk";
 function logging(...args) {
   console.log(...args);
 }

@@ -1,13 +1,13 @@
 var workdir = "/static/modules/tripBuilder/modal";
-import type { fieldsArray } from "../itemController/itemController.js";
-import { ItemController, Item } from "../itemController/itemController.js";
-import { zk } from "../../../lib/zk.js";
-
+import type { fieldsArray } from "../itemController/itemController";
+import { ItemController, Item } from "../itemController/itemController";
+import { zk } from "../../../lib/zk";
+import template from "./modal-template.html";
 interface Iparent extends ItemController {}
 
 export class Modal {
   html: HTMLDivElement;
-  templateFile = "modal-template.html";
+  template = template;
   workdir = "/static/modules/tripBuilder/modal";
   target?: Item;
   constructor(
@@ -35,12 +35,8 @@ export class Modal {
   }
 
   async render() {
-    var template = await fetch(`${this.workdir}/${this.templateFile}`, {
-      headers: { "Content-Type": "text/html" },
-    });
-    var text = await template.text();
     this.html = document.createElement("div");
-    this.html.innerHTML = text;
+    this.html.innerHTML = template;
     document.querySelector(this.parent.containerId).append(this.html);
     if (!this.update) {
       document.querySelector("#deleteItem").remove();
