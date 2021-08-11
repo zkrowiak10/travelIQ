@@ -18,6 +18,13 @@ home = Blueprint('home', __name__, url_prefix='/')
 def welcome():
     return render_template("welcome.html")
 
+# Temporary static folder while I migrate to full SPA
+
+
+@home.route('/static/<path:filename>', methods=("get",))
+def staticRoute(filename):
+    return send_from_directory("./static", filename)
+
 
 # app roote blueprint. All paths beyond /app require authentication as well.
 iq = Blueprint('iq', __name__, url_prefix='/app')

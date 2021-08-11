@@ -16,17 +16,18 @@ body {
   flex-direction: column;
 }
 
+.inline {
+  display: inline;
+}
 .slideOut {
   display: flex;
   flex-direction: column;
   margin-top: 5px;
-  background-color: #f2f2f2;
   align-items: center;
 }
 .slideOut > a > button {
   flex: 3;
   margin-bottom: 2px;
-  background-color: #f2f2f2;
   font-size: medium;
   font-weight: bolder;
   width: 200px;
@@ -127,6 +128,7 @@ body {
   margin-bottom: 3px;
   padding: 2px;
   border: blue;
+  display: block;
 }
 .dropdown-toggle > p {
   margin: auto;

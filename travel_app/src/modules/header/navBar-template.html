@@ -1,20 +1,14 @@
 <nav>
   <ul class="nav-bar">
     <li id="iconlink">
-      <a href="/app"
-        ><img src="/Assets/Logo_Text_200.png" style="width: 150px"
-      /></a>
+      <a href="/app"><img src="/Assets/Logo_Text_200.png" style="width: 150px" /></a>
     </li>
     <li class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">
       <p zk-bind="hidden: g.trip.isDefined">Select Trip </p>
-      <p zk-bind="visible: g.trip.isDefined"
-        ><span zk-bind="value:g.trip.name"></span
-      ></p>
+      <p zk-bind="visible: g.trip.isDefined"><span zk-bind="value:g.trip.name"></span></p>
       <div class="dropdown-menu" aria-labelledby="navbarDropdown">
         <div zk-bind="for: trip of trips">
-          <a class="dropdown-item" zk-bind="attr: href|trip.href"
-            ><span zk-bind="value:trip.name"></span
-          ></a>
+          <a class="dropdown-item" zk-bind="attr: href|trip.href"><span zk-bind="value:trip.name"></span></a>
         </div>
 
         <div class="dropdown-divider"></div>
@@ -28,6 +22,3 @@
     </li>
   </ul>
 </nav>
-<!-- <div dat-bind="for: message of messages">
-    <div class="flash alert alert-primary" data-dismiss="alert" role="alert">{{ message }}</div>
-</div> -->
